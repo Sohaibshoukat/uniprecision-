@@ -104,3 +104,10 @@ CREATE TABLE Report (
     FOREIGN KEY (doctor_id) REFERENCES Doctor(doctor_id),
     FOREIGN KEY (order_id) REFERENCES Orders(order_id)
 );
+
+CREATE TABLE PasswordResetTokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL
+);

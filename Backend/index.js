@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const db = require("./config/db");
 
+app.use(express.json());
+
 // Import routes
 const adminRoutes = require('./routes/admin/admin');
 const doctorRoutes = require('./routes/doctor/doctor');
