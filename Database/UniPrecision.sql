@@ -1,55 +1,55 @@
--- Create User Table
-CREATE TABLE Users (
+-- User Table
+CREATE TABLE User (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255),
-    organisation VARCHAR(255),
+    organization VARCHAR(255),
     mobile_number VARCHAR(15),
     email VARCHAR(255),
     password VARCHAR(255),
-    role VARCHAR(50),
-    address_line1 VARCHAR(255),
-    address_line2 VARCHAR(255),
+    role ENUM('Radiologist', 'Doctor', 'Admin'),
+    address_line_1 VARCHAR(255),
+    address_line_2 VARCHAR(255),
     postcode VARCHAR(10),
-    city VARCHAR(100),
-    state VARCHAR(100),
-    country VARCHAR(100)
+    city VARCHAR(255),
+    state VARCHAR(255),
+    country VARCHAR(255) DEFAULT 'Malaysia'
 );
 
--- Create Doctor Table
+-- Doctor Table
 CREATE TABLE Doctor (
     doctor_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     status ENUM('Approved', 'Not Approved'),
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
--- Create Radiologist Table
+-- Radiologist Table
 CREATE TABLE Radiologist (
     radiologist_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     status ENUM('Approved', 'Not Approved'),
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
--- Create Admin Table
+-- Admin Table
 CREATE TABLE Admin (
     admin_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
--- Create Category Table
+-- Category Table
 CREATE TABLE Category (
     category_id INT AUTO_INCREMENT PRIMARY KEY,
-    price DECIMAL(10,2),
-    unit VARCHAR(20),
+    price DECIMAL(10, 2),
+    unit VARCHAR(50),
     category_name VARCHAR(255)
 );
 
--- Create Transactions Table
+-- Transactions Table
 CREATE TABLE Transactions (
     transaction_id INT AUTO_INCREMENT PRIMARY KEY,
-    transaction_record TEXT,
+    transaction_record VARCHAR(255),
     doctor_id INT,
     radiologist_id INT,
     date_generated DATE,
@@ -57,57 +57,44 @@ CREATE TABLE Transactions (
     FOREIGN KEY (radiologist_id) REFERENCES Radiologist(radiologist_id)
 );
 
--- Create Order Table
+-- Order Table
 CREATE TABLE Orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     doctor_id INT,
     transaction_id INT,
-    image_file_path TEXT,
-    total_price DECIMAL(10,2),
+    file_path VARCHAR(255),
     category_id INT,
     date_generated DATE,
     patient_name VARCHAR(255),
     dob DATE,
-    nric_passport_no VARCHAR(50),
-    clinical_summary TEXT,
-    examination_date DATE,
+    nric_passport_no VARCHAR(255),
+    clinical_summary_title VARCHAR(255),
     age INT,
-    gender ENUM('Male', 'Female', 'Other'),
-    clinical_diagnostic_center VARCHAR(255),
-    previous_study TEXT,
-    findings TEXT,
-    summary TEXT,
+    gender ENUM('Male', 'Female'),
+    previous_study VARCHAR(255),
     FOREIGN KEY (doctor_id) REFERENCES Doctor(doctor_id),
     FOREIGN KEY (transaction_id) REFERENCES Transactions(transaction_id),
     FOREIGN KEY (category_id) REFERENCES Category(category_id)
 );
 
--- Create Report Table
+-- Report Table
 CREATE TABLE Report (
-    radiologist_id INT AUTO_INCREMENT PRIMARY KEY,
-    report_id INT,
-    date_generated DATE,
+    report_id INT AUTO_INCREMENT PRIMARY KEY,
+    radiologist_id INT,
     patient_name VARCHAR(255),
     dob DATE,
-    nric_passport_no VARCHAR(50),
+    nric_passport_no VARCHAR(255),
     doctor_id INT,
-    clinical_summary TEXT,
     examination_date DATE,
     age INT,
-    gender ENUM('Male', 'Female', 'Other'),
+    gender ENUM('Male', 'Female'),
     clinical_diagnostic_center VARCHAR(255),
-    previous_study TEXT,
+    previous_study VARCHAR(255),
     findings TEXT,
     summary TEXT,
     order_id INT,
-    report_status ENUM('Pending', 'Assigned', 'Complete'),
+    report_status ENUM('Pending', 'Assign', 'Complete'),
+    FOREIGN KEY (radiologist_id) REFERENCES Radiologist(radiologist_id),
     FOREIGN KEY (doctor_id) REFERENCES Doctor(doctor_id),
     FOREIGN KEY (order_id) REFERENCES Orders(order_id)
-);
-
-CREATE TABLE PasswordResetTokens (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL,
-    token VARCHAR(255) NOT NULL,
-    expires_at DATETIME NOT NULL
 );

@@ -16,7 +16,7 @@ router.post('/forgot-password', (req, res) => {
     const { email } = req.body;
 
     // Check if the user exists in the database
-    const userQuery = 'SELECT * FROM Users WHERE email = ?';
+    const userQuery = 'SELECT * FROM User WHERE email = ?';
     db.query(userQuery, [email], (err, results) => {
         if (err) {
             console.error('Error retrieving user:', err);
@@ -67,94 +67,128 @@ router.post('/forgot-password', (req, res) => {
 });
 
 router.post('/signup', (req, res) => {
-  const { name, organisation, mobile_number, email, password, address_line1, address_line2, postcode, city, state, country, role } = req.body;
-  const status = 'Not Approved';
+    const { name, organization, mobile_number, email, password, address_line1, address_line2, postcode, city, state, country, role } = req.body;
+    const status = 'Not Approved';
 
-  // Hash the password
-  bcrypt.hash(password, 10, (err, hashedPassword) => {
-      if (err) {
-          console.error('Error hashing password:', err);
-          return res.status(500).json({ error: 'Internal Server Error' });
-      }
+    // Check if the email already exists in the database
+    const emailCheckQuery = 'SELECT COUNT(*) AS count FROM User WHERE email = ?';
+    db.query(emailCheckQuery, [email], (err, result) => {
+        if (err) {
+            console.error('Error checking email:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
 
-      // Insert data into Users table
-      const userInsertQuery = 'INSERT INTO Users (name, organisation, mobile_number, email, password, role, address_line1, address_line2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-      db.query(userInsertQuery, [name, organisation, mobile_number, email, hashedPassword, role, address_line1, address_line2, postcode, city, state, country], (err, result) => {
-          if (err) {
-              console.error('Error signing up User:', err);
-              return res.status(500).json({ error: 'Internal Server Error' });
-          }
+        const emailCount = result[0].count;
 
-          const userId = result.insertId;
+        if (emailCount > 0) {
+            return res.status(400).json({ error: 'Email already exists' });
+        }
 
-          // Insert data into Doctor table if the role is Doctor
-          if (role === 'Doctor') {
-              const doctorInsertQuery = 'INSERT INTO Doctor (user_id, status) VALUES (?, ?)';
-              db.query(doctorInsertQuery, [userId, status], (err) => {
-                  if (err) {
-                      console.error('Error signing up doctor:', err);
-                      return res.status(500).json({ error: 'Internal Server Error' });
-                  }
+        // Hash the password
+        bcrypt.hash(password, 10, (err, hashedPassword) => {
+            if (err) {
+                console.error('Error hashing password:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
 
-                  return res.status(200).json({ message: 'Doctor signed up successfully' });
-              });
-          }
-          // Insert data into Radiologist table if the role is Radiologist
-          else if (role === 'Radiologist') {
-              const radiologistInsertQuery = 'INSERT INTO Radiologist (user_id, status) VALUES (?, ?)';
-              db.query(radiologistInsertQuery, [userId, status], (err) => {
-                  if (err) {
-                      console.error('Error signing up radiologist:', err);
-                      return res.status(500).json({ error: 'Internal Server Error' });
-                  }
+            // Insert data into User table
+            const userInsertQuery = 'INSERT INTO User (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            db.query(userInsertQuery, [name, organization, mobile_number, email, hashedPassword, role, address_line1, address_line2, postcode, city, state, country], (err, result) => {
+                if (err) {
+                    console.error('Error signing up User:', err);
+                    return res.status(500).json({ error: 'Internal Server Error' });
+                }
 
-                  return res.status(200).json({ message: 'Radiologist signed up successfully' });
-              });
-          }
-          // Handle other roles here
-          else {
-              return res.status(400).json({ error: 'Invalid role' });
-          }
-      });
-  });
+                const userId = result.insertId;
+
+                // Insert data into Doctor table if the role is Doctor
+                if (role.toLowerCase() === 'doctor') {
+                    const doctorInsertQuery = 'INSERT INTO Doctor (user_id, status) VALUES (?, ?)';
+                    db.query(doctorInsertQuery, [userId, status], (err) => {
+                        if (err) {
+                            console.error('Error signing up doctor:', err);
+                            return res.status(500).json({ error: 'Internal Server Error' });
+                        }
+
+                        return res.status(200).json({ message: 'Doctor signed up successfully' });
+                    });
+                }
+                // Insert data into Radiologist table if the role is Radiologist
+                else if (role.toLowerCase() === 'radiologist') {
+                    const radiologistInsertQuery = 'INSERT INTO Radiologist (user_id, status) VALUES (?, ?)';
+                    db.query(radiologistInsertQuery, [userId, status], (err) => {
+                        if (err) {
+                            console.error('Error signing up radiologist:', err);
+                            return res.status(500).json({ error: 'Internal Server Error' });
+                        }
+
+                        return res.status(200).json({ message: 'Radiologist signed up successfully' });
+                    });
+                }
+                // Handle other roles here
+                else {
+                    return res.status(400).json({ error: 'Invalid role' });
+                }
+            });
+        });
+    });
 });
+
 
 router.post('/login', (req, res) => {
-  const { email, password } = req.body;
+    const { email, password } = req.body;
 
-  // Check if the user exists in the database
-  const userQuery = 'SELECT * FROM Users WHERE email = ?';
-  db.query(userQuery, [email], (err, results) => {
-      if (err) {
-          console.error('Error retrieving user:', err);
-          return res.status(500).json({ error: 'Internal Server Error' });
-      }
+    // Check if the user exists in the database
+    const userQuery = 'SELECT * FROM User WHERE email = ?';
+    db.query(userQuery, [email], (err, results) => {
+        if (err) {
+            console.error('Error retrieving user:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
 
-      if (results.length === 0) {
-          return res.status(401).json({ error: 'Invalid email or password' });
-      }
+        if (results.length === 0) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
 
-      const user = results[0];
+        const user = results[0];
 
-      // Compare the hashed password
-      bcrypt.compare(password, user.password, (err, isValidPassword) => {
-          if (err) {
-              console.error('Error comparing passwords:', err);
-              return res.status(500).json({ error: 'Internal Server Error' });
-          }
+        // Compare the hashed password
+        bcrypt.compare(password, user.password, (err, isValidPassword) => {
+            if (err) {
+                console.error('Error comparing passwords:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
 
-          if (!isValidPassword) {
-              return res.status(401).json({ error: 'Invalid email or password' });
-          }
+            if (!isValidPassword) {
+                return res.status(401).json({ error: 'Invalid email or password' });
+            }
 
-          // Create a JWT token
-          const token = jwt.sign({ userId: user.user_id, email: user.email, role: user.role }, 'your_secret_key', { expiresIn: '1h' });
+            // Check if the user's status is approved
+            const statusQuery = user.role.toLowerCase() === 'doctor' ? 'SELECT status FROM Doctor WHERE user_id = ?' :
+                                user.role.toLowerCase() === 'radiologist' ? 'SELECT status FROM Radiologist WHERE user_id = ?' :
+                                '';
+            db.query(statusQuery, [user.user_id], (err, statusResult) => {
+                if (err) {
+                    console.error('Error retrieving user status:', err);
+                    return res.status(500).json({ error: 'Internal Server Error' });
+                }
 
-          // Return the token and user role
-          return res.status(200).json({ token, role: user.role });
-      });
-  });
+                if (statusResult.length === 0 || statusResult[0].status !== 'Approved') {
+                    return res.status(403).json({ error: 'User status not approved' });
+                }
+
+                // Create a JWT token with a secret key and 2 days expiry
+                const secretKey = 'uniprecisionYHU';
+                const token = jwt.sign({ userId: user.user_id, email: user.email, role: user.role }, secretKey, { expiresIn: '2d' });
+
+                // Return the token and user role
+                return res.status(200).json({ token, role: user.role });
+            });
+        });
+    });
 });
+
+
 
 
 
