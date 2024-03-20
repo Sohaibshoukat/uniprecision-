@@ -24,35 +24,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Doctor Signup API
-router.post('/adddoctor', (req, res) => {
-    const { name, organisation, mobile_number, email, password, address_line1, address_line2, postcode, city, state, country } = req.body;
-    const role = 'Doctor';
-    const status = 'Not Approved';
-
-    // Insert data into User table
-    const userInsertQuery = 'INSERT INTO User (name, organisation, mobile_number, email, password, role, address_line1, address_line2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    db.query(userInsertQuery, [name, organisation, mobile_number, email, password, role, address_line1, address_line2, postcode, city, state, country], (err, result) => {
-        if (err) {
-            console.error('Error signing up doctor:', err);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
-
-        const userId = result.insertId;
-
-        // Insert data into Doctor table
-        const doctorInsertQuery = 'INSERT INTO Doctor (user_id, status) VALUES (?, ?)';
-        db.query(doctorInsertQuery, [userId, status], (err, result) => {
-            if (err) {
-                console.error('Error signing up doctor:', err);
-                return res.status(500).json({ error: 'Internal Server Error' });
-            }
-
-            return res.status(200).json({ message: 'Doctor signed up successfully' });
-        });
-    });
-});
-
 router.post('/order', upload.single('file'), (req, res) => {
     const { doctor_id, category_id, date_generated, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study } = req.body;
 
@@ -67,7 +38,18 @@ router.post('/order', upload.single('file'), (req, res) => {
             return res.status(500).json({ error: 'Internal Server Error' });
         }
 
-        return res.status(200).json({ message: 'Order created successfully' });
+        const orderId = result.insertId;
+
+        // Insert data into Report table
+        const reportInsertQuery = 'INSERT INTO Report (doctor_id, patient_name, dob, nric_passport_no, order_id,age,gender,report_status) VALUES (?, ?, ?, ?, ?,?,?,?)';
+        db.query(reportInsertQuery, [doctor_id, patient_name, dob, nric_passport_no, orderId,age,gender,"Pending"], (err) => {
+            if (err) {
+                console.error('Error inserting report:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+
+            return res.status(200).json({ message: 'Order created successfully' });
+        });
     });
 });
 
@@ -181,8 +163,5 @@ router.get('/doctorTransactions/:doctorId', (req, res) => {
         return res.status(200).json({ transactions: results });
     });
 });
-
-
-
 
 module.exports = router;

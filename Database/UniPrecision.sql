@@ -86,6 +86,7 @@ CREATE TABLE Report (
     nric_passport_no VARCHAR(255),
     doctor_id INT,
     examination_date DATE,
+    date_generated Date,
     age INT,
     gender ENUM('Male', 'Female'),
     clinical_diagnostic_center VARCHAR(255),

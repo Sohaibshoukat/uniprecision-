@@ -134,7 +134,6 @@ router.post('/signup', (req, res) => {
     });
 });
 
-
 router.post('/login', (req, res) => {
     const { email, password } = req.body;
 
@@ -187,9 +186,5 @@ router.post('/login', (req, res) => {
         });
     });
 });
-
-
-
-
 
 module.exports = router;
