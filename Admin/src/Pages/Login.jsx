@@ -10,7 +10,7 @@ const Login = () => {
     <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
       <div className="md:w-1/3 max-w-sm">
         <img
-          src="https://tecdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+          src="./draw2.webp"
           alt="Sample image"
         />
       </div>
@@ -45,11 +45,6 @@ const Login = () => {
               type="submit"
               onClick={() => {
                 sessionStorage.setItem('token', "1452");
-                if (Email == 'Doctor' || Email == 'doctor') {
-                  sessionStorage.setItem('portal', 'Doctor')
-                } else {
-                  sessionStorage.setItem('portal', 'Radiologist')
-                }
                 navigate("/")
               }}
             >

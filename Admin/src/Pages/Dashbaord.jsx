@@ -1,0 +1,105 @@
+import React, { useState } from 'react'
+import Nav from '../Component/Nav'
+import { Route, Routes } from 'react-router-dom'
+import AdminDashboard from './adminDashboard';
+import AddUser from './AddUser';
+import Users from './Users';
+import Earning from './Earning';
+import Pricing from './Pricing';
+import AdminProfile from './AdminProfile';
+import ApprovedUser from './ApprovedUser';
+import NewUser from './NewUser';
+import AssignRequest from './AssignRequest';
+
+const Dashbaord = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState(true);
+    const [OpenModel, setOpenModel] = useState(false)
+    const handleLogout = () => {
+        sessionStorage.removeItem('token');
+        navigate('/');
+    };
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+    return (
+        <>
+            {OpenModel &&
+                <div className='fixed z-50 w-[100vw] h-[100vh] flex justify-center items-center'>
+                    <div className='absolute z-30 bg-black/50 w-[100%] h-[100%]' onClick={()=>{setOpenModel(false)}}>
+
+                    </div>
+                    <div className='w-fit h-fit bg-white relative z-50 flex flex-col gap-4 rounded-xl lg:w-[40%] py-8 px-8'>
+                        <h2 className='text-black font-Para text-2xl'>Add New Service</h2>
+                        <div className="flex flex-col md:flex-row justify-between gap-6">
+                            <div className="flex flex-col gap-4">
+                                <label htmlFor="" className='text-gray-500 text-xl font-normal'>New Service *</label>
+                                <input type="text" placeholder='Enter servie Name' className='w-full text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md border-[1px] border-gray-500' />
+                            </div>
+                            <div className="flex flex-col gap-4 ">
+                                <label htmlFor="" className=' text-gray-500 text-xl font-normal'>Price *</label>
+                                <input type="number" placeholder='Enter Service Pricing OTP' className='w-full text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md border-[1px] border-gray-500' />
+                            </div>
+                        </div>
+                            <button 
+                                className='w-fit self-center bg-darkblue text-center text-white border-2 border-darkblue hover:bg-transparent px-6  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
+                                onClick={()=>{setOpenModel(false)}}
+                            >
+                                Add Servie
+                            </button>
+                    </div>
+                </div>
+            }
+            <div className='flex flex-row min-h-[100vh]'>
+                <div className={`lg:basis-[30%] xl:basis-[15%] z-50 absolute lg:relative w-[80%] md:w-[55%]  h-[100%] ${isMenuOpen && 'hidden'}  lg:block lg:w-auto bg-slate-700`}
+                    style={{ overflow: "unset" }}
+                >
+                    <Nav isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} toggleMenu={toggleMenu} />
+                </div>
+                <div className="basis-[100%] lg:basis-[68%] xl:basis-[85%] w-[100%] relative">
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={<AdminDashboard toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                        </Route>
+                        <Route
+                            path="/new-user"
+                            element={<AddUser toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                        </Route>
+                        <Route
+                            path="/all-user"
+                            element={<Users toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                        </Route>
+                        <Route
+                            path="/earning"
+                            element={<Earning toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                        </Route>
+                        <Route
+                            path="/pricings"
+                            element={<Pricing OpenModel={OpenModel} setOpenModel={setOpenModel} toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                        </Route>
+                        <Route
+                            path="/admin-profile"
+                            element={<AdminProfile toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                        </Route>
+                        <Route
+                            path="/approved-user"
+                            element={<ApprovedUser toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                        </Route>
+                        <Route
+                            path="/user-request"
+                            element={<NewUser toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                        </Route>
+                        <Route
+                            path="/assign-request"
+                            element={<AssignRequest toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                        </Route>
+
+                    </Routes>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export default Dashbaord

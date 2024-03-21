@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/**/*.{html,jsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -13,12 +16,12 @@ export default {
         "lightblue": "#00afee",
         "sideblue": "#0f77be"
       },
-      textColor:{
+      textColor: {
         "darkblue": "#0c4884",
         "lightblue": "#00afee",
         "sideblue": "#0f77be"
       },
-      borderColor:{
+      borderColor: {
         "darkblue": "#0c4884",
         "lightblue": "#00afee",
         "sideblue": "#0f77be"
