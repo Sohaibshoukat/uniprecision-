@@ -181,7 +181,7 @@ router.post('/login', (req, res) => {
                 const token = jwt.sign({ userId: user.user_id, email: user.email, role: user.role }, secretKey, { expiresIn: '2d' });
 
                 // Return the token and user role
-                return res.status(200).json({ token, role: user.role });
+                return res.status(200).json({ token, role: user.role,userid:user.user_id });
             });
         });
     });
