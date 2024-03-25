@@ -2,44 +2,35 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AlertContext from "../Context/Alert/AlertContext";
 
-const Login = () => {
+const Forgetpassword = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   const AletContext = useContext(AlertContext);
   const { showAlert } = AletContext;
 
-  const handleLogin = async (event) => {
+  const handleForgetPassword = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:3000/guest/login", {
+      const response = await fetch("http://localhost:3000/guest/forgot-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email }),
       });
-
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.role);
         setEmail('')
-        setPassword('')
-        showAlert('Login Success', 'success');
-        if(data.role=='Doctor'){
-          navigate("/docDashboard"); // Redirect to dashboard upon successful login
-        }else if(data.role=='Radiologist'){
-          navigate("/radioDashboard"); // Redirect to dashboard upon successful login
-        }
+        showAlert(data.message, 'success');
+          navigate("/login"); 
       } else {
         showAlert(data.error, 'danger')
       }
     } catch (error) {
-      showAlert(error.error, 'danger');
+      showAlert(error.error);
     }
   };
 
@@ -53,7 +44,7 @@ const Login = () => {
       </div>
       <div className="md:w-1/3 max-w-sm">
         <div className="text-center md:text-left">
-          <form onSubmit={handleLogin} className="flex flex-col gap-2">
+          <form onSubmit={handleForgetPassword} className="flex flex-col gap-2">
             {/* Email input */}
             <input
               className="text-lg w-full px-4 py-2 text-black border border-solid border-gray-500 rounded-lg"
@@ -64,32 +55,13 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email Address"
             />
-            {/* Password input */}
-            <input
-              className="text-lg w-full px-4 py-2 text-black border border-solid border-gray-500 rounded-lg"
-              type="password"
-              name="password"
-              value={password}
-              required
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-            />
-            {/* Forgot password link */}
-            <div className="mt-4 flex justify-between font-semibold text-sm">
-              <Link
-                className="text-blue-600 hover:text-blue-700 text-xl font-Para hover:underline hover:underline-offset-4"
-                to={'/forgetpassword'}
-              >
-                Forgot Password?
-              </Link>
-            </div>
             {/* Login button */}
             <div className="text-center md:text-left">
               <button
                 className="mt-4 bg-blue-600 text-xl font-Para hover:bg-blue-700 px-4 py-2 text-white uppercase rounded tracking-wider"
                 type="submit"
               >
-                Login
+                Send Reuqest
               </button>
             </div>
           </form>
@@ -110,4 +82,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Forgetpassword;

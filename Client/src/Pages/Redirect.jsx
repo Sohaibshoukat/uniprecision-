@@ -6,16 +6,12 @@ const Redirect = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (sessionStorage.getItem('token')) {
-            if (sessionStorage.getItem('portal') == "Doctor") {
-
+        if (localStorage.getItem('token')) {
+            if (localStorage.getItem('role') == "Doctor") {
                 navigate('/docDashboard')
-
             }
-            else if (sessionStorage.getItem('portal') == 'Radiologist') {
-
+            else if (localStorage.getItem('role') == 'Radiologist') {
                 navigate('/radioDashboard')
-
             }
         } else {
             navigate('/login')

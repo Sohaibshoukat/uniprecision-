@@ -1,8 +1,55 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { IoIosLogOut } from 'react-icons/io'
 import { GiHamburgerMenu } from 'react-icons/gi'
 
 const AddUser = ({ toggleMenu, handleLogout }) => {
+    const [userType, setUserType] = useState('');
+    const [userorg, setuserorg] = useState('')
+    const [formData, setFormData] = useState({
+        name: '',
+        organization: '',
+        mobile_number: '',
+        email: '',
+        address_line_1: '',
+        address_line_2: '',
+        postcode: '',
+        city: '',
+        state: '',
+        country: ''
+    });
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Set role based on userType
+        formData.role = userType;
+
+        // Call appropriate API based on userType
+        const apiUrl = userType === 'Doctor' ? '/adddoctor' : '/addradiologist';
+        const response = await fetch(`http://localhost:3000/admin/${apiUrl}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log(data); // Handle success response
+        } else {
+            console.error('Failed to add user');
+            // Handle error response
+        }
+    };
+
+    const handleUserTypeChange = (e) => {
+        setUserType(e.target.value);
+    };
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
 
     return (
@@ -27,97 +74,174 @@ const AddUser = ({ toggleMenu, handleLogout }) => {
                 <h2 className='font-Para text-2xl font-bold mb-2'>Add New Doctor/Radiologist</h2>
                 <p className='text-gray-500 text-xl font-medium'>Please fill below form to add new user</p>
 
-                <div className='my-10 bg-gray-200 rounded-lg py-8 px-5 md:px-10 flex flex-col gap-8'>
+                <form onSubmit={handleSubmit}>
+                    <div className='my-10 bg-gray-200 rounded-lg py-8 px-5 md:px-10 flex flex-col gap-8'>
 
-                    <div className='flex flex-col gap-4'>
-                        <label htmlFor="" className='text-gray-500 text-xl font-normal'>User Type</label>
-                        <div className='flex flex-row gap-4'>
-                            <div className="flex flex-row gap-2">
-                                <input type="radio" />
-                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>Doctor</label>
-                            </div>
-                            <div className="flex flex-row gap-2">
-                                <input type="radio" />
-                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>Radiologist</label>
+                        <div className='flex flex-col gap-4'>
+                            <label htmlFor="" className='text-gray-500 text-xl font-normal'>User Type</label>
+                            <div className='flex flex-row gap-4'>
+                                <div className="flex flex-row gap-2">
+                                    <input type="radio" required name="userType" id='Doctor' value="Doctor" onChange={handleUserTypeChange} />
+                                    <label htmlFor="Doctor" className='text-gray-500 text-lg font-normal'>Doctor</label>
+                                </div>
+                                <div className="flex flex-row gap-2">
+                                    <input type="radio" required name="userType" id='Radiologist' value="Radiologist" onChange={handleUserTypeChange} />
+                                    <label htmlFor="Radiologist" className='text-gray-500 text-lg font-normal'>Radiologist</label>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="flex flex-col gap-[20px] lg:flex-row">
-                        <div className="flex flex-col basis-[50%] gap-2">
-                            <label htmlFor="" className='text-gray-500 text-lg font-normal'>Name *</label>
-                            <input type="text" placeholder='Your Name' className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md' />
+                        <div className="flex flex-col gap-[20px] lg:flex-row">
+                            <div className="flex flex-col basis-[50%] gap-2">
+                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>Name *</label>
+                                <input
+                                    type="text"
+                                    placeholder='Your Name'
+                                    name='name'
+                                    id='name'
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'
+                                />
+                            </div>
+                            <div className="flex flex-col basis-[50%] gap-2">
+                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>Mobile Number *</label>
+                                <input
+                                    type="text"
+                                    name='mobile_number'
+                                    id='mobile_number'
+                                    value={formData.mobile_number}
+                                    onChange={handleChange}
+                                    placeholder='+00000000000'
+                                    className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md' />
+                            </div>
                         </div>
-                        <div className="flex flex-col basis-[50%] gap-2">
-                            <label htmlFor="" className='text-gray-500 text-lg font-normal'>Mobile Number *</label>
-                            <input type="text" placeholder='+00000000000' className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md' />
+                        <div className="flex flex-col md:flex-row basis-[50%] gap-2  md:items-center">
+                            <label htmlFor="" className='basis-[30%] text-gray-500 text-lg font-normal'>Email *</label>
+                            <input
+                                type="email"
+                                placeholder='abc@gmail.com'
+                                name='email'
+                                id='email'
+                                value={formData.email}
+                                onChange={handleChange}
+                                className='basis[70%] md:w-[70%] text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'
+                            />
                         </div>
-                    </div>
-                    <div className="flex flex-col md:flex-row basis-[50%] gap-2  md:items-center">
-                        <label htmlFor="" className='basis-[30%] text-gray-500 text-lg font-normal'>Email *</label>
-                        <input type="text" placeholder='abc@gmail.com' className='basis[70%] md:w-[70%] text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md' />
-                    </div>
-                    <div className="flex flex-col md:flex-row basis-[50%] gap-2  md:items-center">
-                        <label htmlFor="" className='basis-[30%] text-gray-500 text-lg font-normal'>Address Line 1 *</label>
-                        <input type="text" placeholder='ABC clinic' className='basis[70%] md:w-[70%] text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md' />
-                    </div>
-                    <div className="flex flex-col md:flex-row basis-[50%] gap-2  md:items-center">
-                        <label htmlFor="" className='basis-[30%] text-gray-500 text-lg font-normal'>Address Line 2</label>
-                        <input type="text" placeholder='Gound flour Sublot 23' className='basis[70%] md:w-[70%] text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md' />
-                    </div>
-                    <div className="flex flex-col md:flex-row basis-[50%] gap-2  md:items-center">
-                        <label htmlFor="" className='basis-[30%] text-gray-500 text-lg font-normal'>Address Line 3</label>
-                        <input type="text" placeholder='UNISQUARE COMMERCIAL CENTER' className='basis[70%] md:w-[70%] text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md' />
-                    </div>
-                    <div className="flex  flex-col gap-[20px] lg:flex-row">
-                        <div className="flex flex-col basis-[50%] gap-2">
-                            <label htmlFor="" className='text-gray-500 text-lg font-normal'>Postcode *</label>
-                            <input type="text" placeholder='Your Name' className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md' />
+                        <div className="flex flex-col md:flex-row basis-[50%] gap-2  md:items-center">
+                            <label htmlFor="" className='basis-[30%] text-gray-500 text-lg font-normal'>Address Line 1 *</label>
+                            <input
+                                type="text"
+                                placeholder='ABC clinic'
+                                name='address_line_1'
+                                id='address_line_1'
+                                value={formData.address_line_1}
+                                onChange={handleChange}
+                                className='basis[70%] md:w-[70%] text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'
+                            />
                         </div>
-                        <div className="flex flex-col basis-[50%] gap-2">
-                            <label htmlFor="" className='text-gray-500 text-lg font-normal'>City *</label>
-                            <input type="text" placeholder='+00000000000' className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md' />
+                        <div className="flex flex-col md:flex-row basis-[50%] gap-2  md:items-center">
+                            <label htmlFor="" className='basis-[30%] text-gray-500 text-lg font-normal'>Address Line 2</label>
+                            <input
+                                type="text"
+                                placeholder='Gound flour Sublot 23'
+                                name='address_line_2'
+                                id='address_line_2'
+                                value={formData.address_line_2}
+                                onChange={handleChange}
+                                className='basis[70%] md:w-[70%] text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'
+                            />
                         </div>
+                        <div className="flex  flex-col gap-[20px] lg:flex-row">
+                            <div className="flex flex-col basis-[50%] gap-2">
+                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>Postcode *</label>
+                                <input
+                                    type="text"
+                                    placeholder='Your PostCode'
+                                    name='postcode'
+                                    id='postcode'
+                                    value={formData.postcode}
+                                    onChange={handleChange}
+                                    className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'
+                                />
+                            </div>
+                            <div className="flex flex-col basis-[50%] gap-2">
+                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>City *</label>
+                                <input
+                                    type="text"
+                                    placeholder='City'
+                                    name='city'
+                                    id='city'
+                                    value={formData.city}
+                                    onChange={handleChange}
+                                    className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'
+                                />
+                            </div>
+                        </div>
+                        <div className="flex  flex-col gap-[20px] lg:flex-row">
+                            <div className="flex flex-col basis-[50%] gap-2">
+                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>State *</label>
+                                <select
+                                    name='state'
+                                    id='state'
+                                    value={formData.state}
+                                    onChange={handleChange}
+                                    className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md '
+                                >
+                                    <option value="Sarawak">Sarawak</option>
+                                    <option value="Sarawak">Sarawak</option>
+                                    <option value="Sarawak">Sarawak</option>
+                                    <option value="Sarawak">Sarawak</option>
+                                    <option value="Sarawak">Sarawak</option>
+                                </select>
+                            </div>
+                            <div className="flex flex-col basis-[50%] gap-2">
+                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>Country *</label>
+                                <select
+                                    name='country'
+                                    id='country'
+                                    value={formData.country}
+                                    onChange={handleChange}
+                                    className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'
+                                >
+                                    <option value="Malaysia">Malaysia</option>
+                                    <option value="UK">UK</option>
+                                    <option value="US">US</option>
+                                    <option value="Canada">CANADA</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="flex  flex-col gap-[20px] lg:flex-row">
+                            <div className="flex flex-col basis-[50%] gap-2">
+                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>User type *</label>
+                                <select
+                                    name=""
+                                    id=""
+                                    onChange={(e) => { setuserorg(e.target.value) }}
+                                    value={userorg}
+                                    className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'
+                                >
+                                    <option value="">Select Option</option>
+                                    <option value="Organization">Organization</option>
+                                    <option value="Personal">Personal</option>
+                                </select>
+                            </div>
+                            {userorg == 'Organization' && <div className="flex flex-col basis-[50%] gap-2">
+                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>Organization *</label>
+                                <input
+                                    type="text"
+                                    placeholder='Your Orgainization'
+                                    name='organization'
+                                    id='organization'
+                                    value={formData.organization}
+                                    onChange={handleChange}
+                                    className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'
+                                />
+                            </div>}
+                        </div>
+                        <button className='w-full bg-darkblue text-white border-2 border-darkblue hover:bg-transparent  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'>Submit</button>
                     </div>
-                    <div className="flex  flex-col gap-[20px] lg:flex-row">
-                        <div className="flex flex-col basis-[50%] gap-2">
-                            <label htmlFor="" className='text-gray-500 text-lg font-normal'>State *</label>
-                            <select name="" id="" className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md '>
-                                <option value="Sarawak">Sarawak</option>
-                                <option value="Sarawak">Sarawak</option>
-                                <option value="Sarawak">Sarawak</option>
-                                <option value="Sarawak">Sarawak</option>
-                                <option value="Sarawak">Sarawak</option>
-                            </select>
-                        </div>
-                        <div className="flex flex-col basis-[50%] gap-2">
-                            <label htmlFor="" className='text-gray-500 text-lg font-normal'>Country *</label>
-                            <select name="" id="" className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'>
-                                <option value="Sarawak">UK</option>
-                                <option value="Sarawak">US</option>
-                                <option value="Sarawak">CANADA</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className="flex  flex-col gap-[20px] lg:flex-row">
-                        <div className="flex flex-col basis-[50%] gap-2">
-                            <label htmlFor="" className='text-gray-500 text-lg font-normal'>User type *</label>
-                            <select name="" id="" className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'>
-                                <option value="Sarawak">Organization</option>
-                                <option value="Sarawak">Personal</option>
-                                <option value="Sarawak">Office</option>
-                            </select>
-                        </div>
-                        <div className="flex flex-col basis-[50%] gap-2">
-                            <label htmlFor="" className='text-gray-500 text-lg font-normal'>Status *</label>
-                            <select name="" id="" className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'>
-                                <option value="Sarawak">Active</option>
-                                <option value="Sarawak">Blocked</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button className='w-full bg-darkblue text-white border-2 border-darkblue hover:bg-transparent  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'>Submit</button>
-                </div>
+                </form>
             </div>
         </>
     )

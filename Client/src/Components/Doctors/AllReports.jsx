@@ -8,7 +8,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
         {
             ID: "SR000233",
             Type: "Specialist Reporting",
-            Status: "Created",
+            Status: "UnPaid",
             Date: "16 May 2023 10:56:42 AM",
             Patient: "Frank Gyver Anak Majing",
             StudyDate: "16 May 2023 10:56:42 AM",
@@ -28,7 +28,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
         {
             ID: "SR000233",
             Type: "Specialist Reporting",
-            Status: "Created",
+            Status: "UnPaid",
             Date: "16 May 2023 10:56:42 AM",
             Patient: "Frank Gyver Anak Majing",
             StudyDate: "16 May 2023 10:56:42 AM",
@@ -38,7 +38,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
         {
             ID: "SR000233",
             Type: "Specialist Reporting",
-            Status: "Created",
+            Status: "UnPaid",
             Date: "16 May 2023 10:56:42 AM",
             Patient: "Frank Gyver Anak Majing",
             StudyDate: "16 May 2023 10:56:42 AM",
@@ -58,7 +58,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
         {
             ID: "SR000233",
             Type: "Specialist Reporting",
-            Status: "Created",
+            Status: "UnPaid",
             Date: "16 May 2023 10:56:42 AM",
             Patient: "Sohaib",
             StudyDate: "16 May 2023 10:56:42 AM",
@@ -68,7 +68,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
         {
             ID: "SR000233",
             Type: "Specialist Reporting",
-            Status: "Created",
+            Status: "UnPaid",
             Date: "16 May 2023 10:56:42 AM",
             Patient: "Frank Gyver Anak Majing",
             StudyDate: "16 May 2023 10:56:42 AM",
@@ -139,13 +139,12 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>All Service Request</h2>
                     <div className="flex flex-col gap-4 my-6">
-                        <h2 className='font-Lora italic font-normal text-lg'>Instruction for user:</h2>
+                        <h2 className='font-Lora italic font-normal text-lg'> Instructions:</h2>
                         <ol className='flex flex-col gap-2 ml-2'>
-                            <li className='text-base font-normal font-Lora '>1. Click <b>'Create new Service Request'</b> button below to create new service request</li>
-                            <li className='text-base font-normal font-Lora '>2. Alternatively, click <b>NEW REQUEST</b> link at top right of page to create new service request</li>
-                            <li className='text-base font-normal font-Lora '>3. Click 'Show All' button to reveal the uploaded file and Report columns</li>
-                            <p className='text-base font-normal font-Lora '>Click on the <i>Uploaded file</i> link to downlaod a copy of the file you have uploaded</p>
-                            <p className='text-base font-normal font-Lora '>Scroll to the right, click on the Report link to downlaod the radiology report in PDF format. <i>Report link</i> only available after payment has been made</p>
+                            <li className='text-base font-normal font-Lora '>1. Click <b>'Create New Request'</b> button below to create new  request</li>
+                            <li className='text-base font-normal font-Lora '>2. Alternatively, click <b>'New Request'</b>  On the left menu to create new request.</li>
+                            <li className='text-base font-normal font-Lora '>3. Click on the Uploaded file link to downlaod a copy of the file you have uploaded</li>
+                            <li className='text-base font-normal font-Lora '>4. Scroll to the right, click on the Report link to download the report in PDF format. Report link only available after payment has been made</li>
                         </ol>
                     </div>
 
@@ -187,7 +186,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                                         <td
                                             className='text-center w-20'
                                         >
-                                            {item.Status === 'Created' && (
+                                            {item.Status === 'UnPaid' && (
                                                 <input
                                                     type='checkbox'
                                                     checked={SelectedItem.includes(item)}
@@ -197,7 +196,15 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                                         </td>
                                         <td>{item.ID}</td>
                                         <td>{item.Type}</td>
-                                        <td>{item.Status}</td>
+                                        <td>
+                                            <h2 className={`
+                                                    ${item.Status == 'Paid' ? 'bg-green-600' : 'bg-red-500'}
+                                                    py-2 px-4 rounded-lg text-white
+                                                `}
+                                            >
+                                                {item.Status}
+                                            </h2>
+                                        </td>
                                         <td>{item.Date}</td>
                                         <td>{item.Patient}</td>
                                         <td>{item.StudyDate}</td>

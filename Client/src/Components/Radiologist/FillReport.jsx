@@ -39,13 +39,21 @@ const FillReport = ({ handleLogout, toggleMenu }) => {
                   <h2 className='text-lg font-normal font-Para'> NRIC/Passport No:</h2>
                   <p className='text-base font-light font-Para'>990101-01-5591</p>
                 </div>
-                <div className="flex flex-row gap-3">
+                <div className="flex flex-row items-center gap-3">
                   <h2 className='text-lg font-normal font-Para'>Age:</h2>
                   <p className='text-base font-light font-Para'>23</p>
                 </div>
-                <div className="flex flex-row gap-3">
+                <div className="flex flex-row items-center gap-3">
                   <h2 className='text-lg font-normal font-Para'>Gender:</h2>
                   <p className='text-base font-light font-Para'>Male</p>
+                </div>
+                <div className="flex flex-row items-center gap-3">
+                  <h2 className='text-lg font-normal font-Para'>Examination Date:</h2>
+                  <p className='text-base font-light font-Para'>11/Dec/2023</p>
+                </div>
+                <div className="flex flex-row items-center gap-3">
+                  <h2 className='text-lg font-normal font-Para'>Clinic/Diagnosic Center:</h2>
+                  <p className='text-base font-light font-Para'>Inzamam Center</p>
                 </div>
               </div>
             </div>
@@ -59,18 +67,6 @@ const FillReport = ({ handleLogout, toggleMenu }) => {
             <div className='flex flex-col gap-8 mt-10 grid-cols-1'>
 
               <h2 className='text-xl font-medium  font-Para'>Fill Form</h2>
-
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                <div className='w-[100%] flex flex-col'>
-                  <label htmlFor="" className='font-Para text-base'>Examination Date *</label>
-                  <input type='text' name="" id="" className='border-gray-400 border-2 py-2 px-4 rounded-lg ' />
-                </div>
-
-                <div className='w-[100%] flex flex-col'>
-                  <label htmlFor="" className='font-Para text-base'>Uni Clinic *</label>
-                  <input type='text' name="" id="" className='border-gray-400 border-2 py-2 px-4 rounded-lg ' />
-                </div>
-              </div>
 
               <div className="flex flex-col gap-6">
                 <div className='w-[100%] flex flex-col'>

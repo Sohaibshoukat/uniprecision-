@@ -52,13 +52,13 @@ router.post('/assignReport', (req, res) => {
 });
 
 router.post('/adddoctor', (req, res) => {
-    const { name, organisation, mobile_number, email, password, address_line1, address_line2, postcode, city, state, country } = req.body;
+    const { name, organization, mobile_number, email, password, address_line_1, address_line_2, postcode, city, state, country } = req.body;
     const role = 'Doctor';
     const status = 'Approved';
 
     // Insert data into User table
-    const userInsertQuery = 'INSERT INTO User (name, organisation, mobile_number, email, password, role, address_line1, address_line2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    db.query(userInsertQuery, [name, organisation, mobile_number, email, password, role, address_line1, address_line2, postcode, city, state, country], (err, result) => {
+    const userInsertQuery = 'INSERT INTO User (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    db.query(userInsertQuery, [name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country], (err, result) => {
         if (err) {
             console.error('Error signing up doctor:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
@@ -80,13 +80,13 @@ router.post('/adddoctor', (req, res) => {
 });
 
 router.post('/addradiologist', (req, res) => {
-    const { name, organisation, mobile_number, email, password, address_line1, address_line2, postcode, city, state, country } = req.body;
+    const { name, organization, mobile_number, email, password, address_line_1, address_line_2, postcode, city, state, country } = req.body;
     const role = 'Radiologist';
     const status = 'Approved';
 
     // Insert data into User table
-    const userInsertQuery = 'INSERT INTO User (name, organisation, mobile_number, email, password, role, address_line1, address_line2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    db.query(userInsertQuery, [name, organisation, mobile_number, email, password, role, address_line1, address_line2, postcode, city, state, country], (err, result) => {
+    const userInsertQuery = 'INSERT INTO User (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    db.query(userInsertQuery, [name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country], (err, result) => {
         if (err) {
             console.error('Error signing up radiologist:', err);
             return res.status(500).json({ error: 'Internal Server Error' });

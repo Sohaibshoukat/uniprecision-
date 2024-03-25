@@ -44,7 +44,7 @@ router.post('/order', upload.single('file'), (req, res) => {
         const reportInsertQuery = 'INSERT INTO Report (doctor_id, patient_name, dob, nric_passport_no, order_id,age,gender,report_status) VALUES (?, ?, ?, ?, ?,?,?,?)';
         db.query(reportInsertQuery, [doctor_id, patient_name, dob, nric_passport_no, orderId,age,gender,"Pending"], (err) => {
             if (err) {
-                console.error('Error inserting report:', err);
+                console.error('Error inserting report:', err.message);
                 return res.status(500).json({ error: 'Internal Server Error' });
             }
 

@@ -24,13 +24,13 @@ function RadioDashboard() {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('token')
-        sessionStorage.removeItem('userid')
+        localStorage.removeItem('token')
+        localStorage.removeItem('role')
         navigate('/');
     };
 
     useEffect(() => {
-        if (sessionStorage.getItem('token') && sessionStorage.getItem('portal') == 'Radiologist') {
+        if (localStorage.getItem('token') && localStorage.getItem('role') == 'Radiologist') {
             return
         } else {
             navigate("/login")
@@ -40,7 +40,7 @@ function RadioDashboard() {
 
     const tabs = [
         {
-            name: 'New submitted File',
+            name: 'New Request',
             Icon: BsCalendar4Event,
             Link: '/radioDashboard/',
         },

@@ -31,13 +31,13 @@ function Dashboard() {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('token')
-        sessionStorage.removeItem('userid')
+        localStorage.removeItem('token')
+        localStorage.removeItem('role')
         navigate('/');
     };
 
     useEffect(() => {
-        if (sessionStorage.getItem('token') && sessionStorage.getItem('portal') == 'Doctor') {
+        if (localStorage.getItem('token') && localStorage.getItem('role') == 'Doctor') {
             return
         } else {
             navigate("/login")
