@@ -1,77 +1,91 @@
 import React, { useState } from 'react'
 import { IoIosLogOut } from 'react-icons/io'
 import { GiHamburgerMenu } from 'react-icons/gi'
+import { useEffect } from 'react'
+import { useContext } from 'react'
+import AlertContext from '../Context/Alert/AlertContext'
 
 const NewUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
-    const [searchQuery, setSearchQuery] = useState('');
+    const [Users, setUsers] = useState([])
 
-    const UserData = [
-        {
-            Name: "Inzamam",
-            Type: "Doctor",
-            Status: "Not Approved",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Radiologist",
-            Status: "Not Approved",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Doctor",
-            Status: "Not Approved",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Radiologist",
-            Status: "Not Approved",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Doctor",
-            Status: "Not Approved",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Radiologist",
-            Status: "Not Approved",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Doctor",
-            Status: "Not Approved",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Radiologist",
-            Status: "Not Approved",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
+
+
+    const [userrole, setuserrole] = useState('Doctor')
+
+
+    const getuser = async () => {
+        if (userrole == 'Doctor') {
+            fetch(`http://localhost:3000/admin/getNewDoctors`) // Assuming this is the correct endpoint
+                .then(response => {
+                    if (!response.ok) {
+                        showAlert('Network response was not ok', 'danger');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.approvedDoctors) {
+                        setUsers(data.approvedDoctors);
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error fetching categories', 'danger');
+                });
+        } else if (userrole == 'Radiologist') {
+            fetch(`http://localhost:3000/admin/getnewRadiologist`) // Assuming this is the correct endpoint
+                .then(response => {
+                    if (!response.ok) {
+                        showAlert('Network response was not ok', 'danger');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.approvedRadio) {
+                        setUsers(data.approvedRadio);
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error fetching categories', 'danger');
+                });
         }
-    ]
+    }
 
-    // Filter the UserData based on search query
-    const filteredData = UserData.filter(item =>
-        item.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.Email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.Location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.Type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.Total.includes(searchQuery)
-    );
+    useEffect(() => {
+        getuser()
+    }, [userrole])
+
+    const ApproveUser = (user_id) => {
+        const apiUrl = 'http://localhost:3000/admin/updateUserStatus';
+        const bodyData = {
+            user_id: user_id
+        };
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bodyData)
+        };
+        fetch(apiUrl, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                showAlert(`${userrole} Approved`,'success')
+                getuser()
+            })
+            .catch(error => {
+                showAlert(error.message, 'danger'); // Handle errors here
+            });
+    };
+
+    
+
+
     return (
         <>
 
@@ -93,9 +107,9 @@ const NewUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
                 '
             >
                 <div className=''>
-                    <h2 className='font-Para text-2xl font-bold mb-4'>All Users</h2>
+                    <h2 className='font-Para text-2xl font-bold mb-4'>New User Request</h2>
 
-                    <div className='flex flex-row justify-between'>
+                    {/* <div className='flex flex-row justify-between'>
                         <input
                             type="text"
                             placeholder='Search'
@@ -103,6 +117,13 @@ const NewUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'
                         />
+                    </div> */}
+
+                    <div className='flex flex-row justify-between'>
+                        <select name="" id="" value={userrole} onChange={(e) => { setuserrole(e.target.value) }} className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'>
+                            <option value="Doctor">Doctor</option>
+                            <option value="Radiologist">Radiologist</option>
+                        </select>
                     </div>
 
                     <div className='overflow-x-scroll'>
@@ -112,26 +133,31 @@ const NewUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Location</th>
+                                    <th>Role</th>
                                     <th>Type</th>
-                                    <th>Status</th>
+                                    <th>Phone Num</th>
                                     <th>Operation</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredData.map((item, index) => (
+                                {Users.map((item, index) => (
                                     <tr
                                         className='font-Para cursor-pointer'
                                         key={index}
                                     >
-                                        <td>{item.Name}</td>
-                                        <td>{item.Email}</td>
-                                        <td>{item.Location}</td>
-                                        <td>{item.Type}</td>
-                                        <td>{item.Status}</td>
+                                        <td>{item?.name}</td>
+                                        <td>{item?.email}</td>
+                                        <td>{item?.address_line_1}, {item?.state}</td>
+                                        <td>{item?.role}</td>
+                                        <td>{item?.guest_type}</td>
+                                        <td>{item?.mobile_number}</td>
                                         <td>
                                             <button
                                                 className='w-fit px-4 self-center bg-darkblue text-white border-2 border-darkblue hover:bg-transparent  py-1  rounded-lg ease-in-out duration-300 hover:text-darkblue text-lg font-medium'
-                                            >Approve</button>
+                                                onClick={()=>{ApproveUser(item?.user_id)}}
+                                            >
+                                                Approve
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}

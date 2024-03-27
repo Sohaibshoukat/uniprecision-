@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoIosLogOut } from 'react-icons/io'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import AlertContext from '../../Context/Alert/AlertContext'
 
-const AllReports = ({ handleLogout, toggleMenu }) => {
+const AllPaidReports = ({ handleLogout, toggleMenu }) => {
     const [SearchKey, setSearchKey] = useState(null)
     const [Dataset, setDataset] = useState([])
 
@@ -12,7 +12,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
     const { showAlert } = AletContext;
 
     const getorder = async () => {
-        fetch(`http://localhost:3000/doctor/getAllOrders/${localStorage.getItem('doctorId')}`) // Assuming this is the correct endpoint
+        fetch(`http://localhost:3000/doctor/getAllReports/${localStorage.getItem('doctorId')}`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -33,42 +33,8 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
         getorder()
     }, []);
 
-    const [SelectedItem, setSelectedItem] = useState([])
-
-    const handleCheckboxChange = (event, item) => {
-        if (event.target.checked) {
-            // Add the item to the SelectedItems array
-            setSelectedItem(prevSelected => [...prevSelected, item]);
-        } else {
-            // Remove the item from the SelectedItems array
-            setSelectedItem(prevSelected =>
-                prevSelected.filter(selectedItem => selectedItem !== item)
-            );
-        }
-    };
 
     const navigate = useNavigate()
-
-
-    const handlePayNow = () => {
-        SelectedItem.forEach(item => {
-            fetch(`http://localhost:3000/doctor/payorder/${item}`, {
-                method: 'PUT',
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        showAlert(`Error paying for order ${item}`, 'danger');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    getorder()
-                })
-                .catch(error => {
-                    showAlert(`Error paying for order ${item}`, 'danger');
-                });
-        });
-    };
 
     return (
         <>
@@ -80,7 +46,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                 >
                     <GiHamburgerMenu />
                 </button>
-                <h2 className='text-lg md:text-xl font-normal'>All Reports</h2>
+                <h2 className='text-lg md:text-xl font-normal'>All Paid Reports</h2>
                 <IoIosLogOut className='text-3xl md:text-3xl' onClick={handleLogout} />
             </div>
             <div className='min-h-[100vh] py-10 px-5 md:px-10 m-auto'>
@@ -111,72 +77,52 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                         <table className=' w-[100%] styled-table'>
                             <thead className='font-Para'>
                                 <tr>
-                                    <th>Select to Pay</th>
-                                    <th>ID</th>
+                                    <th>Report ID</th>
                                     <th>Type</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
+                                    <th>Genrated Date</th>
                                     <th>Patient name</th>
                                     <th>Study date</th>
-                                    <th>Uploaded file</th>
-                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Download Report</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {Dataset && Dataset.length > 0 && Dataset.map((item, index) => (
                                     <tr
-                                        className='font-Para cursor-pointer'
-                                        // onClick={() => {
-                                        //     navigate('/docDashboard/ReportDetail', { item: item });
-                                        // }}
+                                        className='font-Para'
                                         key={index}
                                     >
-                                        <td
-                                            className='text-center w-20'
-                                        >
-                                            {item.status === 'UnPaid' && (
-                                                <input
-                                                    type='checkbox'
-                                                    checked={SelectedItem.includes(item.order_id)}
-                                                    onChange={(e) => handleCheckboxChange(e, item.order_id)}
-                                                />
-                                            )}
-                                        </td>
-                                        <td>{item.order_id}</td>
+                                        <td>{item.report_id}</td>
                                         <td>{item.category_name}</td>
-                                        <td>
-                                            <h2 className={`
-                                                    ${item.status == 'UnPaid' ? 'bg-red-500' : 'bg-green-600'}
-                                                    py-2 px-4 rounded-lg text-white
-                                                `}
-                                            >
-                                                {item.status}
-                                            </h2>
-                                        </td>
                                         <td>{item.date_generated}</td>
                                         <td>{item.patient_name}</td>
                                         <td>{item.Examination_Date}</td>
-                                        <td
-                                            className='text-blue-600 underline cursor-pointer'>
-                                            <a href={item.file_url} target='_blank'>{item.file_path}</a>
+                                        <td>
+                                            <h2 className={`
+                                                    ${item.report_status == 'Pending' ? 'bg-red-500' : item.report_status == 'Assigned' ? 'bg-blue-500' : 'bg-green-600'}
+                                                    py-2 px-4 rounded-lg text-white w-fit
+                                                `}
+                                            >
+                                                {item.report_status}
+                                            </h2>
                                         </td>
-                                        <td>{item.price}</td>
+                                        <td>{
+                                            item.report_status ==
+                                                'Complete' ?
+                                                <Link to={'/docDashboard/ReportDetail'} state={{id:item.report_id}}>
+                                                    <div
+                                                        className='py-2 px-4 rounded-lg text-white w-fit bg-slate-500'
+                                                    >
+                                                        Check Report
+                                                    </div>
+                                                </Link> :
+                                                'Wait For Completion'}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
-
-                    <button
-                        className={`
-                        bg-slate-700 border-2 border-slate-700 text-lg text-white 
-                        font-Para py-2 px-4 rounded-lg hover:bg-transparent my-5 float-right
-                        hover:text-slate-700 ease-in-out duration-300 ${SelectedItem.length == 0 ? 'opacity-20' : 'opacity-100'}`}
-                        disabled={SelectedItem.length == 0}
-                        onClick={handlePayNow}
-                    >
-                        Pay now
-                    </button>
 
                 </div>
             </div>
@@ -184,4 +130,4 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
     )
 }
 
-export default AllReports
+export default AllPaidReports

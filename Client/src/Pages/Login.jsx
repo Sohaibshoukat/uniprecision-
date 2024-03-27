@@ -27,13 +27,14 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.role);
+        localStorage.setItem("userid", data.userid);
         setEmail('')
         setPassword('')
         showAlert('Login Success', 'success');
         if(data.role=='Doctor'){
-          navigate("/docDashboard"); // Redirect to dashboard upon successful login
+          navigate("/docDashboard/"); // Redirect to dashboard upon successful login
         }else if(data.role=='Radiologist'){
-          navigate("/radioDashboard"); // Redirect to dashboard upon successful login
+          navigate("/radioDashboard/"); // Redirect to dashboard upon successful login
         }
       } else {
         showAlert(data.error, 'danger')

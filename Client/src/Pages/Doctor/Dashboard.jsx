@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import Logo from "../../assets/LogoText2.png"
-import { GiHamburgerMenu } from "react-icons/gi";
+import React, { useContext, useEffect, useState } from 'react';
 import { GrClose } from "react-icons/gr"
 import { LuLayoutTemplate } from "react-icons/lu"
 import { BsCalendar4Event } from "react-icons/bs"
@@ -13,6 +11,8 @@ import NewReport from '../../Components/Doctors/NewReport';
 import Transaction from '../../Components/Doctors/transaction';
 import UserAccount from '../../Components/Doctors/UserAccount';
 import ReportDetails from '../../Components/Doctors/ReportDetails';
+import AlertContext from '../../Context/Alert/AlertContext';
+import AllPaidReports from '../../Components/Doctors/AllPaidReports';
 
 
 function Dashboard() {
@@ -23,7 +23,8 @@ function Dashboard() {
 
     const navigate = useNavigate();
 
-
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
 
 
     const toggleMenu = () => {
@@ -33,6 +34,9 @@ function Dashboard() {
     const handleLogout = () => {
         localStorage.removeItem('token')
         localStorage.removeItem('role')
+        localStorage.removeItem('doctorId')
+        localStorage.removeItem('userid')
+        localStorage.removeItem('RadioId')
         navigate('/');
     };
 
@@ -44,12 +48,38 @@ function Dashboard() {
         }
     }, [])
 
+    const fetchDoctorId = async () => {
+        try {
+            const userId = localStorage.getItem('userid'); // Assuming you have stored userId in localStorage
+            const response = await fetch(`http://localhost:3000/doctor/getDoctorId/${userId}`);
+            if (response.ok) {
+                const data = await response.json();
+                const { doctorId } = data;
+                localStorage.setItem('doctorId', doctorId); 
+            } else {
+                showAlert('Failed to fetch doctorId','danger');
+            }
+        } catch (error) {
+            showAlert('Error fetching doctor', 'danger');
+            navigate("/login")
+        }
+    };
+
+    useEffect(() => {
+
+        fetchDoctorId();
+    }, []);
 
     const tabs = [
         {
             name: 'All Reports',
             Icon: BsCalendar4Event,
             Link:'/docDashboard'
+        },
+        {
+            name: 'All Paid Reports',
+            Icon: BsCalendar4Event,
+            Link:'/docDashboard/all-paid'
         },
         {
             name: 'New Request',
@@ -130,6 +160,10 @@ function Dashboard() {
                         <Route
                             path="/"
                             element={<AllReports toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                        </Route>
+                        <Route
+                            path="/all-paid"
+                            element={<AllPaidReports toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
                         </Route>
                         <Route
                             path="/new-request"

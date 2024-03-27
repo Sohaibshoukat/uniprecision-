@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Nav from '../Component/Nav'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 import AdminDashboard from './adminDashboard';
 import AddUser from './AddUser';
 import Users from './Users';
@@ -10,18 +10,88 @@ import AdminProfile from './AdminProfile';
 import ApprovedUser from './ApprovedUser';
 import NewUser from './NewUser';
 import AssignRequest from './AssignRequest';
+import AlertContext from '../Context/Alert/AlertContext';
 
 const Dashbaord = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(true);
     const [OpenModel, setOpenModel] = useState(false)
+
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
+
+    const navigate = useNavigate()
+
+    const [price, setprice] = useState('')
+    const [type, settype] = useState(null)
+    const [editid, seteditid] = useState(null)
+    const [category_name, setcategory_name] = useState('')
+
     const handleLogout = () => {
-        sessionStorage.removeItem('token');
-        navigate('/');
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            localStorage.removeItem("adminID")
+            navigate('/login');
     };
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
+
+    const AddService = async () => {
+        if(type=='Add'){
+            try {
+                if(price==''||category_name==''){
+                    showAlert('Fill All fields','danger');
+                    return;
+                }
+                const response = await fetch('http://localhost:3000/admin/addCateogry', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ price, unit:"MY-12", category_name })
+                });
+                
+                if (!response.ok) {
+                    showAlert('Network response was not ok','danger');
+                }
+        
+                const data = await response.json();
+                showAlert('Category Added Success','success')
+                setOpenModel(false);
+            } catch (error) {
+                console.error('Error adding category:', error);
+                throw error;
+            }
+        }else if(type=='Edit'){
+            try {
+                if(price==''||category_name==''){
+                    showAlert('Fill All fields','danger');
+                    return;
+                }
+                const response = await fetch(`http://localhost:3000/admin/editCategory/${editid}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ price, unit:"MY-12", category_name })
+                });
+                
+                if (!response.ok) {
+                    showAlert('Network response was not ok','danger');
+                }
+        
+                const data = await response.json();
+                showAlert('Category Edit Success','success')
+                setOpenModel(false);
+            } catch (error) {
+                console.error('Error Editing category:', error);
+                throw error;
+            }
+        }
+    };
+    
+
     return (
         <>
             {OpenModel &&
@@ -34,18 +104,30 @@ const Dashbaord = () => {
                         <div className="flex flex-col md:flex-row justify-between gap-6">
                             <div className="flex flex-col gap-4">
                                 <label htmlFor="" className='text-gray-500 text-xl font-normal'>New Service *</label>
-                                <input type="text" placeholder='Enter servie Name' className='w-full text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md border-[1px] border-gray-500' />
+                                <input 
+                                    type="text" 
+                                    value={category_name}
+                                    onChange={(e)=>{setcategory_name(e.target.value)}}
+                                    placeholder='Enter servie Name' 
+                                    className='w-full text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md border-[1px] border-gray-500' 
+                                />
                             </div>
                             <div className="flex flex-col gap-4 ">
                                 <label htmlFor="" className=' text-gray-500 text-xl font-normal'>Price *</label>
-                                <input type="number" placeholder='Enter Service Pricing OTP' className='w-full text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md border-[1px] border-gray-500' />
+                                <input 
+                                    type="number" 
+                                    value={price}
+                                    onChange={(e)=>{setprice(e.target.value)}}
+                                    placeholder='Enter Service Pricing OTP' 
+                                    className='w-full text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md border-[1px] border-gray-500' 
+                                />
                             </div>
                         </div>
                             <button 
                                 className='w-fit self-center bg-darkblue text-center text-white border-2 border-darkblue hover:bg-transparent px-6  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
-                                onClick={()=>{setOpenModel(false)}}
+                                onClick={AddService}
                             >
-                                Add Servie
+                                {type=='Add'? "Add":"Edit"} Servie
                             </button>
                     </div>
                 </div>
@@ -76,7 +158,7 @@ const Dashbaord = () => {
                         </Route>
                         <Route
                             path="/pricings"
-                            element={<Pricing OpenModel={OpenModel} setOpenModel={setOpenModel} toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                            element={<Pricing OpenModel={OpenModel} setOpenModel={setOpenModel} toggleMenu={toggleMenu} handleLogout={handleLogout} setprice={setprice} setcategory_name={setcategory_name} settype={settype} seteditid={seteditid} />}>
                         </Route>
                         <Route
                             path="/admin-profile"

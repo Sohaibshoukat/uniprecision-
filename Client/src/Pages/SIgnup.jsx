@@ -40,6 +40,7 @@ export default function SignupPage() {
                 body: JSON.stringify({
                     name,
                     organization,
+                    guest_type: Type,
                     mobile_number: mobileNumber,
                     email,
                     password,
@@ -108,15 +109,16 @@ export default function SignupPage() {
                                     name=""
                                     id="type"
                                     value={Type}
+                                    required
                                     className="text-lg w-full px-4 py-2 text-black border border-solid border-gray-500 rounded-lg"
                                     onChange={(e) => setType(e.target.value)}
                                 >
-                                    <option value="">Select Type</option>
+                                    <option value="" disabled>Select Type</option>
                                     <option value="Personal">Personal</option>
                                     <option value="Organization">Organization</option>
                                 </select>
                             </div>
-                            {Type=='Organization'&&<input
+                            {Type == 'Organization' && <input
                                 className="text-lg w-full px-4 py-2 text-black border border-solid border-gray-500 rounded-lg"
                                 type="text"
                                 placeholder="Organization"
@@ -213,6 +215,7 @@ export default function SignupPage() {
                                         value="radiologist"
                                         checked={role === "radiologist"}
                                         onChange={(e) => setRole(e.target.value)}
+                                        required
                                     />
                                     <label htmlFor="Radiologist" className="text-lg font-Para">Radiologist</label>
                                 </div>
@@ -223,10 +226,12 @@ export default function SignupPage() {
                                         value="doctor"
                                         checked={role === "doctor"}
                                         onChange={(e) => setRole(e.target.value)}
+                                        required
                                     />
                                     <label htmlFor="Doctor" className="text-lg font-Para">Doctor</label>
                                 </div>
                             </div>
+
                             <div className="text-center md:text-left">
                                 <button
                                     className="mt-4 bg-blue-600 text-xl font-Para hover:bg-blue-700 px-4 py-2 text-white uppercase rounded tracking-wider"

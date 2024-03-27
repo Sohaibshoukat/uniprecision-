@@ -1,78 +1,70 @@
 import React, { useState } from 'react'
 import { IoIosLogOut } from 'react-icons/io'
 import { GiHamburgerMenu } from 'react-icons/gi'
+import { useEffect } from 'react'
+import { useContext } from 'react'
+import AlertContext from '../Context/Alert/AlertContext'
 
 const ApprovedUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
-    const [searchQuery, setSearchQuery] = useState('');
+    // const [searchQuery, setSearchQuery] = useState('');
 
-    const UserData = [
-        {
-            Name: "Inzamam",
-            Type: "Doctor",
-            Total: "500",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Radiologist",
-            Total: "500",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Doctor",
-            Total: "500",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Radiologist",
-            Total: "500",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Doctor",
-            Total: "500",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Radiologist",
-            Total: "500",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Doctor",
-            Total: "500",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
-        },
-        {
-            Name: "Inzamam",
-            Type: "Radiologist",
-            Total: "500",
-            Email: "Inzamam@gmail.coms",
-            Location: "892 New York CIty, US",
+
+    const [Users, setUsers] = useState([])
+
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
+
+    const [userrole, setuserrole] = useState('Doctor')
+
+
+    const getuser = async () => {
+        if (userrole == 'Doctor') {
+            fetch(`http://localhost:3000/admin/getAllApprovedDoctors`) // Assuming this is the correct endpoint
+                .then(response => {
+                    if (!response.ok) {
+                        showAlert('Network response was not ok', 'danger');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.approvedDoctors) {
+                        setUsers(data.approvedDoctors);
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error fetching categories', 'danger');
+                });
+        } else if (userrole == 'Radiologist') {
+            fetch(`http://localhost:3000/admin/getAllApprovedRadiologist`) // Assuming this is the correct endpoint
+                .then(response => {
+                    if (!response.ok) {
+                        showAlert('Network response was not ok', 'danger');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.approvedRadio) {
+                        setUsers(data.approvedRadio);
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error fetching categories', 'danger');
+                });
         }
-    ]
+    }
+
+    useEffect(() => {
+        getuser()
+    }, [userrole])
 
 
-
-    const filteredData = UserData.filter(item =>
-        item.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.Email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.Location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.Type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.Total.includes(searchQuery)
-    );
+    // const filteredData = UserData.filter(item =>
+    //     item.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    //     item.Email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    //     item.Location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    //     item.Type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    //     item.Total.includes(searchQuery)
+    // );
 
     return (
         <>
@@ -97,7 +89,7 @@ const ApprovedUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => 
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>All Approved Users</h2>
 
-                    <div className='flex flex-row justify-between'>
+                    {/* <div className='flex flex-row justify-between'>
                         <input
                             type="text"
                             placeholder='Search'
@@ -105,31 +97,42 @@ const ApprovedUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => 
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'
                         />
+                    </div> */}
+
+                    <div className='flex flex-row justify-between'>
+                        <select name="" id="" value={userrole} onChange={(e)=>{setuserrole(e.target.value)}} className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'>
+                            <option value="Doctor">Doctor</option>
+                            <option value="Radiologist">Radiologist</option>
+                        </select>
                     </div>
 
                     <div className='overflow-x-scroll'>
-                        <table className='styled-table w-[100%]'>
+                    <table className='styled-table w-[100%]'>
                             <thead className='font-Para'>
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Location</th>
+                                    <th>Role</th>
                                     <th>Type</th>
-                                    <th>Total</th>
+                                    <th>Num</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredData.map((item, index) => (
-                                    <tr
-                                        className='font-Para cursor-pointer'
-                                        key={index}
-                                    >
-                                        <td>{item.Name}</td>
-                                        <td>{item.Email}</td>
-                                        <td>{item.Location}</td>
-                                        <td>{item.Type}</td>
-                                        <td>{item.Total}</td>
-                                    </tr>
+                                {Users.map((item, index) => (
+                                    <>
+                                        <tr
+                                            className={`font-Para cursor-pointer ${item?.role=='Admin' && 'hidden'}`}
+                                            key={index}
+                                        >
+                                            <td>{item?.name}</td>
+                                            <td>{item?.email}</td>
+                                            <td>{item?.address_line_1}, {item?.state}</td>
+                                            <td>{item?.role}</td>
+                                            <td>{item?.guest_type}</td>
+                                            <td>{item?.mobile_number}</td>
+                                        </tr>
+                                    </>
                                 ))}
                             </tbody>
                         </table>

@@ -15,24 +15,24 @@ if (!fs.existsSync(uploadDirectory)) {
 
 // Set up multer for file upload
 const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, uploadDirectory);
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname));
     }
 });
 const upload = multer({ storage: storage });
 
 router.post('/order', upload.single('file'), (req, res) => {
-    const { doctor_id, category_id, date_generated, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study } = req.body;
+    const { doctor_id, category_id, date_generated, Examination_Date, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study, price } = req.body;
 
     // Extract file path
     const filePath = req.file ? req.file.path : null;
 
     // Insert data into Orders table
-    const orderInsertQuery = 'INSERT INTO Orders (doctor_id, file_path, category_id, date_generated, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    db.query(orderInsertQuery, [doctor_id, filePath, category_id, date_generated, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study], (err, result) => {
+    const orderInsertQuery = 'INSERT INTO Orders (doctor_id, file_path, category_id, date_generated, Examination_Date, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study, status, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    db.query(orderInsertQuery, [doctor_id, filePath, category_id, date_generated, Examination_Date, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study, 'UnPaid', price], (err, result) => {
         if (err) {
             console.error('Error inserting order:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
@@ -41,8 +41,8 @@ router.post('/order', upload.single('file'), (req, res) => {
         const orderId = result.insertId;
 
         // Insert data into Report table
-        const reportInsertQuery = 'INSERT INTO Report (doctor_id, patient_name, dob, nric_passport_no, order_id,age,gender,report_status) VALUES (?, ?, ?, ?, ?,?,?,?)';
-        db.query(reportInsertQuery, [doctor_id, patient_name, dob, nric_passport_no, orderId,age,gender,"Pending"], (err) => {
+        const reportInsertQuery = 'INSERT INTO Report (doctor_id, Examination_Date, patient_name, dob, nric_passport_no, order_id,age,gender,report_status,previous_study,clinical_diagnostic_center,price) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        db.query(reportInsertQuery, [doctor_id, Examination_Date, patient_name, dob, nric_passport_no, orderId, age, gender, "UnPaid", previous_study, clinical_summary_title, price], (err) => {
             if (err) {
                 console.error('Error inserting report:', err.message);
                 return res.status(500).json({ error: 'Internal Server Error' });
@@ -53,8 +53,8 @@ router.post('/order', upload.single('file'), (req, res) => {
     });
 });
 
-router.get('/getDoctorId', (req, res) => {
-    const userId = req.body.userId;
+router.get('/getDoctorId/:id', (req, res) => {
+    const userId = req.params.id;
 
     // Query the database to get the doctor ID based on the user ID
     const doctorIdQuery = 'SELECT doctor_id FROM Doctor WHERE user_id = ?';
@@ -73,19 +73,22 @@ router.get('/getDoctorId', (req, res) => {
     });
 });
 
-router.get('/getAllOrders', (req, res) => {
+router.get('/getAllOrders/:doctorId', (req, res) => {
+    const doctorId = req.params.doctorId;
+
     const ordersQuery = `
         SELECT o.*, c.price, c.category_name
         FROM Orders o
         INNER JOIN Category c ON o.category_id = c.category_id
+        WHERE o.doctor_id = ?
     `;
-    db.query(ordersQuery, (err, results) => {
+
+    db.query(ordersQuery, [doctorId], (err, results) => {
         if (err) {
             console.error('Error retrieving orders:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
 
-        // Prepare response data with file URLs
         const ordersWithFilesAndCategory = results.map(order => {
             const filePath = order.file_path;
             const fileUrl = filePath ? `${req.protocol}://${req.get('host')}/${filePath}` : null;
@@ -95,6 +98,133 @@ router.get('/getAllOrders', (req, res) => {
         return res.status(200).json({ orders: ordersWithFilesAndCategory });
     });
 });
+
+router.get('/getAllReports/:doctorId', (req, res) => {
+    const doctorId = req.params.doctorId;
+
+    const ordersQuery = `
+    SELECT r.*, c.price, c.category_name, o.*
+    FROM Report r
+    INNER JOIN Orders o ON r.order_id = o.order_id
+    INNER JOIN Category c ON o.category_id = c.category_id
+    WHERE r.doctor_id = ?
+    
+    `;
+
+    db.query(ordersQuery, [doctorId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving orders:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        const ordersWithFilesAndCategory = results.map(order => {
+            const filePath = order.file_path;
+            const fileUrl = filePath ? `${req.protocol}://${req.get('host')}/${filePath}` : null;
+            return { ...order, file_url: fileUrl };
+        });
+
+        return res.status(200).json({ orders: ordersWithFilesAndCategory });
+    });
+});
+
+router.get('/getSingleReprte/:docid/:reportid', (req, res) => {
+    const docid = req.params.docid;
+    const reportid = req.params.reportid;
+
+    const reportQuery = `
+    SELECT r.*, c.price, c.category_name, o.*
+    FROM Report r
+    INNER JOIN Orders o ON r.order_id = o.order_id
+    INNER JOIN Category c ON o.category_id = c.category_id
+    WHERE r.doctor_id = ? AND report_status = 'Complete' AND report_id = ?
+    LIMIT 1
+    `;
+
+    db.query(reportQuery, [docid, reportid], (err, results) => {
+        if (err) {
+            console.error('Error retrieving report:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Report not found' });
+        }
+
+        const report = results[0];
+
+        const doctorQuery = `
+        SELECT d.*, u.name AS doctor_name
+        FROM Doctor d
+        INNER JOIN User u ON d.user_id = u.user_id
+        WHERE d.doctor_id = ? AND d.status = 'Approved'
+        `;
+
+        db.query(doctorQuery, [report.doctor_id], (err, doctorResults) => {
+            if (err) {
+                console.error('Error retrieving doctor data:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+
+            if (doctorResults.length === 0) {
+                return res.status(404).json({ error: 'Doctor not found' });
+            }
+
+            const doctor = doctorResults[0];
+
+            const radioQuery = `
+            SELECT r.*, u.name AS radio_name
+            FROM radiologist r
+            INNER JOIN User u ON r.user_id = u.user_id
+            WHERE r.radiologist_id = ? AND r.status = 'Approved'
+            `;
+    
+            db.query(radioQuery, [report.radiologist_id], (err, radioResults) => {
+                if (err) {
+                    console.error('Error retrieving doctor data:', err);
+                    return res.status(500).json({ error: 'Internal Server Error' });
+                }
+    
+                if (doctorResults.length === 0) {
+                    return res.status(404).json({ error: 'Doctor not found' });
+                }
+
+            const filePath = report.file_path;
+            const fileUrl = filePath ? `${req.protocol}://${req.get('host')}/${filePath}` : null;
+            const reportWithFileUrl = { ...report, file_url: fileUrl };
+
+            const radio = radioResults[0];
+
+            return res.status(200).json({ report: reportWithFileUrl, doctor: doctor, radio:radio });
+            })
+        });
+    });
+});
+
+router.put('/payorder/:orderId', (req, res) => {
+    const orderId = req.params.orderId;
+
+    // Update status in Orders table
+    const orderUpdateQuery = 'UPDATE Orders SET status = ? WHERE order_id = ?';
+    db.query(orderUpdateQuery, ['Paid', orderId], (err, orderResult) => {
+        if (err) {
+            console.error('Error updating order status:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Update status in Reports table
+        const reportUpdateQuery = 'UPDATE Report SET report_status = ? WHERE order_id = ?';
+        db.query(reportUpdateQuery, ['Pending', orderId], (err) => {
+            if (err) {
+                console.error('Error updating report status:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+
+            return res.status(200).json({ message: 'Status updated successfully' });
+        });
+    });
+});
+
+
 
 router.get('/download/:fileName', (req, res) => {
     const fileName = req.params.fileName;
@@ -161,6 +291,27 @@ router.get('/doctorTransactions/:doctorId', (req, res) => {
 
         // Return transactions
         return res.status(200).json({ transactions: results });
+    });
+});
+
+router.get('/getAllCategories', (req, res) => {
+    // Query to retrieve all users
+    const getUsersQuery = 'SELECT * FROM category';
+
+    // Execute the query
+    db.query(getUsersQuery, (err, results) => {
+        if (err) {
+            console.error('Error retrieving users:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // If no users found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No users found' });
+        }
+
+        // Return the users
+        return res.status(200).json({ users: results });
     });
 });
 

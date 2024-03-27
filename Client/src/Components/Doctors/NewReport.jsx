@@ -1,53 +1,72 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { IoIosLogOut } from 'react-icons/io';
 import AlertContext from '../../Context/Alert/AlertContext';
 
 const NewReport = ({ handleLogout, toggleMenu }) => {
     const [Price, setPrice] = useState(0)
-    const Service = [
-        {
-            "service": "XR (1 view) reported by subspecialist",
-            "price": 200
-        },
-        {
-            "service": "Relevant XR (1 view) reported by subspecialist",
-            "price": 200
-        },
-        {
-            "service": "XR (multiple views of 1 region) reported by subspecialist",
-            "price": 200
-        },
-        {
-            "service": "CT (1 region) reported by Subspecialist",
-            "price": 200
-        },
-        {
-            "service": "Mammogram reported by subspecialist",
-            "price": 200
-        },
-        {
-            "service": "MRI (1 Region) Reported by Subspecialist",
-            "price": 200
-        },
-        {
-            "service": "CT Coronary Angiogram reported by Subspecialist",
-            "price": 200
-        },
-        {
-            "service": "Film Audit / Image Quality Assessment (MOH requirements for QAP)",
-            "price": 200
-        }
-    ];
+    const [Service, setService] = useState([])
+    // const Service = [
+    //     {
+    //         "service": "XR (1 view) reported by subspecialist",
+    //         "price": 200
+    //     },
+    //     {
+    //         "service": "Relevant XR (1 view) reported by subspecialist",
+    //         "price": 200
+    //     },
+    //     {
+    //         "service": "XR (multiple views of 1 region) reported by subspecialist",
+    //         "price": 200
+    //     },
+    //     {
+    //         "service": "CT (1 region) reported by Subspecialist",
+    //         "price": 200
+    //     },
+    //     {
+    //         "service": "Mammogram reported by subspecialist",
+    //         "price": 200
+    //     },
+    //     {
+    //         "service": "MRI (1 Region) Reported by Subspecialist",
+    //         "price": 200
+    //     },
+    //     {
+    //         "service": "CT Coronary Angiogram reported by Subspecialist",
+    //         "price": 200
+    //     },
+    //     {
+    //         "service": "Film Audit / Image Quality Assessment (MOH requirements for QAP)",
+    //         "price": 200
+    //     }
+    // ];
 
+    useEffect(() => {
+        fetch('http://localhost:3000/doctor/getAllCategories') // Assuming this is the correct endpoint
+            .then(response => {
+                if (!response.ok) {
+                    showAlert('Network response was not ok', 'danger');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.users) {
+                    setService(data.users);
+                }
+            })
+            .catch(error => {
+                showAlert('Error fetching categories', 'danger');
+            });
+    }, []);
 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
 
     const [formData, setFormData] = useState({
-        doctor_id: 2,
+        doctor_id: localStorage.getItem('doctorId'),
         category_id: '',
         date_generated: new Date().toISOString(),
+        Examination_Date: '',
         patient_name: '',
         dob: '',
         nric_passport_no: '',
@@ -60,33 +79,66 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-
+    
+        const formData2 = new FormData(); // Initialize FormData object
+    
+        // Assuming you have variables for form data
+        // const { doctor_id, category_id, date_generated, Examination_Date, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study } = formData
+    
+        // Append form data to FormData object
+        console.log(formData.Examination_Date)
+        formData2.append('doctor_id', formData.doctor_id);
+        formData2.append('category_id', formData.category_id);
+        formData2.append('date_generated', formData.date_generated);
+        formData2.append('Examination_Date', formData.Examination_Date);
+        formData2.append('patient_name', formData.patient_name);
+        formData2.append('dob', formData.dob);
+        formData2.append('price', Price);
+        formData2.append('nric_passport_no', formData.nric_passport_no);
+        formData2.append('clinical_summary_title', formData.clinical_summary_title);
+        formData2.append('age', formData.age);
+        formData2.append('gender', formData.gender);
+        formData2.append('previous_study', formData.previous_study);
+        formData2.append('file', formData.file);
+    
         try {
             const response = await fetch('http://localhost:3000/doctor/order', {
                 method: 'POST',
-                body: JSON.stringify(formData),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                body: formData2, // Send FormData directly
+                // No need to set Content-Type header
             });
-
+    
             const data = await response.json();
             if (response.ok) {
                 showAlert('New Request Created', 'success');
-                setFormData({ ...formData, patient_name: '', dob: '', nric_passport_no: '', clinical_summary_title: '', age: '', gender: '', previous_study: '', file: null });
+                setFormData(
+                    { ...formData,
+                    category_id: '',
+                    Examination_Date: '',
+                    patient_name: '',
+                    dob: '',
+                    nric_passport_no: '',
+                    clinical_summary_title: '',
+                    age: '',
+                    gender: '',
+                    previous_study: '',
+                    file: null
+                    });
             } else {
                 showAlert(data.error, 'danger')
             }
         } catch (error) {
-            showAlert(error.error, 'danger')
+            showAlert('Error: ' + error, 'danger');
         }
     };
+    
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleFileChange = (e) => {
+        console.log(e.target.files[0])
         setFormData({ ...formData, file: e.target.files[0] });
     };
 
@@ -109,33 +161,35 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                 <div className='bg-white shadow-2xl w-full my-10 py-2 rounded-lg px-8'>
                     {/* Your form content */}
                     {Price > 0 &&
-                        <h2 className='font-Para text-base'>{Price}$</h2>}
+                        <h2 className='font-Para text-2xl mt-2 float-right'>
+                           <span className='font-bold'>Price</span> {Price}$
+                        </h2>}
                     <form onSubmit={handleFormSubmit}>
                         <div className='grid md:grid-cols-2 gap-6 mt-10 grid-cols-1'>
                             <h2 className='text-xl font-medium  font-Para'>Patient Data</h2>
                             <div></div>
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="" className='font-Para text-base'>Patient Name</label>
+                                <label htmlFor="patient_name" className='font-Para text-base'>Patient Name</label>
                                 <input type="text" name="patient_name" value={formData.patient_name} onChange={handleInputChange} className='border-gray-400 border-2 py-2 px-4 rounded-lg ' />
                             </div>
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="" className='font-Para text-base'>Date Of Birth</label>
+                                <label htmlFor="dob" className='font-Para text-base'>Date Of Birth</label>
                                 <input type="date" name="dob" value={formData.dob} onChange={handleInputChange} className='border-gray-400 border-2 py-2 px-4 rounded-lg ' />
                             </div>
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="" className='font-Para text-base'>Gender</label>
+                                <label htmlFor="gender" className='font-Para text-base'>Gender</label>
                                 <select name="gender" value={formData.gender} onChange={handleInputChange} className='border-gray-400 border-2 py-2 px-4 rounded-lg '>
-                                    <option selected>Select Gender</option>
+                                    <option>Select Gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                 </select>
                             </div>
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="" className='font-Para text-base'>Age</label>
+                                <label htmlFor="age" className='font-Para text-base'>Age</label>
                                 <input type='number' name="age" value={formData.age} onChange={handleInputChange} className='border-gray-400 border-2 py-2 px-4 rounded-lg ' />
                             </div>
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="" className='font-Para text-base'>NRIC/Passport No</label>
+                                <label htmlFor="nric_passport_no" className='font-Para text-base'>NRIC/Passport No</label>
                                 <input type='text' name="nric_passport_no" value={formData.nric_passport_no} onChange={handleInputChange} className='border-gray-400 border-2 py-2 px-4 rounded-lg ' />
                             </div>
                         </div>
@@ -145,24 +199,39 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                             <h2 className='text-xl font-medium  font-Para'>Report Request</h2>
                             <div></div>
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="" className='font-Para text-base'>Examination Date *</label>
-                                <input type='date' name="" id="" className='border-gray-400 border-2 py-2 px-4 rounded-lg ' />
+                                <label htmlFor="Examination_Date" className='font-Para text-base'>Examination Date *</label>
+                                <input
+                                    type='date'
+                                    name="Examination_Date"
+                                    id="Examination_Date"
+                                    onChange={handleInputChange}
+                                    value={formData.Examination_Date}
+                                    className='border-gray-400 border-2 py-2 px-4 rounded-lg '
+                                />
                             </div>
 
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="" className='font-Para text-base'>Uni Clinic *</label>
-                                <input type='text' name="" id="" className='border-gray-400 border-2 py-2 px-4 rounded-lg ' />
+                                <label htmlFor="clinical_summary_title" className='font-Para text-base'>organization *</label>
+                                <input type='text' name="clinical_summary_title" id="clinical_summary_title" value={formData.clinical_summary_title} onChange={handleInputChange} className='border-gray-400 border-2 py-2 px-4 rounded-lg ' />
                             </div>
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="" className='font-Para text-base'>Request Type *</label>
+                                <label htmlFor="category_id" className='font-Para text-base'>Request Type *</label>
                                 <select
-                                    name="clinical_summary_title"
-                                    value={formData.clinical_summary_title}
+                                    name="category_id"
+                                    value={formData.category_id}
                                     required
                                     onChange={(e) => {
+                                        Service.map((item2,index2)=>{
+                                            if(item2.category_id==e.target.value){
+                                                console.log(item2)
+                                                setPrice(item2.price)
+                                            }else if(e.target.value==''){
+                                                setPrice(0)
+                                            }
+                                        })
                                         setFormData({
                                             ...formData,
-                                            'clinical_summary_title': e.target.value
+                                            'category_id': e.target.value
                                         });
                                     }}
                                     className='border-gray-400 border-2 py-2 px-4 rounded-lg '
@@ -170,17 +239,16 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                                     <option value="">Please Select from the List below</option>
                                     {Service.map((item, index) => (
                                         <option
-                                            value={item.service}
-                                            onClick={() => (setPrice(item.price))}
+                                            value={item.category_id}
                                             key={index}
                                         >
-                                            {item.service}
+                                            {item.category_name}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="" className='font-Para text-base'>Previous History (If any)</label>
+                                <label htmlFor="previous_study" className='font-Para text-base'>Previous History (If any)</label>
                                 <input type='text' name="previous_study" value={formData.previous_study} onChange={handleInputChange} className='border-gray-400 border-2 py-2 px-4 rounded-lg ' />
                                 <p className='text-red-600 text-base'>Please provide the company study indication and other relevant patient history which are essential for radiologist diagnosis</p>
                             </div>
@@ -193,12 +261,14 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                                 <span className='text-red-600 font-bold'>Please upload DICOM (.dem) files only.</span>
                             </p>
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="" className='font-Para text-base'>Add Image</label>
+                                <label htmlFor="file" className='font-Para text-base'>Add Image</label>
                                 <input
+                                    id="file"
+                                    name='file'
                                     className='border-gray-400 border-2 py-2 px-4 rounded-lg '
                                     type='file'
                                     onChange={handleFileChange}
-                                    accept='image/*'
+                                    // accept='image/*'
                                 />
                             </div>
                             <p className='text-red-600 text-base font-bold'>Examination / Study Image file is mandatory for the reading specialist to report</p>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { GrClose } from "react-icons/gr"
 import { LuLayoutTemplate } from "react-icons/lu"
@@ -11,11 +11,16 @@ import UserAccount from '../../Components/Radiologist/UserAccount';
 import AllNewFiles from '../../Components/Radiologist/AllNewFiles';
 import AllPreviousReport from '../../Components/Radiologist/AllReports';
 import FillReport from '../../Components/Radiologist/FillReport';
+import AlertContext from '../../Context/Alert/AlertContext';
+import ReportDetails from '../../Components/Radiologist/ReportDetails';
 
 
 function RadioDashboard() {
     const [isMenuOpen, setIsMenuOpen] = useState(true);
     const location = useLocation();
+
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
 
     const navigate = useNavigate();
 
@@ -23,9 +28,33 @@ function RadioDashboard() {
         setIsMenuOpen(!isMenuOpen);
     };
 
+    const fetchRadioId = async () => {
+        try {
+            const userId = localStorage.getItem('userid'); // Assuming you have stored userId in localStorage
+            const response = await fetch(`http://localhost:3000/radiologist/getRadioId/${userId}`);
+            if (response.ok) {
+                const data = await response.json();
+                const { radioId } = data;
+                localStorage.setItem('RadioId', radioId); 
+            } else {
+                showAlert('Failed to fetch Radio Id','danger');
+            }
+        } catch (error) {
+            showAlert('Error fetching Radilogist', 'danger');
+            navigate("/login")
+        }
+    };
+
+    useEffect(() => {
+        fetchRadioId();
+    }, []);
+
     const handleLogout = () => {
         localStorage.removeItem('token')
         localStorage.removeItem('role')
+        localStorage.removeItem('doctorId')
+        localStorage.removeItem('userid')
+        localStorage.removeItem('RadioId')
         navigate('/');
     };
 
@@ -129,6 +158,10 @@ function RadioDashboard() {
                         <Route
                             path="/fill-report"
                             element={<FillReport toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
+                        </Route>
+                        <Route
+                            path="/ReportDetail"
+                            element={<ReportDetails toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
                         </Route>
                     </Routes>
                 </div>

@@ -1,110 +1,36 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoIosLogOut } from 'react-icons/io'
 import { Link, useNavigate } from 'react-router-dom'
+import AlertContext from '../../Context/Alert/AlertContext'
 
 const AllNewFiles = ({handleLogout,toggleMenu}) => {
-    const Data = [
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Created",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Paid",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Created",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Created",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Paid",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Created",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Sohaib",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Created",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        }
-    ]
-
-    const [SearchKey, setSearchKey] = useState(null)
     const [Dataset, setDataset] = useState([])
 
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
 
-    useEffect(() => {
-        setDataset(Data)
-    }, [])
-
-    useEffect(() => {
-        if (SearchKey !== null) {
-            const filteredData = Data.filter(item => {
-                // Customize the conditions based on your search requirements
-                return (
-                    item.ID.toLowerCase().includes(SearchKey.toLowerCase()) ||
-                    item.Type.toLowerCase().includes(SearchKey.toLowerCase()) ||
-                    item.Status.toLowerCase().includes(SearchKey.toLowerCase()) ||
-                    item.Date.toLowerCase().includes(SearchKey.toLowerCase()) ||
-                    item.Patient.toLowerCase().includes(SearchKey.toLowerCase()) ||
-                    item.StudyDate.toLowerCase().includes(SearchKey.toLowerCase()) ||
-                    item.UploadedFile.toLowerCase().includes(SearchKey.toLowerCase()) ||
-                    item.Price.toString().toLowerCase().includes(SearchKey.toLowerCase())
-                );
+    const getorder = async () => {
+        fetch(`http://localhost:3000/radiologist/getAllReports/${localStorage.getItem('RadioId')}`) // Assuming this is the correct endpoint
+            .then(response => {
+                if (!response.ok) {
+                    showAlert('Network response was not ok', 'danger');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.orders) {
+                    setDataset(data.orders);
+                }
+            })
+            .catch(error => {
+                showAlert('Error fetching categories', 'danger');
             });
-            setDataset(filteredData);
-        } else {
-            setDataset(Data);
-        }
-    }, [SearchKey]);
+    }
+
+    useEffect(() => {
+        getorder()
+    }, []);
 
     const navigate = useNavigate()
 
@@ -133,7 +59,7 @@ const AllNewFiles = ({handleLogout,toggleMenu}) => {
                         </ol>
                     </div>
 
-                    <div className='flex flex-row justify-between'>
+                    {/* <div className='flex flex-row justify-between'>
                         <input
                             type="text"
                             placeholder='Search'
@@ -141,19 +67,17 @@ const AllNewFiles = ({handleLogout,toggleMenu}) => {
                             onChange={(e) => { setSearchKey(e.target.value) }}
                             className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'
                         />
-                    </div>
+                    </div> */}
 
 
                     <div className='overflow-x-scroll'>
-                        <table className='styled-table'>
+                        <table className='w-[100%] styled-table'>
                             <thead className='font-Para'>
                                 <tr>
                                     <th>ID</th>
                                     <th>Type</th>
                                     <th>Status</th>
                                     <th>Submitted Date</th>
-                                    <th>Patient name</th>
-                                    <th>Price</th>
                                     <th>Download File</th>
                                     <th>Operation</th>
                                 </tr>
@@ -164,17 +88,15 @@ const AllNewFiles = ({handleLogout,toggleMenu}) => {
                                         className='font-Para cursor-pointer'
                                         key={index}
                                     >
-                                        <td>{item.ID}</td>
-                                        <td>{item.Type}</td>
-                                        <td>{item.Status}</td>
-                                        <td>{item.Date}</td>
-                                        <td>{item.Patient}</td>
-                                        <td>{item.Price}</td>
+                                        <td>{item.report_id}</td>
+                                        <td>{item.category_name}</td>
+                                        <td>{item.report_status}</td>
+                                        <td>{item.date_generated}</td>
                                         <td className='text-blue-600 underline cursor-pointer'>
-                                            <a download={item.UploadedFile}>{item.UploadedFile}</a>
+                                            <a href={item.file_url} download={item.patient_name} target='_blank'>{item.file_path}</a>
                                         </td>
                                         <td>
-                                            <Link to={'/radioDashboard/fill-report'} state={item}>
+                                            <Link to={'/radioDashboard/fill-report'} state={{id:item.report_id}}>
                                                 <button
                                                     className='border-slate-700 border-2 bg-transparent hover:bg-slate-700 text-slate-700 hover:text-white py-2 px-4 m-1 rounded-lg ease-in-out duration-300'
 

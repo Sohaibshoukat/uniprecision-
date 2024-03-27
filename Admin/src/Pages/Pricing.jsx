@@ -1,44 +1,39 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { IoIosLogOut } from 'react-icons/io'
 import { GiHamburgerMenu } from 'react-icons/gi'
+import AlertContext from '../Context/Alert/AlertContext';
 
-const Pricing = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
+const Pricing = ({ 
+        toggleMenu, 
+        handleLogout, 
+        OpenModel, 
+        setOpenModel,
+        setprice, 
+        setcategory_name, 
+        settype, 
+        seteditid 
+}) => {
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
+    const [categories, setCategories] = useState([]);
 
-    const Service = [
-        {
-            "service": "XR (1 view) reported by subspecialist",
-            "price": 200
-        },
-        {
-            "service": "Relevant XR (1 view) reported by subspecialist",
-            "price": 200
-        },
-        {
-            "service": "XR (multiple views of 1 region) reported by subspecialist",
-            "price": 200
-        },
-        {
-            "service": "CT (1 region) reported by Subspecialist",
-            "price": 200
-        },
-        {
-            "service": "Mammogram reported by subspecialist",
-            "price": 200
-        },
-        {
-            "service": "MRI (1 Region) Reported by Subspecialist",
-            "price": 200
-        },
-        {
-            "service": "CT Coronary Angiogram reported by Subspecialist",
-            "price": 200
-        },
-        {
-            "service": "Film Audit / Image Quality Assessment (MOH requirements for QAP)",
-            "price": 200
-        }
-    ];
-
+    useEffect(() => {
+        fetch('http://localhost:3000/admin/getAllCategories') // Assuming this is the correct endpoint
+            .then(response => {
+                if (!response.ok) {
+                    showAlert('Network response was not ok', 'danger');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.users) {
+                    setCategories(data.users);
+                }
+            })
+            .catch(error => {
+                showAlert('Error fetching categories', 'danger');
+            });
+    }, []);
 
     return (
         <>
@@ -67,42 +62,44 @@ const Pricing = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
                         <div className='flex flex-row gap-4 justify-end'>
                             <button
                                 className='w-fit px-4 bg-darkblue text-white border-2 border-darkblue hover:bg-transparent  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
-                                onClick={() => { setOpenModel(true) }}
+                                onClick={() => { 
+                                    setOpenModel(true)
+                                    settype('Add')
+                                 }}
                             >
                                 Add New Service
                             </button>
-                            <button className='w-fit px-4 bg-darkblue text-white border-2 border-darkblue hover:bg-transparent  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'>Update Price</button>
                         </div>
                         <table className='styled-table w-[100%] bg-slate-300 py-4 px-8 rounded-xl'>
                             <thead className='font-Para'>
                                 <tr>
-                                    <th>Select to change</th>
                                     <th>Name</th>
                                     <th>Price</th>
+                                    <th>Unit</th>
                                     <th>New Input</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {Service && Service.length > 0 && Service.map((item, index) => (
+                                {categories && categories?.length > 0 && categories?.map((item, index) => (
                                     <tr
-                                        className='font-Para cursor-pointer'
+                                        className='font-Para text-lg cursor-pointer'
                                         key={index}
                                     >
-                                        <td
-                                            className='text-center'
-                                        >
-                                            <input
-                                                type='checkbox'
-                                                className='bg-slate-200'
-                                            // checked={SelectedItem.includes(item)}
-                                            // onChange={(e) => handleCheckboxChange(e, item)}
-                                            />
-                                        </td>
-                                        <td>{item.service}</td>
+                                        <td>{item.category_name}</td>
                                         <td>{item.price}</td>
-                                        <td>
-                                            <input type="number" name="" id="" className='bg-slate-200 rounded-lg text-black py-2 px-4' />
-                                        </td>
+                                        <td>{item.unit}</td>
+                                        <button
+                                            className='w-fit px-4 my-2 bg-green-400 text-white border-2 border-green-400 hover:bg-transparent  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
+                                            onClick={() => { 
+                                                setOpenModel(true) 
+                                                setcategory_name(item.category_name)
+                                                setprice(item.price)
+                                                seteditid(item.category_id)
+                                                settype('Edit')
+                                            }}
+                                        >
+                                           Edit
+                                        </button>
                                     </tr>
                                 ))}
                             </tbody>

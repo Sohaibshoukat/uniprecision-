@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom'; // Importing useLocation
+import { Link, useLocation, useNavigate } from 'react-router-dom'; // Importing useLocation
 import { GrClose } from 'react-icons/gr';
 import { IoIosLogOut, IoMdPricetags } from 'react-icons/io';
 import { BsCalendar4Event } from 'react-icons/bs';
@@ -9,7 +9,8 @@ import {FaUserCheck} from 'react-icons/fa6'
 import {MdAssignmentAdd} from 'react-icons/md'
 
 const Nav = ({ isMenuOpen, setIsMenuOpen, toggleMenu }) => {
-    const location = useLocation(); // Using useLocation hook to get the current location
+    const location = useLocation();
+    const navigate= useNavigate(); // Using useLocation hook to get the current location
 
     const tabs = [
         {
@@ -60,8 +61,10 @@ const Nav = ({ isMenuOpen, setIsMenuOpen, toggleMenu }) => {
     ];
 
     const handleLogout = () => {
-        sessionStorage.removeItem('token');
-        navigate('/');
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("adminID")
+        navigate('/login');
     };
 
     return (
@@ -77,9 +80,9 @@ const Nav = ({ isMenuOpen, setIsMenuOpen, toggleMenu }) => {
             </div>
             <div className="flex basis-[5%] py-2 h-[10%] items-center justify-center pr-2  bg-slate-700 border-slate-700">
                 <img
-                    src='../assets/Logo2.png'
+                    src='../assets/Logo.png'
                     alt="User avatar"
-                    className="w-[150px] h-[100%]"
+                    className="w-[130px] h-[100%]"
                 />
             </div>
             <ul className="pb-4">

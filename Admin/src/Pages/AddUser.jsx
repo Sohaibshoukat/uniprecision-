@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import { IoIosLogOut } from 'react-icons/io'
 import { GiHamburgerMenu } from 'react-icons/gi'
+import { useContext } from 'react';
+import AlertContext from '../Context/Alert/AlertContext';
+import { StateData } from '../Constant/StateData';
 
 const AddUser = ({ toggleMenu, handleLogout }) => {
     const [userType, setUserType] = useState('');
@@ -10,6 +13,7 @@ const AddUser = ({ toggleMenu, handleLogout }) => {
         organization: '',
         mobile_number: '',
         email: '',
+        password: '',
         address_line_1: '',
         address_line_2: '',
         postcode: '',
@@ -18,28 +22,47 @@ const AddUser = ({ toggleMenu, handleLogout }) => {
         country: ''
     });
 
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         // Set role based on userType
         formData.role = userType;
 
-        // Call appropriate API based on userType
-        const apiUrl = userType === 'Doctor' ? '/adddoctor' : '/addradiologist';
-        const response = await fetch(`http://localhost:3000/admin/${apiUrl}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        });
+        try {
+            const apiUrl = userType === 'Doctor' ? '/adddoctor' : '/addradiologist';
+            const response = await fetch(`http://localhost:3000/admin/${apiUrl}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
 
-        if (response.ok) {
             const data = await response.json();
-            console.log(data); // Handle success response
-        } else {
-            console.error('Failed to add user');
-            // Handle error response
+            if (response.ok) {
+                showAlert('User Created Successfully', 'success')
+                setFormData({
+                    ...formData, 
+                    name: '',
+                    organization: '',
+                    mobile_number: '',
+                    email: '',
+                    password: '',
+                    address_line_1: '',
+                    address_line_2: '',
+                    postcode: '',
+                    city: '',
+                    state: '',
+                    country: ''
+                });
+            } else {
+                showAlert(data.error, 'danger')
+            }
+        } catch (error) {
+            showAlert(error.message, 'danger')
         }
     };
 
@@ -129,6 +152,18 @@ const AddUser = ({ toggleMenu, handleLogout }) => {
                             />
                         </div>
                         <div className="flex flex-col md:flex-row basis-[50%] gap-2  md:items-center">
+                            <label htmlFor="" className='basis-[30%] text-gray-500 text-lg font-normal'>Password *</label>
+                            <input
+                                type="password"
+                                placeholder='****'
+                                name='password'
+                                id='password'
+                                value={formData.password}
+                                onChange={handleChange}
+                                className='basis[70%] md:w-[70%] text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'
+                            />
+                        </div>
+                        <div className="flex flex-col md:flex-row basis-[50%] gap-2  md:items-center">
                             <label htmlFor="" className='basis-[30%] text-gray-500 text-lg font-normal'>Address Line 1 *</label>
                             <input
                                 type="text"
@@ -188,11 +223,10 @@ const AddUser = ({ toggleMenu, handleLogout }) => {
                                     onChange={handleChange}
                                     className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md '
                                 >
-                                    <option value="Sarawak">Sarawak</option>
-                                    <option value="Sarawak">Sarawak</option>
-                                    <option value="Sarawak">Sarawak</option>
-                                    <option value="Sarawak">Sarawak</option>
-                                    <option value="Sarawak">Sarawak</option>
+                                    <option value="">Select from below</option>
+                                    {StateData.map((item, index) => (
+                                        <option value={item} key={index}>{item}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="flex flex-col basis-[50%] gap-2">

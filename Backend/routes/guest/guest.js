@@ -30,44 +30,50 @@ router.post('/forgot-password', (req, res) => {
         // Generate a unique token
         const token = generateToken();
 
-        // Store the token in the database
-        const insertTokenQuery = 'INSERT INTO PasswordResetTokens (email, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 1 HOUR))';
-        db.query(insertTokenQuery, [email, token], (err) => {
+        bcrypt.hash(token, 10, (err, hashedPassword) => {
             if (err) {
-                console.error('Error inserting token:', err);
+                console.error('Error hashing password:', err);
                 return res.status(500).json({ error: 'Internal Server Error' });
             }
-
-            // Send reset password email
-            const transporter = nodemailer.createTransport({
-                service: 'Gmail',
-                auth: {
-                    user: 'inzamamyousaf11111@gmail.com',
-                    pass: ''
-                }
-            });
-
-            const mailOptions = {
-                from: 'inzamamyousaf11111@gmail.com',
-                to: email,
-                subject: 'Reset Your Password',
-                text: `To reset your password, click on the following link: http://localhost:3000/reset-password?token=${token}`
-            };
-
-            transporter.sendMail(mailOptions, (error) => {
-                if (error) {
-                    console.error('Error sending email:', error);
+            // Store the token in the database
+            const insertTokenQuery = 'UPDATE User SET password = ? WHERE email = ?';
+            db.query(insertTokenQuery, [hashedPassword, email], (err) => {
+                if (err) {
+                    console.error('Error inserting token:', err);
                     return res.status(500).json({ error: 'Internal Server Error' });
                 }
 
-                return res.status(200).json({ message: 'Reset password email sent successfully' });
+                // Send reset password email
+                const transporter = nodemailer.createTransport({
+                    service: 'Gmail',
+                    auth: {
+                        user: 'inzamamyousaf11111@gmail.com',
+                        pass: 'jmon otld jzhx xohs'
+                    }
+                });
+
+                const mailOptions = {
+                    from: 'inzamamyousaf11111@gmail.com',
+                    to: email,
+                    subject: 'Your temporary Password',
+                    text: `This is your temporary password login with it. Then You can reset your password from account setting ${token}`
+                };
+
+                transporter.sendMail(mailOptions, (error) => {
+                    if (error) {
+                        console.error('Error sending email:', error);
+                        return res.status(500).json({ error: 'Internal Server Error' });
+                    }
+
+                    return res.status(200).json({ message: 'Reset password email sent successfully' });
+                });
             });
-        });
+        })
     });
 });
 
 router.post('/signup', (req, res) => {
-    const { name, organization, mobile_number, email, password, address_line1, address_line2, postcode, city, state, country, role } = req.body;
+    const { name, organization, guest_type, mobile_number, email, password, address_line1, address_line2, postcode, city, state, country, role } = req.body;
     const status = 'Not Approved';
 
     // Check if the email already exists in the database
@@ -92,8 +98,8 @@ router.post('/signup', (req, res) => {
             }
 
             // Insert data into User table
-            const userInsertQuery = 'INSERT INTO User (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-            db.query(userInsertQuery, [name, organization, mobile_number, email, hashedPassword, role, address_line1, address_line2, postcode, city, state, country], (err, result) => {
+            const userInsertQuery = 'INSERT INTO User (name, organization, guest_type, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            db.query(userInsertQuery, [name, organization, guest_type, mobile_number, email, hashedPassword, role, address_line1, address_line2, postcode, city, state, country], (err, result) => {
                 if (err) {
                     console.error('Error signing up User:', err);
                     return res.status(500).json({ error: 'Internal Server Error' });
@@ -164,8 +170,8 @@ router.post('/login', (req, res) => {
 
             // Check if the user's status is approved
             const statusQuery = user.role.toLowerCase() === 'doctor' ? 'SELECT status FROM Doctor WHERE user_id = ?' :
-                                user.role.toLowerCase() === 'radiologist' ? 'SELECT status FROM Radiologist WHERE user_id = ?' :
-                                '';
+                user.role.toLowerCase() === 'radiologist' ? 'SELECT status FROM Radiologist WHERE user_id = ?' :
+                    '';
             db.query(statusQuery, [user.user_id], (err, statusResult) => {
                 if (err) {
                     console.error('Error retrieving user status:', err);
@@ -181,10 +187,85 @@ router.post('/login', (req, res) => {
                 const token = jwt.sign({ userId: user.user_id, email: user.email, role: user.role }, secretKey, { expiresIn: '2d' });
 
                 // Return the token and user role
-                return res.status(200).json({ token, role: user.role,userid:user.user_id });
+                return res.status(200).json({ token, role: user.role, userid: user.user_id });
             });
         });
     });
 });
+
+router.get('/getUser/:id', (req, res) => {
+    const userId = req.params.id;
+
+    // Query the database to get the doctor ID based on the user ID
+    const doctorIdQuery = 'SELECT * FROM user WHERE user_id = ?';
+    db.query(doctorIdQuery, [userId], (err, result) => {
+        if (err) {
+            console.error('Error retrieving doctor ID:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        const user = result[0];
+        return res.status(200).json({ user: user });
+    });
+});
+
+
+router.put('/update/:userId', (req, res) => {
+    const userId = req.params.userId;
+    const { name, organization, guest_type, mobile_number, email, address_line1, address_line2, postcode, city, state, country } = req.body;
+
+    const userUpdateQuery = `
+            UPDATE User 
+            SET name = ?, organization = ?, guest_type = ?, mobile_number = ?, email = ?, address_line_1 = ?, address_line_2 = ?, postcode = ?, city = ?, state = ?, country = ?
+            WHERE user_id = ?
+        `;
+    db.query(userUpdateQuery, [name, organization, guest_type, mobile_number, email, address_line1, address_line2, postcode, city, state, country, userId], (err, result) => {
+        if (err) {
+            console.error('Error updating User:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        return res.status(200).json({ message: 'User updated successfully' });
+    });
+});
+
+
+router.put('/update-password/:userId', (req, res) => {
+    const userId = req.params.userId;
+    const { password } = req.body;
+
+    let hashedPassword = password;
+    bcrypt.hash(password, 10, (err, hash) => {
+        if (err) {
+            console.error('Error hashing password:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        hashedPassword = hash;
+
+        const userUpdateQuery = `
+            UPDATE User 
+            SET  password = ?
+            WHERE user_id = ?
+        `;
+        db.query(userUpdateQuery, [hashedPassword, userId], (err, result) => {
+            if (err) {
+                console.error('Error updating User:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            return res.status(200).json({ message: 'Password updated successfully' });
+        });
+    })
+});
+
+
 
 module.exports = router;

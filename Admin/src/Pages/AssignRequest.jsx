@@ -1,80 +1,100 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { IoIosLogOut } from 'react-icons/io'
 import { GiHamburgerMenu } from 'react-icons/gi'
+import AlertContext from '../Context/Alert/AlertContext'
 
 const AssignRequest = ({ toggleMenu, handleLogout }) => {
-    const Data = [
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Created",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Paid",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Created",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Created",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Paid",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Created",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Sohaib",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
-        },
-        {
-            ID: "SR000233",
-            Type: "Specialist Reporting",
-            Status: "Created",
-            Date: "16 May 2023 10:56:42 AM",
-            Patient: "Frank Gyver Anak Majing",
-            StudyDate: "16 May 2023 10:56:42 AM",
-            UploadedFile: "uploads/SR000233.dcm",
-            Price: 15,
+
+    const [Data, setData] = useState([])
+    const [Radiologist, setRadiologist] = useState()
+    const [radiologistid, setradiologistid] = useState(null)
+    const [report_id, setreport_id] = useState(null)
+
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
+
+
+    const getallRadio = async () => {
+        fetch(`http://localhost:3000/admin/getAllRadiologists`) // Assuming this is the correct endpoint
+            .then(response => {
+                if (!response.ok) {
+                    showAlert('Network response was not ok', 'danger');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.radiologists) {
+                    setRadiologist(data.radiologists);
+                }
+            })
+            .catch(error => {
+                showAlert('Error fetching categories', 'danger');
+            });
+    }
+
+    const getorder = async () => {
+        fetch(`http://localhost:3000/admin/getPendingReports`) // Assuming this is the correct endpoint
+            .then(response => {
+                if (!response.ok) {
+                    showAlert('Network response was not ok', 'danger');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.pending_reports) {
+                    setData(data.pending_reports);
+                }
+            })
+            .catch(error => {
+                showAlert('Error fetching categories', 'danger');
+            });
+    }
+    
+
+    useEffect(() => {
+        getorder()
+        getallRadio()
+    }, []);
+
+    const assignReport = async () => {
+        if (!radiologistid || !report_id) {
+            console.log(radiologistid)
+            showAlert('Select Radiologist','danger')
+            return;
         }
-    ]
+
+        const requestData = {
+            radiologist_id: radiologistid,
+            report_id: report_id
+        };
+
+        fetch('http://localhost:3000/admin/assignReport', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+            
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            getorder()
+            showAlert('report Assigned Success','success')
+        })
+        .catch(error => {
+            showAlert('Error assigning report', 'danger');
+        });
+    };
+
+    const handleAssign = (reportId) => {
+        setreport_id(reportId);
+        assignReport();
+    };
 
     return (
         <>
@@ -92,73 +112,46 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
             <div className='h-[100%] max-h-[100vh] py-10 px-5 md:px-10 m-auto overflow-y-scroll'>
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>Assign Reqsuest to Radiologist</h2>
-                    {/* <div className='my-10 bg-gray-200 rounded-lg py-8 px-5 md:px-10 flex flex-col gap-8'>
-                        <div className="flex  flex-col gap-8">
-                            <div className="flex flex-col md:w-[50%] gap-2">
-                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>Radiologist *</label>
-                                <select name="" id="" className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'>
-                                    <option value="">Select From below drop down</option>
-                                    <option value="">Inzama</option>
-                                    <option value="">Inzama</option>
-                                    <option value="">Inzama</option>
-                                    <option value="">Inzama</option>
-                                </select>
-                            </div>
-                            <div className="flex flex-col md:w-[50%] gap-2">
-                                <label htmlFor="" className='text-gray-500 text-lg font-normal'>New Request *</label>
-                                <select name="" id="" className='text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md'>
-                                    <option value="">Select From below drop down</option>
-                                    <option value="">Request 1</option>
-                                    <option value="">Request 2</option>
-                                    <option value="">Request 3</option>
-                                    <option value="">Request 4</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button className='w-fit px-6  bg-darkblue text-white border-2 border-darkblue hover:bg-transparent  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'>Assign Request</button>
-                    </div> */}
-
                     <div className='overflow-x-scroll'>
-                        <table className='styled-table'>
+                        <table className='w-[100%] styled-table'>
                             <thead className='font-Para'>
                                 <tr>
                                     <th>ID</th>
                                     <th>Type</th>
-                                    <th>Status</th>
                                     <th>Submitted Date</th>
                                     <th>Price</th>
-                                    <th>Download File</th>
                                     <th>Radiologist</th>
                                     <th>Operation</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {Data && Data.length > 0 && Data.map((item, index) => (
+                                {Data && Data?.length > 0 && Data?.map((item, index) => (
                                     <tr
                                         className='font-Para cursor-pointer'
                                         key={index}
                                     >
-                                        <td>{item.ID}</td>
-                                        <td>{item.Type}</td>
-                                        <td>{item.Status}</td>
-                                        <td>{item.Date}</td>
-                                        <td>{item.Price}</td>
-                                        <td className='text-blue-600 underline cursor-pointer'>
-                                            <a download={item.UploadedFile}>{item.UploadedFile}</a>
-                                        </td>
+                                        <td>{item.report_id}</td>
+                                        <td>{item.date_generated}</td>
+                                        <td>{item.date_generated}</td>
+                                        <td>{item.price}</td>
                                         <td>
-                                            <select name="" id="" className="text-base w-full px-2 py-2 text-black border border-solid border-gray-500 rounded-lg">
-                                                <option value="">Select Radiologist</option>
-                                                <option value="">Inzamam</option>
-                                                <option value="">Inzamam</option>
-                                                <option value="">Inzamam</option>
-                                                <option value="">Inzamam</option>
+                                            <select 
+                                                name="" 
+                                                id="" 
+                                                className="text-base w-full px-2 py-2 text-black border border-solid border-gray-500 rounded-lg"
+                                                value={radiologistid}
+                                                onChange={(e)=>{setradiologistid(e.target.value)}}
+                                            >
+                                                <option value=''>Select Radiologist</option>
+                                                {Radiologist?.map((item2,index2)=>(
+                                                    <option value={item2.radiologist_id} key={index2}>{item2.radiologist_name}</option>
+                                                ))}
                                             </select>
                                         </td>
                                         <td>
                                             <button
                                                 className='border-slate-700 border-2 bg-transparent hover:bg-slate-700 text-slate-700 hover:text-white py-2 px-4 m-1 rounded-lg ease-in-out duration-300'
-
+                                                onClick={()=>{handleAssign(item.report_id)}}
                                             >
                                                 Assign
                                             </button>
