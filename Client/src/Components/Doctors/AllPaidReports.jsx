@@ -12,7 +12,7 @@ const AllPaidReports = ({ handleLogout, toggleMenu }) => {
     const { showAlert } = AletContext;
 
     const getorder = async () => {
-        fetch(`http://localhost:3000/doctor/getAllReports/${localStorage.getItem('doctorId')}`) // Assuming this is the correct endpoint
+        fetch(`https://backend.uniprecision.com.my/doctor/getAllReports/${localStorage.getItem('doctorId')}`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');

@@ -14,7 +14,7 @@ const Login = () => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:3000/admin/login", {
+      const response = await fetch("https://backend.uniprecision.com.my/admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,6 +40,7 @@ const Login = () => {
         showAlert(data.error, 'danger')
       }
     } catch (error) {
+      console.log(error)
       showAlert(error.error, 'danger');
     }
   };

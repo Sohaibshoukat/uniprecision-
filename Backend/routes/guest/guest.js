@@ -16,7 +16,7 @@ router.post('/forgot-password', (req, res) => {
     const { email } = req.body;
 
     // Check if the user exists in the database
-    const userQuery = 'SELECT * FROM User WHERE email = ?';
+    const userQuery = 'SELECT * FROM user WHERE email = ?';
     db.query(userQuery, [email], (err, results) => {
         if (err) {
             console.error('Error retrieving user:', err);
@@ -24,7 +24,7 @@ router.post('/forgot-password', (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'user not found' });
         }
 
         // Generate a unique token
@@ -36,7 +36,7 @@ router.post('/forgot-password', (req, res) => {
                 return res.status(500).json({ error: 'Internal Server Error' });
             }
             // Store the token in the database
-            const insertTokenQuery = 'UPDATE User SET password = ? WHERE email = ?';
+            const insertTokenQuery = 'UPDATE user SET password = ? WHERE email = ?';
             db.query(insertTokenQuery, [hashedPassword, email], (err) => {
                 if (err) {
                     console.error('Error inserting token:', err);
@@ -77,7 +77,7 @@ router.post('/signup', (req, res) => {
     const status = 'Not Approved';
 
     // Check if the email already exists in the database
-    const emailCheckQuery = 'SELECT COUNT(*) AS count FROM User WHERE email = ?';
+    const emailCheckQuery = 'SELECT COUNT(*) AS count FROM user WHERE email = ?';
     db.query(emailCheckQuery, [email], (err, result) => {
         if (err) {
             console.error('Error checking email:', err);
@@ -97,8 +97,8 @@ router.post('/signup', (req, res) => {
                 return res.status(500).json({ error: 'Internal Server Error' });
             }
 
-            // Insert data into User table
-            const userInsertQuery = 'INSERT INTO User (name, organization, guest_type, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            // Insert data into user table
+            const userInsertQuery = 'INSERT INTO user (name, organization, guest_type, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
             db.query(userInsertQuery, [name, organization, guest_type, mobile_number, email, hashedPassword, role, address_line1, address_line2, postcode, city, state, country], (err, result) => {
                 if (err) {
                     console.error('Error signing up User:', err);
@@ -107,28 +107,28 @@ router.post('/signup', (req, res) => {
 
                 const userId = result.insertId;
 
-                // Insert data into Doctor table if the role is Doctor
+                // Insert data into doctor table if the role is Doctor
                 if (role.toLowerCase() === 'doctor') {
-                    const doctorInsertQuery = 'INSERT INTO Doctor (user_id, status) VALUES (?, ?)';
+                    const doctorInsertQuery = 'INSERT INTO doctor (user_id, status) VALUES (?, ?)';
                     db.query(doctorInsertQuery, [userId, status], (err) => {
                         if (err) {
                             console.error('Error signing up doctor:', err);
                             return res.status(500).json({ error: 'Internal Server Error' });
                         }
 
-                        return res.status(200).json({ message: 'Doctor signed up successfully' });
+                        return res.status(200).json({ message: 'doctor signed up successfully' });
                     });
                 }
-                // Insert data into Radiologist table if the role is Radiologist
+                // Insert data into radiologist table if the role is Radiologist
                 else if (role.toLowerCase() === 'radiologist') {
-                    const radiologistInsertQuery = 'INSERT INTO Radiologist (user_id, status) VALUES (?, ?)';
+                    const radiologistInsertQuery = 'INSERT INTO radiologist (user_id, status) VALUES (?, ?)';
                     db.query(radiologistInsertQuery, [userId, status], (err) => {
                         if (err) {
                             console.error('Error signing up radiologist:', err);
                             return res.status(500).json({ error: 'Internal Server Error' });
                         }
 
-                        return res.status(200).json({ message: 'Radiologist signed up successfully' });
+                        return res.status(200).json({ message: 'radiologist signed up successfully' });
                     });
                 }
                 // Handle other roles here
@@ -144,7 +144,7 @@ router.post('/login', (req, res) => {
     const { email, password } = req.body;
 
     // Check if the user exists in the database
-    const userQuery = 'SELECT * FROM User WHERE email = ?';
+    const userQuery = 'SELECT * FROM user WHERE email = ?';
     db.query(userQuery, [email], (err, results) => {
         if (err) {
             console.error('Error retrieving user:', err);
@@ -169,8 +169,8 @@ router.post('/login', (req, res) => {
             }
 
             // Check if the user's status is approved
-            const statusQuery = user.role.toLowerCase() === 'doctor' ? 'SELECT status FROM Doctor WHERE user_id = ?' :
-                user.role.toLowerCase() === 'radiologist' ? 'SELECT status FROM Radiologist WHERE user_id = ?' :
+            const statusQuery = user.role.toLowerCase() === 'doctor' ? 'SELECT status FROM doctor WHERE user_id = ?' :
+                user.role.toLowerCase() === 'radiologist' ? 'SELECT status FROM radiologist WHERE user_id = ?' :
                     '';
             db.query(statusQuery, [user.user_id], (err, statusResult) => {
                 if (err) {
@@ -179,7 +179,7 @@ router.post('/login', (req, res) => {
                 }
 
                 if (statusResult.length === 0 || statusResult[0].status !== 'Approved') {
-                    return res.status(403).json({ error: 'User status not approved' });
+                    return res.status(403).json({ error: 'user status not approved' });
                 }
 
                 // Create a JWT token with a secret key and 2 days expiry
@@ -215,7 +215,7 @@ router.put('/update/:userId', (req, res) => {
     const { name, organization, guest_type, mobile_number, email, address_line1, address_line2, postcode, city, state, country } = req.body;
 
     const userUpdateQuery = `
-            UPDATE User 
+            UPDATE user 
             SET name = ?, organization = ?, guest_type = ?, mobile_number = ?, email = ?, address_line_1 = ?, address_line_2 = ?, postcode = ?, city = ?, state = ?, country = ?
             WHERE user_id = ?
         `;
@@ -226,10 +226,10 @@ router.put('/update/:userId', (req, res) => {
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'user not found' });
         }
 
-        return res.status(200).json({ message: 'User updated successfully' });
+        return res.status(200).json({ message: 'user updated successfully' });
     });
 });
 
@@ -247,7 +247,7 @@ router.put('/update-password/:userId', (req, res) => {
         hashedPassword = hash;
 
         const userUpdateQuery = `
-            UPDATE User 
+            UPDATE user 
             SET  password = ?
             WHERE user_id = ?
         `;
@@ -258,7 +258,7 @@ router.put('/update-password/:userId', (req, res) => {
             }
 
             if (result.affectedRows === 0) {
-                return res.status(404).json({ error: 'User not found' });
+                return res.status(404).json({ error: 'user not found' });
             }
 
             return res.status(200).json({ message: 'Password updated successfully' });

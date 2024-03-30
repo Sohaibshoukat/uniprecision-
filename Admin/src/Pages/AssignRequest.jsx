@@ -15,7 +15,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
 
 
     const getallRadio = async () => {
-        fetch(`http://localhost:3000/admin/getAllRadiologists`) // Assuming this is the correct endpoint
+        fetch(`https://backend.uniprecision.com.my/admin/getAllRadiologists`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -33,7 +33,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
     }
 
     const getorder = async () => {
-        fetch(`http://localhost:3000/admin/getPendingReports`) // Assuming this is the correct endpoint
+        fetch(`https://backend.uniprecision.com.my/admin/getPendingReports`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -68,7 +68,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
             report_id: report_id
         };
 
-        fetch('http://localhost:3000/admin/assignReport', {
+        fetch('https://backend.uniprecision.com.my/admin/assignReport', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -13,7 +13,7 @@ const Forgetpassword = () => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:3000/guest/forgot-password", {
+      const response = await fetch("https://backend.uniprecision.com.my/guest/forgot-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

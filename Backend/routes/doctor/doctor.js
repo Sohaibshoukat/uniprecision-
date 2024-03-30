@@ -30,8 +30,8 @@ router.post('/order', upload.single('file'), (req, res) => {
     // Extract file path
     const filePath = req.file ? req.file.path : null;
 
-    // Insert data into Orders table
-    const orderInsertQuery = 'INSERT INTO Orders (doctor_id, file_path, category_id, date_generated, Examination_Date, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study, status, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    // Insert data into orders table
+    const orderInsertQuery = 'INSERT INTO orders (doctor_id, file_path, category_id, date_generated, Examination_Date, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study, status, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     db.query(orderInsertQuery, [doctor_id, filePath, category_id, date_generated, Examination_Date, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study, 'UnPaid', price], (err, result) => {
         if (err) {
             console.error('Error inserting order:', err);
@@ -40,8 +40,8 @@ router.post('/order', upload.single('file'), (req, res) => {
 
         const orderId = result.insertId;
 
-        // Insert data into Report table
-        const reportInsertQuery = 'INSERT INTO Report (doctor_id, Examination_Date, patient_name, dob, nric_passport_no, order_id,age,gender,report_status,previous_study,clinical_diagnostic_center,price) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        // Insert data into report table
+        const reportInsertQuery = 'INSERT INTO report (doctor_id, Examination_Date, patient_name, dob, nric_passport_no, order_id,age,gender,report_status,previous_study,clinical_diagnostic_center,price) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         db.query(reportInsertQuery, [doctor_id, Examination_Date, patient_name, dob, nric_passport_no, orderId, age, gender, "UnPaid", previous_study, clinical_summary_title, price], (err) => {
             if (err) {
                 console.error('Error inserting report:', err.message);
@@ -57,7 +57,7 @@ router.get('/getDoctorId/:id', (req, res) => {
     const userId = req.params.id;
 
     // Query the database to get the doctor ID based on the user ID
-    const doctorIdQuery = 'SELECT doctor_id FROM Doctor WHERE user_id = ?';
+    const doctorIdQuery = 'SELECT doctor_id FROM doctor WHERE user_id = ?';
     db.query(doctorIdQuery, [userId], (err, result) => {
         if (err) {
             console.error('Error retrieving doctor ID:', err);
@@ -65,7 +65,7 @@ router.get('/getDoctorId/:id', (req, res) => {
         }
 
         if (result.length === 0) {
-            return res.status(404).json({ error: 'Doctor ID not found for the given user ID' });
+            return res.status(404).json({ error: 'doctor ID not found for the given user ID' });
         }
 
         const doctorId = result[0].doctor_id;
@@ -78,8 +78,8 @@ router.get('/getAllOrders/:doctorId', (req, res) => {
 
     const ordersQuery = `
         SELECT o.*, c.price, c.category_name
-        FROM Orders o
-        INNER JOIN Category c ON o.category_id = c.category_id
+        FROM orders o
+        INNER JOIN category c ON o.category_id = c.category_id
         WHERE o.doctor_id = ?
     `;
 
@@ -104,9 +104,9 @@ router.get('/getAllReports/:doctorId', (req, res) => {
 
     const ordersQuery = `
     SELECT r.*, c.price, c.category_name, o.*
-    FROM Report r
-    INNER JOIN Orders o ON r.order_id = o.order_id
-    INNER JOIN Category c ON o.category_id = c.category_id
+    FROM report r
+    INNER JOIN orders o ON r.order_id = o.order_id
+    INNER JOIN category c ON o.category_id = c.category_id
     WHERE r.doctor_id = ?
     
     `;
@@ -133,9 +133,9 @@ router.get('/getSingleReprte/:docid/:reportid', (req, res) => {
 
     const reportQuery = `
     SELECT r.*, c.price, c.category_name, o.*
-    FROM Report r
-    INNER JOIN Orders o ON r.order_id = o.order_id
-    INNER JOIN Category c ON o.category_id = c.category_id
+    FROM report r
+    INNER JOIN orders o ON r.order_id = o.order_id
+    INNER JOIN category c ON o.category_id = c.category_id
     WHERE r.doctor_id = ? AND report_status = 'Complete' AND report_id = ?
     LIMIT 1
     `;
@@ -147,15 +147,15 @@ router.get('/getSingleReprte/:docid/:reportid', (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: 'Report not found' });
+            return res.status(404).json({ error: 'report not found' });
         }
 
         const report = results[0];
 
         const doctorQuery = `
         SELECT d.*, u.name AS doctor_name
-        FROM Doctor d
-        INNER JOIN User u ON d.user_id = u.user_id
+        FROM doctor d
+        INNER JOIN user u ON d.user_id = u.user_id
         WHERE d.doctor_id = ? AND d.status = 'Approved'
         `;
 
@@ -166,7 +166,7 @@ router.get('/getSingleReprte/:docid/:reportid', (req, res) => {
             }
 
             if (doctorResults.length === 0) {
-                return res.status(404).json({ error: 'Doctor not found' });
+                return res.status(404).json({ error: 'doctor not found' });
             }
 
             const doctor = doctorResults[0];
@@ -174,7 +174,7 @@ router.get('/getSingleReprte/:docid/:reportid', (req, res) => {
             const radioQuery = `
             SELECT r.*, u.name AS radio_name
             FROM radiologist r
-            INNER JOIN User u ON r.user_id = u.user_id
+            INNER JOIN user u ON r.user_id = u.user_id
             WHERE r.radiologist_id = ? AND r.status = 'Approved'
             `;
     
@@ -185,7 +185,7 @@ router.get('/getSingleReprte/:docid/:reportid', (req, res) => {
                 }
     
                 if (doctorResults.length === 0) {
-                    return res.status(404).json({ error: 'Doctor not found' });
+                    return res.status(404).json({ error: 'doctor not found' });
                 }
 
             const filePath = report.file_path;
@@ -203,8 +203,8 @@ router.get('/getSingleReprte/:docid/:reportid', (req, res) => {
 router.put('/payorder/:orderId', (req, res) => {
     const orderId = req.params.orderId;
 
-    // Update status in Orders table
-    const orderUpdateQuery = 'UPDATE Orders SET status = ? WHERE order_id = ?';
+    // Update status in orders table
+    const orderUpdateQuery = 'UPDATE orders SET status = ? WHERE order_id = ?';
     db.query(orderUpdateQuery, ['Paid', orderId], (err, orderResult) => {
         if (err) {
             console.error('Error updating order status:', err);
@@ -212,7 +212,7 @@ router.put('/payorder/:orderId', (req, res) => {
         }
 
         // Update status in Reports table
-        const reportUpdateQuery = 'UPDATE Report SET report_status = ? WHERE order_id = ?';
+        const reportUpdateQuery = 'UPDATE report SET report_status = ? WHERE order_id = ?';
         db.query(reportUpdateQuery, ['Pending', orderId], (err) => {
             if (err) {
                 console.error('Error updating report status:', err);
@@ -247,7 +247,7 @@ router.post('/editDoctorDetails', (req, res) => {
     const { userId, name, organization, mobile_number, email, address_line1, address_line2, postcode, city, state, country } = req.body;
 
     // Check if the user exists in the database
-    const userQuery = 'SELECT * FROM User WHERE user_id = ?';
+    const userQuery = 'SELECT * FROM user WHERE user_id = ?';
     db.query(userQuery, [userId], (err, results) => {
         if (err) {
             console.error('Error retrieving user:', err);
@@ -255,20 +255,20 @@ router.post('/editDoctorDetails', (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'user not found' });
         }
 
         const user = results[0];
 
         // Update user details
-        const updateUserQuery = 'UPDATE User SET name = ?, organization = ?, mobile_number = ?, email = ?, address_line_1 = ?, address_line_2 = ?, postcode = ?, city = ?, state = ?, country = ? WHERE user_id = ?';
+        const updateUserQuery = 'UPDATE user SET name = ?, organization = ?, mobile_number = ?, email = ?, address_line_1 = ?, address_line_2 = ?, postcode = ?, city = ?, state = ?, country = ? WHERE user_id = ?';
         db.query(updateUserQuery, [name, organization, mobile_number, email, address_line1, address_line2, postcode, city, state, country, userId], (err, result) => {
             if (err) {
                 console.error('Error updating user details:', err);
                 return res.status(500).json({ error: 'Internal Server Error' });
             }
 
-            return res.status(200).json({ message: 'Doctor details updated successfully' });
+            return res.status(200).json({ message: 'doctor details updated successfully' });
         });
     });
 });
@@ -277,7 +277,7 @@ router.get('/doctorTransactions/:doctorId', (req, res) => {
     const doctorId = req.params.doctorId;
 
     // Query transactions for the specified doctor
-    const transactionsQuery = 'SELECT * FROM Transactions WHERE doctor_id = ?';
+    const transactionsQuery = 'SELECT * FROM transactions WHERE doctor_id = ?';
     db.query(transactionsQuery, [doctorId], (err, results) => {
         if (err) {
             console.error('Error retrieving transactions:', err);

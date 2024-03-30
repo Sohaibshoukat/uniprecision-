@@ -42,7 +42,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
     // ];
 
     useEffect(() => {
-        fetch('http://localhost:3000/doctor/getAllCategories') // Assuming this is the correct endpoint
+        fetch('https://backend.uniprecision.com.my/doctor/getAllCategories') // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -102,7 +102,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
         formData2.append('file', formData.file);
     
         try {
-            const response = await fetch('http://localhost:3000/doctor/order', {
+            const response = await fetch('https://backend.uniprecision.com.my/doctor/order', {
                 method: 'POST',
                 body: formData2, // Send FormData directly
                 // No need to set Content-Type header

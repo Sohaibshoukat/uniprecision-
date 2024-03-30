@@ -31,7 +31,7 @@ function RadioDashboard() {
     const fetchRadioId = async () => {
         try {
             const userId = localStorage.getItem('userid'); // Assuming you have stored userId in localStorage
-            const response = await fetch(`http://localhost:3000/radiologist/getRadioId/${userId}`);
+            const response = await fetch(`https://backend.uniprecision.com.my/radiologist/getRadioId/${userId}`);
             if (response.ok) {
                 const data = await response.json();
                 const { radioId } = data;

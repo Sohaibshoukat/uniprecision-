@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 
 router.get('/getAllRadiologists', (req, res) => {
     // Query to fetch all radiologists with their names
-    const radiologistsQuery = 'SELECT r.*, u.name AS radiologist_name FROM Radiologist r INNER JOIN User u ON r.user_id = u.user_id Where status= "Approved"';
+    const radiologistsQuery = 'SELECT r.*, u.name AS radiologist_name FROM radiologist r INNER JOIN user u ON r.user_id = u.user_id Where status= "Approved"';
 
     db.query(radiologistsQuery, (err, results) => {
         if (err) {
@@ -22,7 +22,7 @@ router.get('/getAllRadiologists', (req, res) => {
 
 router.get('/getPendingReports', (req, res) => {
     // Query to fetch all pending reports
-    const pendingReportsQuery = 'SELECT * FROM Report WHERE report_status = "Pending"';
+    const pendingReportsQuery = 'SELECT * FROM report WHERE report_status = "Pending"';
 
     db.query(pendingReportsQuery, (err, results) => {
         if (err) {
@@ -38,8 +38,8 @@ router.get('/getPendingReports', (req, res) => {
 router.post('/assignReport', (req, res) => {
     const { report_id, radiologist_id } = req.body;
 
-    // Update data in the Report table
-    const updateReportQuery = 'UPDATE Report SET radiologist_id = ?, report_status = "Assigned" WHERE report_id = ?';
+    // Update data in the report table
+    const updateReportQuery = 'UPDATE report SET radiologist_id = ?, report_status = "Assigned" WHERE report_id = ?';
     db.query(updateReportQuery, [radiologist_id, report_id], (err, result) => {
         if (err) {
             console.error('Error updating report:', err);
@@ -47,10 +47,10 @@ router.post('/assignReport', (req, res) => {
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Report not found' });
+            return res.status(404).json({ error: 'report not found' });
         }
 
-        return res.status(200).json({ message: 'Report assigned successfully' });
+        return res.status(200).json({ message: 'report assigned successfully' });
     });
 });
 
@@ -59,7 +59,7 @@ router.post('/adddoctor', (req, res) => {
     const role = 'Doctor';
     const status = 'Approved';
 
-    const emailCheckQuery = 'SELECT COUNT(*) AS count FROM User WHERE email = ?';
+    const emailCheckQuery = 'SELECT COUNT(*) AS count FROM user WHERE email = ?';
     db.query(emailCheckQuery, [email], (err, result) => {
         if (err) {
             console.error('Error checking email:', err);
@@ -71,8 +71,8 @@ router.post('/adddoctor', (req, res) => {
         if (emailCount > 0) {
             return res.status(400).json({ error: 'Email already exists' });
         }
-        // Insert data into User table
-        const userInsertQuery = 'INSERT INTO User (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        // Insert data into user table
+        const userInsertQuery = 'INSERT INTO user (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         db.query(userInsertQuery, [name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country], (err, result) => {
             if (err) {
                 console.error('Error signing up doctor:', err);
@@ -81,15 +81,15 @@ router.post('/adddoctor', (req, res) => {
 
             const userId = result.insertId;
 
-            // Insert data into Doctor table
-            const doctorInsertQuery = 'INSERT INTO Doctor (user_id, status) VALUES (?, ?)';
+            // Insert data into doctor table
+            const doctorInsertQuery = 'INSERT INTO doctor (user_id, status) VALUES (?, ?)';
             db.query(doctorInsertQuery, [userId, status], (err, result) => {
                 if (err) {
                     console.error('Error signing up doctor:', err);
                     return res.status(500).json({ error: 'Internal Server Error' });
                 }
 
-                return res.status(200).json({ message: 'Doctor signed up successfully' });
+                return res.status(200).json({ message: 'doctor signed up successfully' });
             });
         });
     })
@@ -100,7 +100,7 @@ router.post('/addradiologist', (req, res) => {
     const role = 'Radiologist';
     const status = 'Approved';
 
-    const emailCheckQuery = 'SELECT COUNT(*) AS count FROM User WHERE email = ?';
+    const emailCheckQuery = 'SELECT COUNT(*) AS count FROM user WHERE email = ?';
     db.query(emailCheckQuery, [email], (err, result) => {
         if (err) {
             console.error('Error checking email:', err);
@@ -112,8 +112,8 @@ router.post('/addradiologist', (req, res) => {
         if (emailCount > 0) {
             return res.status(400).json({ error: 'Email already exists' });
         }
-        // Insert data into User table
-        const userInsertQuery = 'INSERT INTO User (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        // Insert data into user table
+        const userInsertQuery = 'INSERT INTO user (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         db.query(userInsertQuery, [name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country], (err, result) => {
             if (err) {
                 console.error('Error signing up radiologist:', err);
@@ -122,15 +122,15 @@ router.post('/addradiologist', (req, res) => {
 
             const userId = result.insertId;
 
-            // Insert data into Radiologist table
-            const radiologistInsertQuery = 'INSERT INTO Radiologist (user_id, status) VALUES (?, ?)';
+            // Insert data into radiologist table
+            const radiologistInsertQuery = 'INSERT INTO radiologist (user_id, status) VALUES (?, ?)';
             db.query(radiologistInsertQuery, [userId, status], (err, result) => {
                 if (err) {
                     console.error('Error signing up radiologist:', err);
                     return res.status(500).json({ error: 'Internal Server Error' });
                 }
 
-                return res.status(200).json({ message: 'Radiologist signed up successfully' });
+                return res.status(200).json({ message: 'radiologist signed up successfully' });
             });
         });
     })
@@ -140,7 +140,7 @@ router.post('/updateUserStatus', (req, res) => {
     const { user_id } = req.body;
 
     // Query to get the role of the user
-    const roleQuery = 'SELECT role FROM User WHERE user_id = ?';
+    const roleQuery = 'SELECT role FROM user WHERE user_id = ?';
     db.query(roleQuery, [user_id], (err, results) => {
         if (err) {
             console.error('Error retrieving user role:', err);
@@ -148,7 +148,7 @@ router.post('/updateUserStatus', (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'user not found' });
         }
 
         const role = results[0].role.toLowerCase();
@@ -157,10 +157,10 @@ router.post('/updateUserStatus', (req, res) => {
         let updateQuery = '';
         switch (role) {
             case 'radiologist':
-                updateQuery = 'UPDATE Radiologist SET status = "Approved" WHERE user_id = ?';
+                updateQuery = 'UPDATE radiologist SET status = "Approved" WHERE user_id = ?';
                 break;
             case 'doctor':
-                updateQuery = 'UPDATE Doctor SET status = "Approved" WHERE user_id = ?';
+                updateQuery = 'UPDATE doctor SET status = "Approved" WHERE user_id = ?';
                 break;
             // Add more cases for other roles if needed
 
@@ -176,17 +176,17 @@ router.post('/updateUserStatus', (req, res) => {
             }
 
             if (result.affectedRows === 0) {
-                return res.status(404).json({ error: 'User not found in respective table' });
+                return res.status(404).json({ error: 'user not found in respective table' });
             }
 
-            return res.status(200).json({ message: 'User status updated successfully' });
+            return res.status(200).json({ message: 'user status updated successfully' });
         });
     });
 });
 
 router.get('/getAllUsers', (req, res) => {
     // Query to retrieve all users
-    const getUsersQuery = 'SELECT * FROM User';
+    const getUsersQuery = 'SELECT * FROM user';
 
     // Execute the query
     db.query(getUsersQuery, (err, results) => {
@@ -209,8 +209,8 @@ router.get('/getAllApprovedDoctors', (req, res) => {
     // Query to retrieve all approved doctors
     const getApprovedDoctorsQuery = `
         SELECT u.*
-        FROM User u
-        INNER JOIN Doctor d ON u.user_id = d.user_id
+        FROM user u
+        INNER JOIN doctor d ON u.user_id = d.user_id
         WHERE u.role = 'Doctor' AND d.status = 'Approved'
     `;
 
@@ -218,7 +218,7 @@ router.get('/getAllApprovedDoctors', (req, res) => {
     db.query(getApprovedDoctorsQuery, (err, results) => {
         if (err) {
             console.error('Error retrieving approved doctors:', err);
-            return res.status(500).json({ error: 'Internal Server Error' });
+            return res.status(500).json({ error: err });
         }
 
         // Return the approved doctors
@@ -230,7 +230,7 @@ router.get('/getAllApprovedRadiologist', (req, res) => {
     // Query to retrieve all approved doctors
     const getApprovedDoctorsQuery = `
         SELECT u.*
-        FROM User u
+        FROM user u
         INNER JOIN radiologist r ON u.user_id = r.user_id
         WHERE u.role = 'Radiologist' AND r.status = 'Approved'
     `;
@@ -253,8 +253,8 @@ router.get('/getNewDoctors', (req, res) => {
     // Query to retrieve all approved doctors
     const getApprovedDoctorsQuery = `
         SELECT u.*
-        FROM User u
-        INNER JOIN Doctor d ON u.user_id = d.user_id
+        FROM user u
+        INNER JOIN doctor d ON u.user_id = d.user_id
         WHERE u.role = 'Doctor' AND d.status = 'Not Approved'
     `;
 
@@ -274,7 +274,7 @@ router.get('/getnewRadiologist', (req, res) => {
     // Query to retrieve all approved doctors
     const getApprovedDoctorsQuery = `
         SELECT u.*
-        FROM User u
+        FROM user u
         INNER JOIN radiologist r ON u.user_id = r.user_id
         WHERE u.role = 'Radiologist' AND r.status = 'Not Approved'
     `;
@@ -316,15 +316,15 @@ router.get('/getAllCategories', (req, res) => {
 router.post('/addCateogry', (req, res) => {
     const { price, unit, category_name } = req.body;
 
-    // Insert data into Category table
-    const addCategoryQuery = 'INSERT INTO Category (price, unit, category_name) VALUES (?, ?, ?)';
+    // Insert data into category table
+    const addCategoryQuery = 'INSERT INTO category (price, unit, category_name) VALUES (?, ?, ?)';
     db.query(addCategoryQuery, [price, unit, category_name], (err, result) => {
         if (err) {
             console.error('Error adding category:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
 
-        return res.status(200).json({ message: 'Category added successfully' });
+        return res.status(200).json({ message: 'category added successfully' });
     });
 });
 
@@ -332,8 +332,8 @@ router.post('/editCategory/:categoryId', (req, res) => {
     const categoryId = req.params.categoryId;
     const { price, unit, category_name } = req.body;
 
-    // Update data in Category table
-    const editCategoryQuery = 'UPDATE Category SET price = ?, unit = ?, category_name = ? WHERE category_id = ?';
+    // Update data in category table
+    const editCategoryQuery = 'UPDATE category SET price = ?, unit = ?, category_name = ? WHERE category_id = ?';
     db.query(editCategoryQuery, [price, unit, category_name, categoryId], (err, result) => {
         if (err) {
             console.error('Error editing category:', err);
@@ -341,18 +341,18 @@ router.post('/editCategory/:categoryId', (req, res) => {
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Category not found' });
+            return res.status(404).json({ error: 'category not found' });
         }
 
-        return res.status(200).json({ message: 'Category updated successfully' });
+        return res.status(200).json({ message: 'category updated successfully' });
     });
 });
 
 router.delete('/deleteCategory/:categoryId', (req, res) => {
     const categoryId = req.params.categoryId;
 
-    // Delete category from Category table
-    const deleteCategoryQuery = 'DELETE FROM Category WHERE category_id = ?';
+    // Delete category from category table
+    const deleteCategoryQuery = 'DELETE FROM category WHERE category_id = ?';
     db.query(deleteCategoryQuery, [categoryId], (err, result) => {
         if (err) {
             console.error('Error deleting category:', err);
@@ -360,10 +360,10 @@ router.delete('/deleteCategory/:categoryId', (req, res) => {
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Category not found' });
+            return res.status(404).json({ error: 'category not found' });
         }
 
-        return res.status(200).json({ message: 'Category deleted successfully' });
+        return res.status(200).json({ message: 'category deleted successfully' });
     });
 });
 
@@ -373,7 +373,7 @@ router.post('/signup', (req, res) => {
     const status = 'Approved';
 
     // Check if the email already exists in the database
-    const emailCheckQuery = 'SELECT COUNT(*) AS count FROM User WHERE email = ?';
+    const emailCheckQuery = 'SELECT COUNT(*) AS count FROM user WHERE email = ?';
     db.query(emailCheckQuery, [email], (err, result) => {
         if (err) {
             console.error('Error checking email:', err);
@@ -394,10 +394,10 @@ router.post('/signup', (req, res) => {
             }
 
             // Insert data into User table
-            const userInsertQuery = 'INSERT INTO User (name, organization, guest_type, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const userInsertQuery = 'INSERT INTO user (name, organization, guest_type, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
             db.query(userInsertQuery, [name, organization, guest_type, mobile_number, email, hashedPassword, 'Admin', address_line1, address_line2, postcode, city, state, country], (err, result) => {
                 if (err) {
-                    console.error('Error signing up User:', err);
+                    console.error('Error signing up user:', err);
                     return res.status(500).json({ error: 'Internal Server Error' });
                 }
 
@@ -422,7 +422,7 @@ router.post('/login', (req, res) => {
     const { email, password } = req.body;
 
     // Check if the user exists in the database
-    const userQuery = 'SELECT * FROM User WHERE email = ?';
+    const userQuery = 'SELECT * FROM user WHERE email = ?';
     db.query(userQuery, [email], (err, results) => {
         if (err) {
             console.error('Error retrieving user:', err);

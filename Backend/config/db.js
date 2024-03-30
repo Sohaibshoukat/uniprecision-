@@ -3,9 +3,9 @@ const mysql = require('mysql');
 // Database connection configuration
 const connection = mysql.createConnection({
   host: 'localhost',
-  user: 'unipreci_unipreci',
-  password: 'L}YHWoE@NjsH',
-  database: 'unipreci_uniprecision'
+  user: 'root',
+  password: '',
+  database: 'uniprecision'
 });
 
 // Connect to the database

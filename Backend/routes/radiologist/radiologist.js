@@ -8,9 +8,9 @@ router.get('/getAllReports/:radioid', (req, res) => {
 
     const ordersQuery = `
     SELECT r.*, c.price, c.category_name, o.*
-    FROM Report r
-    INNER JOIN Orders o ON r.order_id = o.order_id
-    INNER JOIN Category c ON o.category_id = c.category_id
+    FROM report r
+    INNER JOIN orders o ON r.order_id = o.order_id
+    INNER JOIN category c ON o.category_id = c.category_id
     WHERE r.radiologist_id = ? AND report_status = 'Assigned'
     `;
 
@@ -36,9 +36,9 @@ router.get('/getSingleReprt/:radioid/:reportid', (req, res) => {
 
     const reportQuery = `
     SELECT r.*, c.price, c.category_name, o.*
-    FROM Report r
-    INNER JOIN Orders o ON r.order_id = o.order_id
-    INNER JOIN Category c ON o.category_id = c.category_id
+    FROM report r
+    INNER JOIN orders o ON r.order_id = o.order_id
+    INNER JOIN category c ON o.category_id = c.category_id
     WHERE r.radiologist_id = ? AND report_status = 'Assigned' AND report_id = ?
     LIMIT 1
     `;
@@ -50,15 +50,15 @@ router.get('/getSingleReprt/:radioid/:reportid', (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: 'Report not found' });
+            return res.status(404).json({ error: 'report not found' });
         }
 
         const report = results[0];
 
         const doctorQuery = `
         SELECT d.*, u.name AS doctor_name
-        FROM Doctor d
-        INNER JOIN User u ON d.user_id = u.user_id
+        FROM doctor d
+        INNER JOIN user u ON d.user_id = u.user_id
         WHERE d.doctor_id = ? AND d.status = 'Approved'
         `;
 
@@ -69,7 +69,7 @@ router.get('/getSingleReprt/:radioid/:reportid', (req, res) => {
             }
 
             if (doctorResults.length === 0) {
-                return res.status(404).json({ error: 'Doctor not found' });
+                return res.status(404).json({ error: 'doctor not found' });
             }
 
             const doctor = doctorResults[0];
@@ -95,7 +95,7 @@ router.get('/getRadioId/:id', (req, res) => {
         }
 
         if (result.length === 0) {
-            return res.status(404).json({ error: 'Radiologist ID not found for the given user ID' });
+            return res.status(404).json({ error: 'radiologist ID not found for the given user ID' });
         }
 
         const radioId = result[0].radiologist_id;
@@ -109,8 +109,8 @@ router.post('/fillReport', (req, res) => {
     // Get current date and time
     const currentDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    // Update data in the Report table
-    const updateReportQuery = 'UPDATE Report SET findings = ?, summary = ?, date_generated = ?, report_status = "Complete" WHERE report_id = ?';
+    // Update data in the report table
+    const updateReportQuery = 'UPDATE report SET findings = ?, summary = ?, date_generated = ?, report_status = "Complete" WHERE report_id = ?';
     db.query(updateReportQuery, [findings, summary, currentDate, report_id], (err, result) => {
         if (err) {
             console.error('Error updating report:', err);
@@ -118,10 +118,10 @@ router.post('/fillReport', (req, res) => {
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Report not found or already completed' });
+            return res.status(404).json({ error: 'report not found or already completed' });
         }
 
-        return res.status(200).json({ message: 'Report filled successfully' });
+        return res.status(200).json({ message: 'report filled successfully' });
     });
 });
 
@@ -129,7 +129,7 @@ router.post('/editRadiologistDetails', (req, res) => {
     const { userId, name, organization, mobile_number, email, address_line1, address_line2, postcode, city, state, country } = req.body;
 
     // Check if the user exists in the database
-    const userQuery = 'SELECT * FROM User WHERE user_id = ?';
+    const userQuery = 'SELECT * FROM user WHERE user_id = ?';
     db.query(userQuery, [userId], (err, results) => {
         if (err) {
             console.error('Error retrieving user:', err);
@@ -137,20 +137,20 @@ router.post('/editRadiologistDetails', (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'user not found' });
         }
 
         const user = results[0];
 
         // Update user details
-        const updateUserQuery = 'UPDATE User SET name = ?, organization = ?, mobile_number = ?, email = ?, address_line_1 = ?, address_line_2 = ?, postcode = ?, city = ?, state = ?, country = ? WHERE user_id = ?';
+        const updateUserQuery = 'UPDATE user SET name = ?, organization = ?, mobile_number = ?, email = ?, address_line_1 = ?, address_line_2 = ?, postcode = ?, city = ?, state = ?, country = ? WHERE user_id = ?';
         db.query(updateUserQuery, [name, organization, mobile_number, email, address_line1, address_line2, postcode, city, state, country, userId], (err, result) => {
             if (err) {
                 console.error('Error updating user details:', err);
                 return res.status(500).json({ error: 'Internal Server Error' });
             }
 
-            return res.status(200).json({ message: 'Doctor details updated successfully' });
+            return res.status(200).json({ message: 'doctor details updated successfully' });
         });
     });
 });
@@ -160,9 +160,9 @@ router.get('/getCompletedReports/:radioid', (req, res) => {
 
     const ordersQuery = `
     SELECT r.*, c.price, c.category_name, o.*
-    FROM Report r
-    INNER JOIN Orders o ON r.order_id = o.order_id
-    INNER JOIN Category c ON o.category_id = c.category_id
+    FROM report r
+    INNER JOIN orders o ON r.order_id = o.order_id
+    INNER JOIN category c ON o.category_id = c.category_id
     WHERE r.radiologist_id = ? AND report_status = 'Complete'
     `;
 
@@ -188,9 +188,9 @@ router.get('/getcompleteSingleReprt/:radioid/:reportid', (req, res) => {
 
     const reportQuery = `
     SELECT r.*, c.price, c.category_name, o.*
-    FROM Report r
-    INNER JOIN Orders o ON r.order_id = o.order_id
-    INNER JOIN Category c ON o.category_id = c.category_id
+    FROM report r
+    INNER JOIN orders o ON r.order_id = o.order_id
+    INNER JOIN category c ON o.category_id = c.category_id
     WHERE r.radiologist_id = ? AND report_status = 'Complete' AND report_id = ?
     LIMIT 1
     `;
@@ -202,15 +202,15 @@ router.get('/getcompleteSingleReprt/:radioid/:reportid', (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: 'Report not found' });
+            return res.status(404).json({ error: 'report not found' });
         }
 
         const report = results[0];
 
         const doctorQuery = `
         SELECT d.*, u.name AS doctor_name
-        FROM Doctor d
-        INNER JOIN User u ON d.user_id = u.user_id
+        FROM doctor d
+        INNER JOIN user u ON d.user_id = u.user_id
         WHERE d.doctor_id = ? AND d.status = 'Approved'
         `;
 
@@ -221,7 +221,7 @@ router.get('/getcompleteSingleReprt/:radioid/:reportid', (req, res) => {
             }
 
             if (doctorResults.length === 0) {
-                return res.status(404).json({ error: 'Doctor not found' });
+                return res.status(404).json({ error: 'doctor not found' });
             }
 
             const doctor = doctorResults[0];

@@ -16,7 +16,7 @@ const Users = ({ toggleMenu, handleLogout }) => {
 
 
     const getuser = async () => {
-        fetch(`http://localhost:3000/admin/getAllUsers`) // Assuming this is the correct endpoint
+        fetch(`https://backend.uniprecision.com.my/admin/getAllUsers`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
