@@ -4,7 +4,7 @@ import { IoIosLogOut } from 'react-icons/io'
 import { Link, useNavigate } from 'react-router-dom'
 import AlertContext from '../../Context/Alert/AlertContext'
 
-const AllNewFiles = ({handleLogout,toggleMenu}) => {
+const AllNewFiles = ({ handleLogout, toggleMenu }) => {
     const [Dataset, setDataset] = useState([])
 
     const AletContext = useContext(AlertContext);
@@ -33,6 +33,7 @@ const AllNewFiles = ({handleLogout,toggleMenu}) => {
     }, []);
 
     const navigate = useNavigate()
+
 
 
     return (
@@ -93,10 +94,13 @@ const AllNewFiles = ({handleLogout,toggleMenu}) => {
                                         <td>{item.report_status}</td>
                                         <td>{item.date_generated}</td>
                                         <td className='text-blue-600 underline cursor-pointer'>
-                                            <a href={item.file_url} download={item.patient_name} target='_blank'>{item.file_path}</a>
+                                            <a href={item.file_url} download={item.report_id} target='_blank'>
+                                                {item.file_path}
+                                            </a>
                                         </td>
+
                                         <td>
-                                            <Link to={'/radioDashboard/fill-report'} state={{id:item.report_id}}>
+                                            <Link to={'/radioDashboard/fill-report'} state={{ id: item.report_id }}>
                                                 <button
                                                     className='border-slate-700 border-2 bg-transparent hover:bg-slate-700 text-slate-700 hover:text-white py-2 px-4 m-1 rounded-lg ease-in-out duration-300'
 

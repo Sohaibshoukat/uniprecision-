@@ -55,10 +55,9 @@ const AllPaidReports = ({ handleLogout, toggleMenu }) => {
                     <div className="flex flex-col gap-4 my-6">
                         <h2 className='font-Lora italic font-normal text-lg'> Instructions:</h2>
                         <ol className='flex flex-col gap-2 ml-2'>
-                            <li className='text-base font-normal font-Lora '>1. Click <b>'Create New Request'</b> button below to create new  request</li>
-                            <li className='text-base font-normal font-Lora '>2. Alternatively, click <b>'New Request'</b>  On the left menu to create new request.</li>
-                            <li className='text-base font-normal font-Lora '>3. Click on the Uploaded file link to downlaod a copy of the file you have uploaded</li>
-                            <li className='text-base font-normal font-Lora '>4. Scroll to the right, click on the Report link to download the report in PDF format. Report link only available after payment has been made</li>
+                            <li className='text-base font-normal font-Lora '>1. Alternatively, click <b>'New Request'</b>  On the left menu to create new request.</li>
+                            <li className='text-base font-normal font-Lora '>2. Click on the Uploaded file link to downlaod a copy of the file you have uploaded</li>
+                            <li className='text-base font-normal font-Lora '>3. Scroll to the right, click on the Report link to download the report in PDF format. Report link only available after payment has been made</li>
                         </ol>
                     </div>
 

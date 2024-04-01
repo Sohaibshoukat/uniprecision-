@@ -22,7 +22,13 @@ router.get('/getAllRadiologists', (req, res) => {
 
 router.get('/getPendingReports', (req, res) => {
     // Query to fetch all pending reports
-    const pendingReportsQuery = 'SELECT * FROM report WHERE report_status = "Pending"';
+    const pendingReportsQuery = `    
+    SELECT r.*, c.price, c.category_name, o.*
+    FROM report r
+    INNER JOIN orders o ON r.order_id = o.order_id
+    INNER JOIN category c ON o.category_id = c.category_id
+    WHERE report_status = 'Pending'`;
+
 
     db.query(pendingReportsQuery, (err, results) => {
         if (err) {

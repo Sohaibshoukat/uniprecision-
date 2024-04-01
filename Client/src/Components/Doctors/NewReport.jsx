@@ -2,44 +2,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { IoIosLogOut } from 'react-icons/io';
 import AlertContext from '../../Context/Alert/AlertContext';
+import { convertDateFormat } from '../DateFunction';
 
 const NewReport = ({ handleLogout, toggleMenu }) => {
     const [Price, setPrice] = useState(0)
     const [Service, setService] = useState([])
-    // const Service = [
-    //     {
-    //         "service": "XR (1 view) reported by subspecialist",
-    //         "price": 200
-    //     },
-    //     {
-    //         "service": "Relevant XR (1 view) reported by subspecialist",
-    //         "price": 200
-    //     },
-    //     {
-    //         "service": "XR (multiple views of 1 region) reported by subspecialist",
-    //         "price": 200
-    //     },
-    //     {
-    //         "service": "CT (1 region) reported by Subspecialist",
-    //         "price": 200
-    //     },
-    //     {
-    //         "service": "Mammogram reported by subspecialist",
-    //         "price": 200
-    //     },
-    //     {
-    //         "service": "MRI (1 Region) Reported by Subspecialist",
-    //         "price": 200
-    //     },
-    //     {
-    //         "service": "CT Coronary Angiogram reported by Subspecialist",
-    //         "price": 200
-    //     },
-    //     {
-    //         "service": "Film Audit / Image Quality Assessment (MOH requirements for QAP)",
-    //         "price": 200
-    //     }
-    // ];
 
     useEffect(() => {
         fetch('https://backend.uniprecision.com.my/doctor/getAllCategories') // Assuming this is the correct endpoint
@@ -62,6 +29,8 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
 
+    const [Organization, setOrganization] = useState('')
+
     const [formData, setFormData] = useState({
         doctor_id: localStorage.getItem('doctorId'),
         category_id: '',
@@ -70,7 +39,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
         patient_name: '',
         dob: '',
         nric_passport_no: '',
-        clinical_summary_title: '',
+        clinical_summary_title: Organization == '' ? 'N/A' : Organization,
         age: '',
         gender: '',
         previous_study: '',
@@ -79,18 +48,15 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-    
-        const formData2 = new FormData(); // Initialize FormData object
-    
-        // Assuming you have variables for form data
-        // const { doctor_id, category_id, date_generated, Examination_Date, patient_name, dob, nric_passport_no, clinical_summary_title, age, gender, previous_study } = formData
-    
-        // Append form data to FormData object
+
+        const formData2 = new FormData();
         console.log(formData.Examination_Date)
         formData2.append('doctor_id', formData.doctor_id);
         formData2.append('category_id', formData.category_id);
-        formData2.append('date_generated', formData.date_generated);
-        formData2.append('Examination_Date', formData.Examination_Date);
+        const dategenrate = await convertDateFormat(formData.date_generated)
+        formData2.append('date_generated', dategenrate);
+        const examinationData = await convertDateFormat(formData.Examination_Date)
+        formData2.append('Examination_Date', examinationData);
         formData2.append('patient_name', formData.patient_name);
         formData2.append('dob', formData.dob);
         formData2.append('price', Price);
@@ -100,29 +66,29 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
         formData2.append('gender', formData.gender);
         formData2.append('previous_study', formData.previous_study);
         formData2.append('file', formData.file);
-    
+
         try {
             const response = await fetch('https://backend.uniprecision.com.my/doctor/order', {
                 method: 'POST',
-                body: formData2, // Send FormData directly
-                // No need to set Content-Type header
+                body: formData2,
             });
-    
+
             const data = await response.json();
             if (response.ok) {
                 showAlert('New Request Created', 'success');
                 setFormData(
-                    { ...formData,
-                    category_id: '',
-                    Examination_Date: '',
-                    patient_name: '',
-                    dob: '',
-                    nric_passport_no: '',
-                    clinical_summary_title: '',
-                    age: '',
-                    gender: '',
-                    previous_study: '',
-                    file: null
+                    {
+                        ...formData,
+                        category_id: '',
+                        Examination_Date: '',
+                        patient_name: '',
+                        dob: '',
+                        nric_passport_no: '',
+                        clinical_summary_title: '',
+                        age: '',
+                        gender: '',
+                        previous_study: '',
+                        file: null
                     });
             } else {
                 showAlert(data.error, 'danger')
@@ -131,7 +97,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
             showAlert('Error: ' + error, 'danger');
         }
     };
-    
+
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -141,6 +107,29 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
         console.log(e.target.files[0])
         setFormData({ ...formData, file: e.target.files[0] });
     };
+
+
+    const fetchDoctorOrganization = async () => {
+        try {
+            const userId = localStorage.getItem('userid'); // Assuming you have stored userId in localStorage
+            const response = await fetch(`https://backend.uniprecision.com.my/doctor/getorganization/${userId}`);
+            if (response.ok) {
+                const data = await response.json();
+                const { organization } = data;
+                console.log(organization)
+                setOrganization(organization.organization)
+            } else {
+                showAlert('Failed to fetch doctorId', 'danger');
+            }
+        } catch (error) {
+            showAlert('Error fetching doctor', 'danger');
+            navigate("/login")
+        }
+    };
+
+    useEffect(() => {
+        fetchDoctorOrganization();
+    }, []);
 
     return (
         <>
@@ -161,8 +150,8 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                 <div className='bg-white shadow-2xl w-full my-10 py-2 rounded-lg px-8'>
                     {/* Your form content */}
                     {Price > 0 &&
-                        <h2 className='font-Para text-2xl mt-2 float-right'>
-                           <span className='font-bold'>Price</span> {Price}$
+                        <h2 className='font-Para text-2xl mt-2 float-left'>
+                            <span className='font-bold'>Price</span> RM{Price}.00
                         </h2>}
                     <form onSubmit={handleFormSubmit}>
                         <div className='grid md:grid-cols-2 gap-6 mt-10 grid-cols-1'>
@@ -211,8 +200,15 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                             </div>
 
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="clinical_summary_title" className='font-Para text-base'>organization *</label>
-                                <input type='text' name="clinical_summary_title" id="clinical_summary_title" value={formData.clinical_summary_title} onChange={handleInputChange} className='border-gray-400 border-2 py-2 px-4 rounded-lg ' />
+                                <label htmlFor="clinical_summary_title" className='font-Para text-base'>organization</label>
+                                <input
+                                    type='text'
+                                    name="clinical_summary_title"
+                                    id="clinical_summary_title"
+                                    value={formData.clinical_summary_title}
+                                    disabled
+                                    className='border-gray-400 border-2 py-2 px-4 rounded-lg '
+                                />
                             </div>
                             <div className='w-[100%] flex flex-col'>
                                 <label htmlFor="category_id" className='font-Para text-base'>Request Type *</label>
@@ -221,11 +217,11 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                                     value={formData.category_id}
                                     required
                                     onChange={(e) => {
-                                        Service.map((item2,index2)=>{
-                                            if(item2.category_id==e.target.value){
+                                        Service.map((item2, index2) => {
+                                            if (item2.category_id == e.target.value) {
                                                 console.log(item2)
                                                 setPrice(item2.price)
-                                            }else if(e.target.value==''){
+                                            } else if (e.target.value == '') {
                                                 setPrice(0)
                                             }
                                         })
@@ -268,16 +264,14 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                                     className='border-gray-400 border-2 py-2 px-4 rounded-lg '
                                     type='file'
                                     onChange={handleFileChange}
-                                    // accept='image/*'
+                                    accept='.dcm'
                                 />
                             </div>
                             <p className='text-red-600 text-base font-bold'>Examination / Study Image file is mandatory for the reading specialist to report</p>
                             <p className='text-base text-gray-500 my-2'>
                                 To upload more than one file, create a single ZIP or RAR file containing all the DICOM image files you want to upload.
                             </p>
-                            <p className='text-base text-gray-500 my-2'>
-                                To upload the content of your examination CD/DVD, select all the CD/DVD content and create a ZIP or RAR file. Upload the ZIP / RAR.
-                            </p>
+
                             <div className='flex flex-row gap-2 my-2'>
                                 <input type="checkbox" />
                                 <span>I hereby confirm the above service request (agreeing to this constitutes a purchase order)</span>

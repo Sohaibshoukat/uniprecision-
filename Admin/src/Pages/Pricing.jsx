@@ -11,28 +11,17 @@ const Pricing = ({
         setprice, 
         setcategory_name, 
         settype, 
-        seteditid 
+        seteditid,
+        fetchPrice,
+        categories
 }) => {
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
-    const [categories, setCategories] = useState([]);
+
+
 
     useEffect(() => {
-        fetch('https://backend.uniprecision.com.my/admin/getAllCategories') // Assuming this is the correct endpoint
-            .then(response => {
-                if (!response.ok) {
-                    showAlert('Network response was not ok', 'danger');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.users) {
-                    setCategories(data.users);
-                }
-            })
-            .catch(error => {
-                showAlert('Error fetching categories', 'danger');
-            });
+        fetchPrice()
     }, []);
 
     return (

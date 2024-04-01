@@ -66,7 +66,6 @@ function Dashboard() {
     };
 
     useEffect(() => {
-
         fetchDoctorId();
     }, []);
 

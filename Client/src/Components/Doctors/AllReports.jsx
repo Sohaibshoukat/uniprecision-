@@ -89,10 +89,9 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                     <div className="flex flex-col gap-4 my-6">
                         <h2 className='font-Lora italic font-normal text-lg'> Instructions:</h2>
                         <ol className='flex flex-col gap-2 ml-2'>
-                            <li className='text-base font-normal font-Lora '>1. Click <b>'Create New Request'</b> button below to create new  request</li>
-                            <li className='text-base font-normal font-Lora '>2. Alternatively, click <b>'New Request'</b>  On the left menu to create new request.</li>
-                            <li className='text-base font-normal font-Lora '>3. Click on the Uploaded file link to downlaod a copy of the file you have uploaded</li>
-                            <li className='text-base font-normal font-Lora '>4. Scroll to the right, click on the Report link to download the report in PDF format. Report link only available after payment has been made</li>
+                            <li className='text-base font-normal font-Lora '>1. Alternatively, click <b>'New Request'</b>  On the left menu to create new request.</li>
+                            <li className='text-base font-normal font-Lora '>2. Click on the Uploaded file link to downlaod a copy of the file you have uploaded</li>
+                            <li className='text-base font-normal font-Lora '>3. Scroll to the right, click on the Report link to download the report in PDF format. Report link only available after payment has been made</li>
                         </ol>
                     </div>
 
@@ -158,7 +157,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                                         <td>{item.Examination_Date}</td>
                                         <td
                                             className='text-blue-600 underline cursor-pointer'>
-                                            <a href={item.file_url} target='_blank'>{item.file_path}</a>
+                                            <a href={item.file_url} download={item.report_id} target='_blank'>{item.file_path}</a>
                                         </td>
                                         <td>{item.price}</td>
                                     </tr>

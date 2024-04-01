@@ -109,15 +109,6 @@ const NewUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>New User Request</h2>
 
-                    {/* <div className='flex flex-row justify-between'>
-                        <input
-                            type="text"
-                            placeholder='Search'
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'
-                        />
-                    </div> */}
 
                     <div className='flex flex-row justify-between'>
                         <select name="" id="" value={userrole} onChange={(e) => { setuserrole(e.target.value) }} className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'>
@@ -132,10 +123,10 @@ const NewUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Location</th>
+                                    <th>Address</th>
                                     <th>Role</th>
                                     <th>Type</th>
-                                    <th>Phone Num</th>
+                                    <th>Contact Number</th>
                                     <th>Operation</th>
                                 </tr>
                             </thead>

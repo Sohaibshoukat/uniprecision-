@@ -25,6 +25,8 @@ const Dashbaord = () => {
     const [type, settype] = useState(null)
     const [editid, seteditid] = useState(null)
     const [category_name, setcategory_name] = useState('')
+    const [categories, setCategories] = useState([]);
+
 
     const handleLogout = () => {
             localStorage.removeItem("token");
@@ -36,6 +38,24 @@ const Dashbaord = () => {
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
+
+    const fetchPrice=()=>{
+        fetch('https://backend.uniprecision.com.my/admin/getAllCategories') // Assuming this is the correct endpoint
+        .then(response => {
+            if (!response.ok) {
+                showAlert('Network response was not ok', 'danger');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.users) {
+                setCategories(data.users);
+            }
+        })
+        .catch(error => {
+            showAlert('Error fetching categories', 'danger');
+        });
+    }
 
     const AddService = async () => {
         if(type=='Add'){
@@ -49,7 +69,7 @@ const Dashbaord = () => {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ price, unit:"MY-12", category_name })
+                    body: JSON.stringify({ price, unit:"RM", category_name })
                 });
                 
                 if (!response.ok) {
@@ -59,6 +79,7 @@ const Dashbaord = () => {
                 const data = await response.json();
                 showAlert('Category Added Success','success')
                 setOpenModel(false);
+                fetchPrice()
             } catch (error) {
                 console.error('Error adding category:', error);
                 throw error;
@@ -74,7 +95,7 @@ const Dashbaord = () => {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ price, unit:"MY-12", category_name })
+                    body: JSON.stringify({ price, unit:"RM", category_name })
                 });
                 
                 if (!response.ok) {
@@ -84,6 +105,7 @@ const Dashbaord = () => {
                 const data = await response.json();
                 showAlert('Category Edit Success','success')
                 setOpenModel(false);
+                fetchPrice()
             } catch (error) {
                 console.error('Error Editing category:', error);
                 throw error;
@@ -158,7 +180,7 @@ const Dashbaord = () => {
                         </Route>
                         <Route
                             path="/pricings"
-                            element={<Pricing OpenModel={OpenModel} setOpenModel={setOpenModel} toggleMenu={toggleMenu} handleLogout={handleLogout} setprice={setprice} setcategory_name={setcategory_name} settype={settype} seteditid={seteditid} />}>
+                            element={<Pricing OpenModel={OpenModel} setOpenModel={setOpenModel} toggleMenu={toggleMenu} handleLogout={handleLogout} setprice={setprice} setcategory_name={setcategory_name} settype={settype} seteditid={seteditid} fetchPrice={fetchPrice} categories={categories} />}>
                         </Route>
                         <Route
                             path="/admin-profile"

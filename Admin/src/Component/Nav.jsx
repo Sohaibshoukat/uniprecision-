@@ -29,12 +29,12 @@ const Nav = ({ isMenuOpen, setIsMenuOpen, toggleMenu }) => {
             link: '/admin-dashboard/new-user', 
         },
         {
-            name: 'All User',
+            name: 'All Users',
             Icon: FaUserFriends,
             link: '/admin-dashboard/all-user', 
         },
         {
-            name: 'Approved User',
+            name: 'Approved Users',
             Icon: FaUserCheck,
             link: '/admin-dashboard/approved-user', 
         },

@@ -77,14 +77,14 @@ const Login = () => {
               placeholder="Password"
             />
             {/* Forgot password link */}
-            <div className="mt-4 flex justify-between font-semibold text-sm">
+            {/* <div className="mt-4 flex justify-between font-semibold text-sm">
               <Link
                 className="text-blue-600 hover:text-blue-700 text-xl font-Para hover:underline hover:underline-offset-4"
                 to={'/forgetpassword'}
               >
                 Forgot Password?
               </Link>
-            </div>
+            </div> */}
             {/* Login button */}
             <div className="text-center md:text-left">
               <button

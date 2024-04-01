@@ -69,7 +69,7 @@ export default function SignupPage() {
                 setCountry("");
                 setRole("");
                 navigate("/login")
-                showAlert(data.message, 'success')
+                showAlert('Successfully registered, pending approval', 'success')
             } else {
                 showAlert(data.error, 'danger')
             }

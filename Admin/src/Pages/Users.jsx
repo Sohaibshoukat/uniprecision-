@@ -38,15 +38,6 @@ const Users = ({ toggleMenu, handleLogout }) => {
     }, [])
     
 
-    // Filter the UserData based on search query
-    // const filteredData = UserData.filter(item =>
-    //     item.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    //     item.Email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    //     item.Location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    //     item.Type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    //     item.Total.includes(searchQuery)
-    // );
-
     return (
         <>
             <div className='flex flex-row items-center justify-between gap-0 md:gap-20 h-auto shadow-xl py-4 bg-white px-4 md:px-10 '>
@@ -71,26 +62,16 @@ const Users = ({ toggleMenu, handleLogout }) => {
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>All Users</h2>
 
-                    {/* <div className='flex flex-row justify-between'>
-                        <input
-                            type="text"
-                            placeholder='Search'
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'
-                        />
-                    </div> */}
-
                     <div className='overflow-x-scroll w-[100%]'>
                         <table className='styled-table w-[100%]'>
                             <thead className='font-Para'>
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Location</th>
+                                    <th>Address</th>
                                     <th>Role</th>
                                     <th>Type</th>
-                                    <th>Num</th>
+                                    <th>Contact Number</th>
                                 </tr>
                             </thead>
                             <tbody>
