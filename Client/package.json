@@ -12,6 +12,7 @@
   "dependencies": {
     "@coreui/coreui": "^4.3.0",
     "@coreui/react": "^4.11.1",
+    "crypto-js": "^4.2.0",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.1",
     "jspdf": "^2.5.1",
