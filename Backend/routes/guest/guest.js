@@ -269,5 +269,20 @@ router.put('/update-password/:userId', (req, res) => {
 });
 
 
+router.get('/getorganization/:id', (req, res) => {
+    const userId = req.params.id;
+
+    // Query the database to get the doctor ID based on the user ID
+    const doctorIdQuery = 'SELECT * FROM user WHERE user_id = ?';
+    db.query(doctorIdQuery, [userId], (err, result) => {
+        if (err) {
+            console.error('Error retrieving doctor ID:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        const user = result[0];
+        return res.status(200).json({ organization: user });
+    });
+});
 
 module.exports = router;

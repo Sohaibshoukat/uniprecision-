@@ -82,11 +82,11 @@ export default function SignupPage() {
 
 
     return (
-        <>
+        <div className="overflow-x-hidden">
             <section className="h-screen w-[80%] flex flex-col lg:flex-row justify-between space-y-10 md:space-y-0 md:space-x-16 md:items-center my-2 md:my-0  m-auto">
                 <div className="hidden md:block basis-[40%]">
                     <img
-                        src="https://tecdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+                        src="./Logo.png"
                         alt="Sample image"
                     />
                 </div>
@@ -253,6 +253,9 @@ export default function SignupPage() {
                     </div>
                 </div>
             </section>
-        </>
+            <div className="w-[100vw] text-center">
+                <h2>© 2024 Uniprecision Telerad Sdn. Bhd. (1549296-V) | <a href="https://uniprecision.com.my/privacy-policy/">Privacy Policy </a> | <a href="https://uniprecision.com.my/terms-and-conditions/"> Terms and Condition </a></h2>
+            </div>
+        </div>
     );
 }

@@ -4,6 +4,7 @@ import { IoIosLogOut } from 'react-icons/io';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AlertContext from '../../Context/Alert/AlertContext';
 import CryptoJS from 'crypto-js';
+import { convertDateFormat } from '../DateFunction';
 
 const AllReports = ({ handleLogout, toggleMenu }) => {
     const [SearchKey, setSearchKey] = useState(null);
@@ -13,6 +14,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
     const [name, setName] = useState('');
     const [mobileNumber, setMobileNumber] = useState('');
     const [email, setEmail] = useState('');
+    const [Model, setModel] = useState(false)
 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
@@ -28,13 +30,14 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
         const hash = queryParams.get('hash');
 
         if (statusId && orderId && msg && transactionId && hash) {
-            const secretKey = '41367-365'; // Your secret key
+            const secretKey = '41367-365';
             const hashedString = CryptoJS.HmacSHA256(secretKey + statusId + orderId + transactionId + msg, secretKey).toString(CryptoJS.enc.Hex);
-            
+
             if (hash === hashedString) {
                 if (statusId === '1') {
+                    let orderIdArray = orderId.split('_');
                     showAlert('Payment was successful with message: ' + msg, 'success');
-                    SelectedItem.forEach(item => {
+                    orderIdArray.forEach(item => {
                         fetch(`https://backend.uniprecision.com.my/doctor/payorder/${item}`, {
                             method: 'PUT',
                         })
@@ -50,15 +53,44 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                             .catch(error => {
                                 showAlert(`Error paying for order ${item}`, 'danger');
                             });
-                        })
+                    })
+
+                    const dategen = new Date().toISOString()
+                    const dategenrate = convertDateFormat(dategen)
+
+
+                    fetch(`https://backend.uniprecision.com.my/doctor/addtransaction/${localStorage.getItem('doctorId')}`, {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            txnref: transactionId,
+                            amount: localStorage.getItem('amount'),
+                            date: dategenrate
+                        }),
+                    }).then(response => {
+                        if (!response.ok) {
+                            showAlert(`Error Genrating Transaction Recipt`, 'danger');
+                        }
+                        return response.json();
+                    }).then(data => {
+                        getorder()
+                    }).catch(error => {
+                        showAlert(`Error Genrating Transaction Recipt`, 'danger');
+                    });
+                    localStorage.removeItem('amount')
+
+
                 } else {
                     showAlert('Payment failed with message: ' + msg, 'danger');
                 }
             } else {
                 showAlert('Hashed value is not correct', 'danger');
             }
+
         }
-    }, [location.search, showAlert]);
+    }, []);
 
     const getorder = async () => {
         fetch(`https://backend.uniprecision.com.my/doctor/getAllOrders/${localStorage.getItem('doctorId')}`)
@@ -128,20 +160,21 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
         await SelectedItem.map((item) => {
             OrderId += `${item}_`;
         });
-    
+
         OrderId = OrderId.slice(0, -1);
-    
+
         const detail = `Ordering for ID: ${OrderId}`;
         const secretKey = '41367-365';
         const amount = SelectedPrice;
+        localStorage.setItem('amount', amount)
         const str = `${secretKey}${detail}${amount}${OrderId}`;
-    
+
         const hash = CryptoJS.HmacSHA256(str, secretKey).toString(CryptoJS.enc.Hex);
-    
+
         const form = document.createElement('form');
         form.setAttribute('method', 'post');
         form.setAttribute('action', 'https://app.senangpay.my/payment/578171160985718');
-    
+
         const fields = [
             { name: 'detail', value: detail },
             { name: 'amount', value: amount },
@@ -151,7 +184,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
             { name: 'email', value: email },
             { name: 'phone', value: mobileNumber }
         ];
-    
+
         await fields.forEach(field => {
             const input = document.createElement('input');
             input.setAttribute('type', 'hidden');
@@ -159,13 +192,80 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
             input.setAttribute('value', field.value);
             form.appendChild(input);
         });
-    
+
         await document.body.appendChild(form);
         form.submit();
     };
 
     return (
         <>
+            {Model &&
+                <div className='fixed z-50 w-[100vw] h-[100vh] flex items-center'>
+                    <div className='absolute z-30 bg-black/50 w-[100%] h-[100%]' onClick={() => { setModel(false) }}>
+
+                    </div>
+                    <div className='w-fit h-fit bg-white relative z-50 flex flex-col gap-4 rounded-xl lg:w-[70%] py-8 px-8 ml-2 md:ml-8'>
+                        <h2 className='text-black font-Para text-2xl'>Check Out Page</h2>
+                        <div className='overflow-x-scroll'>
+                            <table className=' w-[100%] styled-table'>
+                                <thead className='font-Para'>
+                                    <tr>
+                                        <th>Select to Pay</th>
+                                        <th>ID</th>
+                                        <th>Type</th>
+                                        <th>Date</th>
+                                        <th>Patient name</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Dataset && Dataset.length > 0 && Dataset.map((item, index) => (
+                                        <>{
+                                            SelectedItem.map((item2) => (
+                                                <>
+                                                {item2==item.order_id&&<tr
+                                                    className='font-Para cursor-pointer'
+                                                    key={index}
+                                                >
+                                                    <td
+                                                        className='text-center w-20'
+                                                    >
+                                                        {item.status === 'UnPaid' && (
+                                                            <input
+                                                                type='checkbox'
+                                                                checked={SelectedItem.includes(item.order_id)}
+                                                                onChange={(e) => handleCheckboxChange(e, item.order_id, item.price)}
+                                                            />
+                                                        )}
+                                                    </td>
+                                                    <td>{item.order_id}</td>
+                                                    <td>{item.category_name}</td>
+                                                    <td>{convertDateFormat(item.date_generated)}</td>
+                                                    <td>{item.patient_name}</td>
+                                                    <td>{item.price}</td>
+                                                </tr>}
+                                                </>
+                                            ))
+                                        }
+                                        </>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="flex flex-col md:flex-row justify-end gap-4 items-center mx-4">
+                            <h2 className='text-2xl font-bold font-Para '>Total :</h2>
+                            <h4 className='text-xl font-Para font-medium'>{SelectedPrice}</h4>
+                        </div>
+                        <button
+                            className='w-fit self-center bg-darkblue text-center text-white border-2 border-darkblue hover:bg-transparent px-6  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
+                            onClick={HandlePyaOut}
+                        >
+                            Pay Know
+                        </button>
+                    </div>
+                </div>
+            }
+
             <div className='flex flex-row items-center justify-between gap-0 md:gap-20 h-auto shadow-xl py-4 bg-white px-4 md:px-10 '>
                 <button
                     type="button"
@@ -181,11 +281,11 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>All Service Request</h2>
                     <div className="flex flex-col gap-4 my-6">
-                        <h2 className='font-Lora italic font-normal text-lg'> Instructions:</h2>
+                        <h2 className='font-Para font-normal text-lg'> Instructions:</h2>
                         <ol className='flex flex-col gap-2 ml-2'>
-                            <li className='text-base font-normal font-Lora '>1. Alternatively, click <b>'New Request'</b>  On the left menu to create new request.</li>
-                            <li className='text-base font-normal font-Lora '>2. Click on the Uploaded file link to downlaod a copy of the file you have uploaded</li>
-                            <li className='text-base font-normal font-Lora '>3. Scroll to the right, click on the Report link to download the report in PDF format. Report link only available after payment has been made</li>
+                            <li className='text-base font-normal font-Para '>1. Click <b>'New Request'</b>  On the left menu to create new request.</li>
+                            <li className='text-base font-normal font-Para '>2. Click on the Uploaded file link to downlaod a copy of the file you have uploaded</li>
+                            <li className='text-base font-normal font-Para '>3. Scroll to the right, click on the Report link to download the report in PDF format. Report is available after payment has been made.</li>
                         </ol>
                     </div>
 
@@ -243,12 +343,12 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                                                 {item.status}
                                             </h2>
                                         </td>
-                                        <td>{item.date_generated}</td>
+                                        <td>{convertDateFormat(item.date_generated)}</td>
                                         <td>{item.patient_name}</td>
                                         <td>{item.Examination_Date}</td>
                                         <td
                                             className='text-blue-600 underline cursor-pointer'>
-                                            <a href={item.file_url} download={item.report_id} target='_blank'>{item.file_path}</a>
+                                            <a href={item.file_url} download={item.report_id}>{item.file_path}</a>
                                         </td>
                                         <td>{item.price}</td>
                                     </tr>
@@ -263,9 +363,9 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                         font-Para py-2 px-4 rounded-lg hover:bg-transparent my-5 float-right
                         hover:text-slate-700 ease-in-out duration-300 ${SelectedItem.length == 0 ? 'opacity-20' : 'opacity-100'}`}
                         disabled={SelectedItem.length == 0}
-                        onClick={HandlePyaOut}
+                        onClick={() => { setModel(true) }}
                     >
-                        Pay now
+                        Check Out
                     </button>
 
                 </div>

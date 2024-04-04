@@ -5,6 +5,32 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+
+router.get('/allTransactions', (req, res) => {
+
+    // Query transactions for the specified doctor
+    const transactionsQuery = `
+    SELECT t.*, u.name, u.email
+    FROM transactions t
+    INNER JOIN doctor d ON t.doctor_id = d.doctor_id
+    INNER JOIN user u ON d.user_id = u.user_id
+    `;
+    db.query(transactionsQuery, (err, results) => {
+        if (err) {
+            console.error('Error retrieving transactions:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Check if there are no transactions for the specified doctor
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No transactions found for the specified doctor' });
+        }
+
+        // Return transactions
+        return res.status(200).json({ transactions: results });
+    });
+});
+
 router.get('/getAllRadiologists', (req, res) => {
     // Query to fetch all radiologists with their names
     const radiologistsQuery = 'SELECT r.*, u.name AS radiologist_name FROM radiologist r INNER JOIN user u ON r.user_id = u.user_id Where status= "Approved"';
@@ -300,7 +326,7 @@ router.get('/getnewRadiologist', (req, res) => {
 
 router.get('/getAllCategories', (req, res) => {
     // Query to retrieve all users
-    const getUsersQuery = 'SELECT * FROM category';
+    const getUsersQuery = 'SELECT * FROM category WHERE status = "Active"';
 
     // Execute the query
     db.query(getUsersQuery, (err, results) => {
@@ -358,10 +384,10 @@ router.delete('/deleteCategory/:categoryId', (req, res) => {
     const categoryId = req.params.categoryId;
 
     // Delete category from category table
-    const deleteCategoryQuery = 'DELETE FROM category WHERE category_id = ?';
-    db.query(deleteCategoryQuery, [categoryId], (err, result) => {
+    const editCategoryQuery = 'UPDATE category SET status = ? WHERE category_id = ?';
+    db.query(editCategoryQuery, ['DeActive' ,categoryId], (err, result) => {
         if (err) {
-            console.error('Error deleting category:', err);
+            console.error('Error editing category:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
 
@@ -369,7 +395,7 @@ router.delete('/deleteCategory/:categoryId', (req, res) => {
             return res.status(404).json({ error: 'category not found' });
         }
 
-        return res.status(200).json({ message: 'category deleted successfully' });
+        return res.status(200).json({ message: 'category updated successfully' });
     });
 });
 
@@ -463,7 +489,6 @@ router.post('/login', (req, res) => {
         });
     });
 });
-
 
 router.put('/ChangePassword', async (req, res) => {
     try {

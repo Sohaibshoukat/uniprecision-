@@ -3,17 +3,17 @@ import { IoIosLogOut } from 'react-icons/io'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import AlertContext from '../Context/Alert/AlertContext';
 
-const Pricing = ({ 
-        toggleMenu, 
-        handleLogout, 
-        OpenModel, 
-        setOpenModel,
-        setprice, 
-        setcategory_name, 
-        settype, 
-        seteditid,
-        fetchPrice,
-        categories
+const Pricing = ({
+    toggleMenu,
+    handleLogout,
+    OpenModel,
+    setOpenModel,
+    setprice,
+    setcategory_name,
+    settype,
+    seteditid,
+    fetchPrice,
+    categories
 }) => {
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
@@ -23,6 +23,25 @@ const Pricing = ({
     useEffect(() => {
         fetchPrice()
     }, []);
+
+
+    const Deletecategory = async (id) => {
+        try {
+            const response = await fetch(`https://backend.uniprecision.com.my/admin/deleteCategory/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                showAlert('Network response was not ok', 'danger');
+            }
+
+            const data = await response.json();
+            showAlert('Category Deleted Success', 'success')
+            fetchPrice()
+        } catch (error) {
+            showAlert('Error Deleting category', 'danger');
+        }
+    }
 
     return (
         <>
@@ -51,10 +70,10 @@ const Pricing = ({
                         <div className='flex flex-row gap-4 justify-end'>
                             <button
                                 className='w-fit px-4 bg-darkblue text-white border-2 border-darkblue hover:bg-transparent  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
-                                onClick={() => { 
+                                onClick={() => {
                                     setOpenModel(true)
                                     settype('Add')
-                                 }}
+                                }}
                             >
                                 Add New Service
                             </button>
@@ -65,7 +84,7 @@ const Pricing = ({
                                     <th>Name</th>
                                     <th>Price</th>
                                     <th>Unit</th>
-                                    <th>New Input</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -77,18 +96,28 @@ const Pricing = ({
                                         <td>{item.category_name}</td>
                                         <td>{item.price}</td>
                                         <td>{item.unit}</td>
-                                        <button
-                                            className='w-fit px-4 my-2 bg-green-400 text-white border-2 border-green-400 hover:bg-transparent  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
-                                            onClick={() => { 
-                                                setOpenModel(true) 
-                                                setcategory_name(item.category_name)
-                                                setprice(item.price)
-                                                seteditid(item.category_id)
-                                                settype('Edit')
-                                            }}
-                                        >
-                                           Edit
-                                        </button>
+                                        <td className='flex flex-row gap-4'>
+                                            <button
+                                                className='w-fit px-4 my-2 bg-green-400 text-white border-2 border-green-400 hover:bg-transparent  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
+                                                onClick={() => {
+                                                    setOpenModel(true)
+                                                    setcategory_name(item.category_name)
+                                                    setprice(item.price)
+                                                    seteditid(item.category_id)
+                                                    settype('Edit')
+                                                }}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className='w-fit px-4 my-2 bg-red-400 text-white border-2 border-red-400 hover:bg-transparent  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
+                                                onClick={() => {
+                                                    Deletecategory(item.category_id)
+                                                }}
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { IoIosLogOut } from 'react-icons/io'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import AlertContext from '../Context/Alert/AlertContext'
+import { convertDateFormat } from '../Component/DateFunction'
 
 const AssignRequest = ({ toggleMenu, handleLogout }) => {
 
@@ -115,7 +116,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
                                     >
                                         <td>{item.report_id}</td>
                                         <td>{item.category_name}</td>
-                                        <td>{item.Examination_Date}</td>
+                                        <td>{convertDateFormat(item.Examination_Date)}</td>
                                         <td>{item.price}</td>
                                         <td>
                                             <select

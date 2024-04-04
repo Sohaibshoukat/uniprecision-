@@ -31,9 +31,9 @@ const Login = () => {
         setEmail('')
         setPassword('')
         showAlert('Login Success', 'success');
-        if(data.role=='Doctor'){
+        if (data.role == 'Doctor') {
           navigate("/docDashboard/"); // Redirect to dashboard upon successful login
-        }else if(data.role=='Radiologist'){
+        } else if (data.role == 'Radiologist') {
           navigate("/radioDashboard/"); // Redirect to dashboard upon successful login
         }
       } else {
@@ -45,69 +45,74 @@ const Login = () => {
   };
 
   return (
-    <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
-      <div className="md:w-1/3 max-w-sm">
-        <img
-          src="https://tecdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
-          alt="Sample image"
-        />
-      </div>
-      <div className="md:w-1/3 max-w-sm">
-        <div className="text-center md:text-left">
-          <form onSubmit={handleLogin} className="flex flex-col gap-2">
-            {/* Email input */}
-            <input
-              className="text-lg w-full px-4 py-2 text-black border border-solid border-gray-500 rounded-lg"
-              type="email"
-              name="email"
-              value={email}
-              required
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email Address"
-            />
-            {/* Password input */}
-            <input
-              className="text-lg w-full px-4 py-2 text-black border border-solid border-gray-500 rounded-lg"
-              type="password"
-              name="password"
-              value={password}
-              required
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-            />
-            {/* Forgot password link */}
-            <div className="mt-4 flex justify-between font-semibold text-sm">
-              <Link
-                className="text-blue-600 hover:text-blue-700 text-xl font-Para hover:underline hover:underline-offset-4"
-                to={'/forgetpassword'}
-              >
-                Forgot Password?
-              </Link>
-            </div>
-            {/* Login button */}
-            <div className="text-center md:text-left">
-              <button
-                className="mt-4 bg-blue-600 text-xl font-Para hover:bg-blue-700 px-4 py-2 text-white uppercase rounded tracking-wider"
-                type="submit"
-              >
-                Login
-              </button>
-            </div>
-          </form>
+    <div className="overflow-x-hidden">
+      <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
+        <div className="md:w-1/3 max-w-sm">
+          <img
+            src="./Logo.png"
+            alt="Sample image"
+          />
+        </div>
+        <div className="md:w-1/3 max-w-sm">
+          <div className="text-center md:text-left">
+            <form onSubmit={handleLogin} className="flex flex-col gap-2">
+              {/* Email input */}
+              <input
+                className="text-lg w-full px-4 py-2 text-black border border-solid border-gray-500 rounded-lg"
+                type="email"
+                name="email"
+                value={email}
+                required
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email Address"
+              />
+              {/* Password input */}
+              <input
+                className="text-lg w-full px-4 py-2 text-black border border-solid border-gray-500 rounded-lg"
+                type="password"
+                name="password"
+                value={password}
+                required
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+              />
+              {/* Forgot password link */}
+              <div className="mt-4 flex justify-between font-semibold text-sm">
+                <Link
+                  className="text-blue-600 hover:text-blue-700 text-xl font-Para hover:underline hover:underline-offset-4"
+                  to={'/forgetpassword'}
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+              {/* Login button */}
+              <div className="text-center md:text-left">
+                <button
+                  className="mt-4 bg-blue-600 text-xl font-Para hover:bg-blue-700 px-4 py-2 text-white uppercase rounded tracking-wider"
+                  type="submit"
+                >
+                  Login
+                </button>
+              </div>
+            </form>
 
+          </div>
+          {/* Register link */}
+          <div className="mt-4 font-semibold font-Para text-lg text-slate-500 text-center md:text-left">
+            Don't have an account?{" "}
+            <Link
+              className="text-red-600 hover:underline hover:underline-offset-4"
+              to="/signup"
+            >
+              Register
+            </Link>
+          </div>
         </div>
-        {/* Register link */}
-        <div className="mt-4 font-semibold font-Para text-lg text-slate-500 text-center md:text-left">
-          Don't have an account?{" "}
-          <Link
-            className="text-red-600 hover:underline hover:underline-offset-4"
-            to="/signup"
-          >
-            Register
-          </Link>
-        </div>
+      </section>
+      <div className="w-[100vw] text-center">
+        <h2>© 2024 Uniprecision Telerad Sdn. Bhd. (1549296-V) | <a href="https://uniprecision.com.my/privacy-policy/">Privacy Policy </a> | <a href="https://uniprecision.com.my/terms-and-conditions/"> Terms and Condition </a></h2>
       </div>
-    </section>
+    </div>
   );
 };
 

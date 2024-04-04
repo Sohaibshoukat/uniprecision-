@@ -107,7 +107,7 @@ router.get('/getAllReports/:doctorId', (req, res) => {
     FROM report r
     INNER JOIN orders o ON r.order_id = o.order_id
     INNER JOIN category c ON o.category_id = c.category_id
-    WHERE r.doctor_id = ?
+    WHERE r.doctor_id = ? AND r.report_status != 'UnPaid'
     
     `;
 
@@ -172,29 +172,29 @@ router.get('/getSingleReprte/:docid/:reportid', (req, res) => {
             const doctor = doctorResults[0];
 
             const radioQuery = `
-            SELECT r.*, u.name AS radio_name
+            SELECT r.*, u.name AS radio_name, u.organization AS organization
             FROM radiologist r
             INNER JOIN user u ON r.user_id = u.user_id
             WHERE r.radiologist_id = ? AND r.status = 'Approved'
             `;
-    
+
             db.query(radioQuery, [report.radiologist_id], (err, radioResults) => {
                 if (err) {
                     console.error('Error retrieving doctor data:', err);
                     return res.status(500).json({ error: 'Internal Server Error' });
                 }
-    
+
                 if (doctorResults.length === 0) {
                     return res.status(404).json({ error: 'doctor not found' });
                 }
 
-            const filePath = report.file_path;
-            const fileUrl = filePath ? `${req.protocol}://${req.get('host')}/${filePath}` : null;
-            const reportWithFileUrl = { ...report, file_url: fileUrl };
+                const filePath = report.file_path;
+                const fileUrl = filePath ? `${req.protocol}://${req.get('host')}/${filePath}` : null;
+                const reportWithFileUrl = { ...report, file_url: fileUrl };
 
-            const radio = radioResults[0];
+                const radio = radioResults[0];
 
-            return res.status(200).json({ report: reportWithFileUrl, doctor: doctor, radio:radio });
+                return res.status(200).json({ report: reportWithFileUrl, doctor: doctor, radio: radio });
             })
         });
     });
@@ -273,30 +273,9 @@ router.post('/editDoctorDetails', (req, res) => {
     });
 });
 
-router.get('/doctorTransactions/:doctorId', (req, res) => {
-    const doctorId = req.params.doctorId;
-
-    // Query transactions for the specified doctor
-    const transactionsQuery = 'SELECT * FROM transactions WHERE doctor_id = ?';
-    db.query(transactionsQuery, [doctorId], (err, results) => {
-        if (err) {
-            console.error('Error retrieving transactions:', err);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
-
-        // Check if there are no transactions for the specified doctor
-        if (results.length === 0) {
-            return res.status(404).json({ error: 'No transactions found for the specified doctor' });
-        }
-
-        // Return transactions
-        return res.status(200).json({ transactions: results });
-    });
-});
-
 router.get('/getAllCategories', (req, res) => {
     // Query to retrieve all users
-    const getUsersQuery = 'SELECT * FROM category';
+    const getUsersQuery = 'SELECT * FROM category WHERE status = "Active"';
 
     // Execute the query
     db.query(getUsersQuery, (err, results) => {
@@ -320,7 +299,7 @@ router.get('/getorganization/:id', (req, res) => {
     const userId = req.params.id;
 
     // Query the database to get the doctor ID based on the user ID
-    const doctorIdQuery = 'SELECT organization FROM user WHERE user_id = ?';
+    const doctorIdQuery = 'SELECT * FROM user WHERE user_id = ?';
     db.query(doctorIdQuery, [userId], (err, result) => {
         if (err) {
             console.error('Error retrieving doctor ID:', err);
@@ -331,5 +310,44 @@ router.get('/getorganization/:id', (req, res) => {
         return res.status(200).json({ organization: user });
     });
 });
+
+
+router.post('/addtransaction/:doctorId', (req, res) => {
+    const { amount, date, txnref } = req.body;
+    const doctorId = req.params.doctorId;
+
+    // Insert data into category table
+    const addCategoryQuery = 'INSERT INTO transactions (transaction_ref , amount, doctor_id, date_generated ) VALUES (?, ?, ?, ?)';
+    db.query(addCategoryQuery, [txnref, amount, doctorId, date], (err, result) => {
+        if (err) {
+            console.error('Error adding category:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        return res.status(200).json({ message: 'Transaction added successfully' });
+    });
+});
+
+router.get('/doctorTransactions/:doctorId', (req, res) => {
+    const doctorId = req.params.doctorId;
+
+    // Query transactions for the specified doctor
+    const transactionsQuery = 'SELECT * FROM transactions WHERE doctor_id = ?';
+    db.query(transactionsQuery, [doctorId], (err, results) => {
+        if (err) {
+            console.error('Error retrieving transactions:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Check if there are no transactions for the specified doctor
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No transactions found for the specified doctor' });
+        }
+
+        // Return transactions
+        return res.status(200).json({ transactions: results });
+    });
+});
+
 
 module.exports = router;

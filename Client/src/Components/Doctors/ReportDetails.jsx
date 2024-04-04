@@ -6,12 +6,13 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { useLocation } from 'react-router-dom';
 import AlertContext from '../../Context/Alert/AlertContext';
+import { convertDateFormat } from '../DateFunction';
 
 const ReportDetails = ({ handleLogout, toggleMenu }) => {
 
   const location = useLocation()
 
-  
+
   const AletContext = useContext(AlertContext);
   const { showAlert } = AletContext;
 
@@ -23,19 +24,35 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
   const [name, setname] = useState(Data?.patient_name);
   const [Loading, setLoading] = useState(false)
 
+  // const downloadPDF = () => {
+  //   const capture = document.querySelector('#pdf-content');
+  //   setLoading(true);
+  //   html2canvas(capture).then((canvas) => {
+  //     const imgData = canvas.toDataURL('img/png');
+  //     const doc = new jsPDF('p', 'mm', 'a4');
+  //     const componentWidth = doc.internal.pageSize.getWidth();
+  //     const componentHeight = doc.internal.pageSize.getHeight();
+  //     doc.addImage(imgData, 'PNG', 0, 0, componentWidth, componentHeight);
+  //     setLoading(false);
+  //     doc.save(`${Data?.patient_name}.pdf`);
+  //   })
+  // }
+
   const downloadPDF = () => {
     const capture = document.querySelector('#pdf-content');
     setLoading(true);
-    html2canvas(capture).then((canvas) => {
-      const imgData = canvas.toDataURL('img/png');
+    html2canvas(capture, { scale: 1 }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
       const doc = new jsPDF('p', 'mm', 'a4');
-      const componentWidth = doc.internal.pageSize.getWidth();
-      const componentHeight = doc.internal.pageSize.getHeight();
-      doc.addImage(imgData, 'PNG', 0, 0, componentWidth, componentHeight);
+      const ratio = canvas.width / canvas.height;
+      const width = doc.internal.pageSize.getWidth();
+      const height = width / ratio;
+      doc.addImage(imgData, 'PNG', 0, 0, width, height);
       setLoading(false);
-      doc.save(`${Data?.patient_name}.pdf`);
-    })
-  }
+      doc.save(`UNIPRECISION-${Data?.patient_name}.pdf`);
+    });
+  };
+  
 
   const getorder = async () => {
     fetch(`https://backend.uniprecision.com.my/doctor/getSingleReprte/${localStorage.getItem('doctorId')}/${itemid}`) // Assuming this is the correct endpoint
@@ -78,15 +95,15 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
         <div className=''>
           <div className='flex flex-row justify-between px-2 md:px-10'>
             <h2 className='font-Para text-3xl font-bold mb-4'>Report Detail</h2>
-            <button 
-              onClick={downloadPDF} 
+            <button
+              onClick={downloadPDF}
               className={` bg-slate-700 border-2 border-slate-700 text-lg text-white 
                         font-Para py-2 px-4 rounded-lg my-5 float-right ease-in-out duration-300 
-                        ${Loading?'opacity-45':' hover:bg-transparent hover:text-slate-700 '}
+                        ${Loading ? 'opacity-45' : ' hover:bg-transparent hover:text-slate-700 '}
                       `}
               disabled={Loading}
             >
-             {Loading?'Downloading...' : 'Download Report'}
+              {Loading ? 'Downloading...' : 'Download Report'}
             </button>
           </div>
           <div className='w-[100%] font-Para text-lg' id='pdf-content'>
@@ -112,57 +129,73 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
             <div className='flex flex-col my-10 w-[80%] m-auto'>
               <div className="flex flex-row justify-between gap-[10%] items-center">
                 <div className="flex font-Para text-lg flex-row justify-between basis-[50%] items-center">
-                  <h4 className='font-bold'>Name</h4>
-                  <span className='font-bold'>:</span>
+                  <div className='flex flex-row justify-between basis-[60%]'>
+                    <h4 className='font-bold'>Name</h4>
+                    <span className='font-bold'>:</span>
+                  </div>
                   <h4>{Data?.patient_name}</h4>
                 </div>
                 <div className="flex font-Para text-lg flex-row justify-between basis-[50%] items-center">
-                  <h4 className='font-bold'>Examination Date </h4>
-                  <span className='font-bold'>:</span>
-                  <h4>{Data?.examination_date}</h4>
+                  <div className='flex flex-row justify-between basis-[60%]'>
+                    <h4 className='font-bold'>Examination Date </h4>
+                    <span className='font-bold'>:</span>
+                  </div>
+                  <h4>{convertDateFormat(Data?.examination_date)}</h4>
                 </div>
               </div>
               <div className="flex flex-row justify-between gap-[10%] items-center">
                 <div className="flex font-Para text-lg flex-row justify-between basis-[50%] items-center">
-                  <h4 className='font-bold'>Date of Birth</h4>
-                  <span className='font-bold'>:</span>
-                  <h4>{Data?.dob}</h4>
+                  <div className='flex flex-row justify-between basis-[60%]'>
+                    <h4 className='font-bold'>Date of Birth</h4>
+                    <span className='font-bold'>:</span>
+                  </div>
+                  <h4>{convertDateFormat(Data?.dob)}</h4>
                 </div>
                 <div className="flex font-Para text-lg flex-row justify-between basis-[50%] items-center">
-                  <h4 className='font-bold'>Age</h4>
-                  <span className='font-bold'>:</span>
+                  <div className='flex flex-row justify-between basis-[60%]'>
+                    <h4 className='font-bold'>Age</h4>
+                    <span className='font-bold'>:</span>
+                  </div>
                   <h4>{Data?.age}</h4>
                 </div>
               </div>
               <div className="flex flex-row justify-between gap-[10%] items-center">
                 <div className="flex font-Para text-lg flex-row justify-between basis-[50%] items-center">
-                  <h4 className='font-bold'>NRIC/Passport No</h4>
-                  <span className='font-bold'>:</span>
+                  <div className='flex flex-row justify-between basis-[60%]'>
+                    <h4 className='font-bold'>NRIC/Passport No</h4>
+                    <span className='font-bold'>:</span>
+                  </div>
                   <h4>{Data?.nric_passport_no}</h4>
                 </div>
                 <div className="flex font-Para text-lg flex-row justify-between basis-[50%] items-center">
-                  <h4 className='font-bold'>Gender</h4>
-                  <span className='font-bold'>:</span>
+                  <div className='flex flex-row justify-between basis-[60%]'>
+                    <h4 className='font-bold'>Gender</h4>
+                    <span className='font-bold'>:</span>
+                  </div>
                   <h4>{Data?.gender}</h4>
                 </div>
               </div>
               <div className="flex flex-row justify-between gap-[10%] items-center">
                 <div className="flex font-Para text-lg flex-row justify-between basis-[50%] items-center">
-                  <h4 className='font-bold'>Referring Doctor </h4>
-                  <span className='font-bold'>:</span>
+                  <div className='flex flex-row justify-between basis-[60%]'>
+                    <h4 className='font-bold'>Referring Doctor </h4>
+                    <span className='font-bold'>:</span>
+                  </div>
                   <h4>{doctor?.doctor_name}</h4>
                 </div>
                 <div className="flex font-Para text-lg flex-row justify-between basis-[50%] items-center">
-                  <h4 className='font-bold'>Clinic/DiagnosƟc Center </h4>
-                  <span className='font-bold'>:</span>
-                  <h4>{Data?.clinical_summary_title}</h4>
+                  <div className='flex flex-row justify-between basis-[60%]'>
+                    <h4 className='font-bold'>Clinic/Diagnostic Center </h4>
+                    <span className='font-bold'>:</span>
+                  </div>
+                  <h4>{Data?.clinical_summary_title==''?'N/A':Data?.clinical_summary_title}</h4>
                 </div>
               </div>
             </div>
 
             <div className='flex w-[80%] flex-col gap-8 m-auto'>
               <h2 className='mb-6'>Clinical Summary</h2>
-              <h2>[Examination][Date] <span className='ml-5'>{Data?.examination_date}</span></h2>
+              <h2>Examination-Date :<span className='ml-5'>{convertDateFormat(Data?.examination_date)}</span></h2>
 
               <div className='flex flex-col gap-1'>
                 <h1>Prvious study:</h1>
@@ -186,12 +219,12 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
                     <h1>Reported by:</h1>
                     <div className='ml-4 '>
                       <p>{radio?.radio_name}</p>
-                      <p>Clinical Radiologist</p>
+                      <p>{radio?.organization == '' ? 'N/A' : radio?.organization}</p>
                       <p>MMC No: 68832 MD </p>
                       <p>(USU), FRCR (UK) </p>
                     </div>
                   </div>
-                  <h2>Date<span className='ml-5'>{}</span></h2>
+                  <h2>Date<span className='ml-5'>{convertDateFormat(new Date())}</span></h2>
                 </div>
                 <div className='w-fit'>
                   <img src={STAMP} alt="" className='w-[200px] h-[200px]' />

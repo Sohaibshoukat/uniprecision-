@@ -1,81 +1,35 @@
 import React from 'react'
 import { IoIosLogOut } from 'react-icons/io'
 import { GiHamburgerMenu } from 'react-icons/gi'
+import { useContext } from 'react'
+import { useState } from 'react'
+import { useEffect } from 'react'
+import AlertContext from '../Context/Alert/AlertContext'
+import { convertDateFormat } from '../Component/DateFunction'
 
 const Earning = ({ toggleMenu, handleLogout }) => {
+    const [Data, setData] = useState([])
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
 
-    const Transaction=[
-        {
-            Type:"Cash",
-            TillId:"495cn4oen35",
-            Amount:"500",
-            Doctor:"Inzamam",
-            status:"Paid"
-        },
-        {
-            Type:"Cash",
-            TillId:"495cn4oen35",
-            Amount:"500",
-            Doctor:"Inzamam",
-            status:"Paid"
-        },
-        {
-            Type:"Cash",
-            TillId:"495cn4oen35",
-            Amount:"500",
-            Doctor:"Inzamam",
-            status:"Paid"
-        },
-        {
-            Type:"Cash",
-            TillId:"495cn4oen35",
-            Amount:"500",
-            Doctor:"Inzamam",
-            status:"Paid"
-        },
-        {
-            Type:"Cash",
-            TillId:"495cn4oen35",
-            Amount:"500",
-            Doctor:"Inzamam",
-            status:"Paid"
-        },
-        {
-            Type:"Cash",
-            TillId:"495cn4oen35",
-            Amount:"500",
-            Doctor:"Inzamam",
-            status:"Paid"
-        },
-        {
-            Type:"Cash",
-            TillId:"495cn4oen35",
-            Amount:"500",
-            Doctor:"Inzamam",
-            status:"Paid"
-        },
-        {
-            Type:"Cash",
-            TillId:"495cn4oen35",
-            Amount:"500",
-            Doctor:"Inzamam",
-            status:"Paid"
-        },
-        {
-            Type:"Cash",
-            TillId:"495cn4oen35",
-            Amount:"500",
-            Doctor:"Inzamam",
-            status:"Paid"
-        },
-        {
-            Type:"Cash",
-            TillId:"495cn4oen35",
-            Amount:"500",
-            Doctor:"Inzamam",
-            status:"Paid"
-        }
-    ]
+
+    useEffect(() => {
+        fetch(`https://backend.uniprecision.com.my/admin/allTransactions`) // Assuming this is the correct endpoint
+            .then(response => {
+                if (!response.ok) {
+                    showAlert('Network response was not ok', 'danger');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.transactions) {
+                    setData(data.transactions);
+                }
+            })
+            .catch(error => {
+                showAlert('Error fetching categories', 'danger');
+            });
+    }, []);
 
     return (
         <>
@@ -103,24 +57,24 @@ const Earning = ({ toggleMenu, handleLogout }) => {
                     <table className='styled-table w-[100%]'>
                         <thead className='font-Para'>
                             <tr>
-                                <th>Type</th>
+                                <th>Transaction ID</th>
                                 <th>Doctor</th>
                                 <th>Amount</th>
                                 <th>TillId</th>
-                                <th>status</th>
+                                <th>Date</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {Transaction.map((item, index) => (
+                            {Data &&Data?.length>0 && Data?.map((item, index) => (
                                 <tr
                                     className='font-Para cursor-pointer'
                                     key={index}
                                 >
-                                    <td>{item.Type}</td>
-                                    <td>{item.Doctor}</td>
-                                    <td>{item.Amount}</td>
-                                    <td>{item.TillId}</td>
-                                    <td>{item.status}</td>
+                                    <td>{item.transaction_id}</td>
+                                    <td>{item.name}</td>
+                                    <td>RM {item.amount}</td>
+                                    <td>{item.transaction_ref}</td>
+                                    <td>{convertDateFormat(item.date_generated)}</td>
                                 </tr>
                             ))}
                         </tbody>

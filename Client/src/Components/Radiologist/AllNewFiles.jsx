@@ -55,8 +55,9 @@ const AllNewFiles = ({ handleLogout, toggleMenu }) => {
                     <div className="flex flex-col gap-4 my-6">
                         <h2 className='font-Lora italic font-normal text-lg'>Instruction for Radiologist:</h2>
                         <ol className='flex flex-col gap-2 ml-2'>
-                            <li className='text-base font-normal font-Lora '>1. Click <b>Any Service</b> to anaylise and start filing the form</li>
-                            <li className='text-base font-normal font-Lora '>2. Click 'Show All' button to reveal the uploaded file and Report columns</li>
+                            <li className='text-base font-normal font-Lora '>1. Your assigned request(s) is listed below</li>
+                            <li className='text-base font-normal font-Lora '>2. Download the images for your review (Multiple files are zipped). </li>
+                            <li className='text-base font-normal font-Lora '>3. Click Fill Report to fill in your diagnostic or analysis.</li>
                         </ol>
                     </div>
 
@@ -94,7 +95,7 @@ const AllNewFiles = ({ handleLogout, toggleMenu }) => {
                                         <td>{item.report_status}</td>
                                         <td>{item.date_generated}</td>
                                         <td className='text-blue-600 underline cursor-pointer'>
-                                            <a href={item.file_url} download={item.report_id} target='_blank'>
+                                            <a href={item.file_url} download={item.report_id}>
                                                 {item.file_path}
                                             </a>
                                         </td>

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoIosLogOut } from 'react-icons/io'
 import AlertContext from '../../Context/Alert/AlertContext'
+import { convertDateFormat } from '../DateFunction'
 
 const FillReport = ({ handleLogout, toggleMenu }) => {
 
@@ -61,9 +62,9 @@ const FillReport = ({ handleLogout, toggleMenu }) => {
       });
       const responseData = await response.json();
       if (!response.ok) {
-        showAlert(responseData.error,'danger');
+        showAlert(responseData.error, 'danger');
       }
-      showAlert('Report Submitted','success');
+      showAlert('Report Submitted', 'success');
       navigate('/radioDashboard/')
     } catch (error) {
       showAlert(error.message, 'danger');
@@ -100,7 +101,7 @@ const FillReport = ({ handleLogout, toggleMenu }) => {
                 </div>
                 <div className="flex flex-row gap-3">
                   <h2 className='text-lg font-normal font-Para'>Date of Birth:</h2>
-                  <p className='text-base font-light font-Para'>{Data?.dob}</p>
+                  <p className='text-base font-light font-Para'>{convertDateFormat(Data?.dob)}</p>
                 </div>
                 <div className="flex flex-row items-center gap-6">
                   <h2 className='text-lg font-normal font-Para'> NRIC/Passport No:</h2>
@@ -116,7 +117,7 @@ const FillReport = ({ handleLogout, toggleMenu }) => {
                 </div>
                 <div className="flex flex-row items-center gap-3">
                   <h2 className='text-lg font-normal font-Para'>Examination Date:</h2>
-                  <p className='text-base font-light font-Para'>{Data?.examination_date}</p>
+                  <p className='text-base font-light font-Para'>{convertDateFormat(Data?.examination_date)}</p>
                 </div>
                 <div className="flex flex-row items-center gap-3">
                   <h2 className='text-lg font-normal font-Para'>Clinic/Diagnosic Center:</h2>
@@ -146,6 +147,9 @@ const FillReport = ({ handleLogout, toggleMenu }) => {
                     id=''
                     cols='30'
                     rows='4'
+                    placeholder='No consolidation. No pleural effusion. 
+The mediastinum is not widened. 
+No cardiomegaly. Bones are unremarkable. '
                     className='border-gray-400 border-2 py-2 px-4 rounded-lg'
                     value={findings}
                     onChange={(e) => setFindings(e.target.value)}
@@ -161,6 +165,7 @@ const FillReport = ({ handleLogout, toggleMenu }) => {
                     id=''
                     cols='30'
                     rows='4'
+                    placeholder='Normal chest radiograph.'
                     className='border-gray-400 border-2 py-2 px-4 rounded-lg'
                     value={summary}
                     onChange={(e) => setSummary(e.target.value)}
@@ -173,14 +178,14 @@ const FillReport = ({ handleLogout, toggleMenu }) => {
 
             {/* Button Submit */}
             <div className='flex flex-col justify-end w-[100%] '>
-            <button
-          className='bg-slate-700 border-2 border-slate-700 hover:bg-transparent hover:text-slate-700 
+              <button
+                className='bg-slate-700 border-2 border-slate-700 hover:bg-transparent hover:text-slate-700 
             text-white ease-in-out duration-300 w-fit py-2 px-4 text-lg 
             font-Para font-medium mt-6 rounded-lg'
-          onClick={handleSubmit}
-        >
-          Submit Report
-        </button>
+                onClick={handleSubmit}
+              >
+                Submit Report
+              </button>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { GiHamburgerMenu } from 'react-icons/gi';
 import { IoIosLogOut } from 'react-icons/io';
 import AlertContext from '../../Context/Alert/AlertContext';
 import { convertDateFormat } from '../DateFunction';
+import { useNavigate } from 'react-router-dom';
 
 const NewReport = ({ handleLogout, toggleMenu }) => {
     const [Price, setPrice] = useState(0)
@@ -28,6 +29,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
+    const navigate = useNavigate();
 
     const [Organization, setOrganization] = useState('')
 
@@ -39,7 +41,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
         patient_name: '',
         dob: '',
         nric_passport_no: '',
-        clinical_summary_title: Organization == '' ? 'N/A' : Organization,
+        clinical_summary_title: Organization,
         age: '',
         gender: '',
         previous_study: '',
@@ -90,6 +92,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                         previous_study: '',
                         file: null
                     });
+                    navigate('/docDashboard/')
             } else {
                 showAlert(data.error, 'danger')
             }
@@ -115,9 +118,8 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
             const response = await fetch(`https://backend.uniprecision.com.my/doctor/getorganization/${userId}`);
             if (response.ok) {
                 const data = await response.json();
-                const { organization } = data;
-                console.log(organization)
-                setOrganization(organization.organization)
+                console.log(data.organization.organization)
+                setOrganization(data.organization.organization)
             } else {
                 showAlert('Failed to fetch doctorId', 'danger');
             }
@@ -200,12 +202,12 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                             </div>
 
                             <div className='w-[100%] flex flex-col'>
-                                <label htmlFor="clinical_summary_title" className='font-Para text-base'>organization</label>
+                                <label htmlFor="clinical_summary_title" className='font-Para text-base'>Organization</label>
                                 <input
                                     type='text'
                                     name="clinical_summary_title"
                                     id="clinical_summary_title"
-                                    value={formData.clinical_summary_title}
+                                    value={Organization}
                                     disabled
                                     className='border-gray-400 border-2 py-2 px-4 rounded-lg '
                                 />

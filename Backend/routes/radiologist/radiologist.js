@@ -225,12 +225,32 @@ router.get('/getcompleteSingleReprt/:radioid/:reportid', (req, res) => {
             }
 
             const doctor = doctorResults[0];
+            const radioQuery = `
+            SELECT d.*, u.name AS radio_name
+            FROM radiologist d
+            INNER JOIN user u ON d.user_id = u.user_id
+            WHERE d.radiologist_id = ? AND d.status = 'Approved'
+            `;
 
-            const filePath = report.file_path;
-            const fileUrl = filePath ? `${req.protocol}://${req.get('host')}/${filePath}` : null;
-            const reportWithFileUrl = { ...report, file_url: fileUrl };
+            db.query(radioQuery, [radioid], (err, radioResults) => {
+                if (err) {
+                    console.error('Error retrieving doctor data:', err);
+                    return res.status(500).json({ error: 'Internal Server Error' });
+                }
 
-            return res.status(200).json({ report: reportWithFileUrl, doctor: doctor });
+                if (radioResults.length === 0) {
+                    return res.status(404).json({ error: 'doctor not found' });
+                }
+
+                const radio = radioResults[0];
+
+
+                const filePath = report.file_path;
+                const fileUrl = filePath ? `${req.protocol}://${req.get('host')}/${filePath}` : null;
+                const reportWithFileUrl = { ...report, file_url: fileUrl };
+
+                return res.status(200).json({ report: reportWithFileUrl, doctor: doctor, radio:radio });
+            })
         });
     });
 });
