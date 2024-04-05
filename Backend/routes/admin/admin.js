@@ -385,7 +385,7 @@ router.delete('/deleteCategory/:categoryId', (req, res) => {
 
     // Delete category from category table
     const editCategoryQuery = 'UPDATE category SET status = ? WHERE category_id = ?';
-    db.query(editCategoryQuery, ['DeActive' ,categoryId], (err, result) => {
+    db.query(editCategoryQuery, ['DeActive', categoryId], (err, result) => {
         if (err) {
             console.error('Error editing category:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
@@ -505,7 +505,7 @@ router.put('/ChangePassword', async (req, res) => {
             db.query(query, [userid, 'Admin'], async (error, results) => {
                 if (error) {
                     console.error(error);
-                    return res.status(500).send({error:'Error occurred'});
+                    return res.status(500).send({ error: 'Error occurred' });
                 }
 
                 if (results.length === 0) {
@@ -524,7 +524,7 @@ router.put('/ChangePassword', async (req, res) => {
                     db.query(updateQuery, [hashedPassword, userid], (updateError) => {
                         if (updateError) {
                             console.error(updateError);
-                            return res.status(500).send({error:'Error occurred'});
+                            return res.status(500).send({ error: 'Error occurred' });
                         }
                         res.json({ success: true });
                     });
@@ -538,5 +538,172 @@ router.put('/ChangePassword', async (req, res) => {
         res.status(500).send('Error occurred');
     }
 });
+
+
+router.get('/getuseranalysis', async (req, res) => {
+    const radiologistsQuery = 'SELECT COUNT(*) AS totalRadiologists FROM user WHERE role = "Radiologist"';
+
+    db.query(radiologistsQuery, (err, results) => {
+        if (err) {
+            console.error('Error retrieving radiologists:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Extract the total number of radiologists from the results
+        const totalRadiologists = results[0].totalRadiologists;
+
+        const doctorQuery = 'SELECT COUNT(*) AS totaldoctor FROM user WHERE role = "Doctor"';
+
+        db.query(doctorQuery, (err, results1) => {
+            if (err) {
+                console.error('Error retrieving radiologists:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+
+            const totaldoctors = results1[0].totaldoctor;
+
+            const doctorappQuery = 'SELECT COUNT(*) AS totalappdoctor FROM doctor WHERE status = "Approved"';
+
+            db.query(doctorappQuery, (err, results2) => {
+                if (err) {
+                    console.error('Error retrieving radiologists:', err);
+                    return res.status(500).json({ error: 'Internal Server Error' });
+                }
+
+                const totalappdoctors = results2[0].totalappdoctor;
+
+                const radioappQuery = 'SELECT COUNT(*) AS totalappradio FROM radiologist WHERE status = "Approved"';
+
+                db.query(radioappQuery, (err, results3) => {
+                    if (err) {
+                        console.error('Error retrieving radiologists:', err);
+                        return res.status(500).json({ error: 'Internal Server Error' });
+                    }
+
+                    const totalappradio = results3[0].totalappradio;
+
+                    const radiounappQuery = 'SELECT COUNT(*) AS totalunappradio FROM radiologist WHERE status = "Not Approved"';
+
+                    db.query(radiounappQuery, (err, results4) => {
+                        if (err) {
+                            console.error('Error retrieving radiologists:', err);
+                            return res.status(500).json({ error: 'Internal Server Error' });
+                        }
+
+                        const totalunappradio = results4[0].totalunappradio;
+
+                        const docunappQuery = 'SELECT COUNT(*) AS totalunappdoc FROM doctor WHERE status = "Not Approved"';
+
+                        db.query(docunappQuery, (err, results5) => {
+                            if (err) {
+                                console.error('Error retrieving radiologists:', err);
+                                return res.status(500).json({ error: 'Internal Server Error' });
+                            }
+
+                            const totalunappdoc = results5[0].totalunappdoc;
+
+
+                            return res.status(200).json({
+                                totalRadiologists,
+                                totaldoctors,
+                                totalappdoctors,
+                                totalappradio,
+                                totalunappradio,
+                                totalunappdoc
+                            });
+                        })
+                    })
+                })
+            })
+        })
+    });
+})
+
+
+router.get('/gettransactionanalysis', async (req, res) => {
+    const transactionQuery = 'SELECT SUM(amount) AS totalEarning,COUNT(*) AS totaltransaction FROM transactions';
+
+    db.query(transactionQuery, (err, results) => {
+        if (err) {
+            console.error('Error retrieving transaction data:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Extract the total earning from the results
+        const totalEarning = results[0].totalEarning;
+        const totaltransaction = results[0].totaltransaction
+
+        return res.status(200).json({ totalEarning,totaltransaction });
+    });
+});
+
+
+router.get('/gettransactionrecord', async (req, res) => {
+    // Construct the SQL query to retrieve total amount and total transactions for each month over the last six months
+    const transactionQuery = `
+        SELECT 
+            DATE_FORMAT(date_generated, '%Y-%m') AS month,
+            IFNULL(SUM(amount), 0) AS Amount,
+            IFNULL(COUNT(*), 0) AS Transactions
+        FROM 
+            transactions
+        WHERE 
+            date_generated >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+        GROUP BY 
+            month
+        ORDER BY 
+            month;
+    `;
+    
+    // Execute the SQL query
+    db.query(transactionQuery, (err, results) => {
+        if (err) {
+            console.error('Error retrieving transaction analysis data:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        
+        // Create an array of all months in the last six months
+        const lastSixMonths = [];
+        const currentDate = new Date();
+        for (let i = 5; i >= 0; i--) {
+            const month = currentDate.getMonth() - i + 1;
+            const year = currentDate.getFullYear();
+            lastSixMonths.push(`${year}-${String(month).padStart(2, '0')}`);
+        }
+        
+        // Merge query results with the list of all months
+        const mergedResults = lastSixMonths.map(month => {
+            const foundResult = results.find(result => result.month === month);
+            if (foundResult) {
+                return foundResult;
+            } else {
+                return { month, Amount: 0, Transactions: 0 };
+            }
+        });
+        
+        return res.status(200).json({ transactionAnalysis: mergedResults });
+    });
+});
+
+
+
+router.get('/getunassignedreport', async (req, res) => {
+    const transactionQuery = 'SELECT COUNT(*) AS totalreport FROM report WHERE report_status = "Pending" ';
+
+    db.query(transactionQuery, (err, results) => {
+        if (err) {
+            console.error('Error retrieving transaction data:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Extract the total earning from the results
+        const UnAssignedReport = results[0].totalreport;
+
+        return res.status(200).json({ UnAssignedReport });
+    });
+});
+
+
+
 
 module.exports = router;

@@ -313,12 +313,12 @@ router.get('/getorganization/:id', (req, res) => {
 
 
 router.post('/addtransaction/:doctorId', (req, res) => {
-    const { amount, date, txnref } = req.body;
+    const { amount, date, orderid, requesttype, txnref } = req.body;
     const doctorId = req.params.doctorId;
 
     // Insert data into category table
-    const addCategoryQuery = 'INSERT INTO transactions (transaction_ref , amount, doctor_id, date_generated ) VALUES (?, ?, ?, ?)';
-    db.query(addCategoryQuery, [txnref, amount, doctorId, date], (err, result) => {
+    const addCategoryQuery = 'INSERT INTO transactions (transaction_ref, orderid, requesttype, amount, doctor_id, date_generated ) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(addCategoryQuery, [txnref, orderid, requesttype, amount, doctorId, date], (err, result) => {
         if (err) {
             console.error('Error adding category:', err);
             return res.status(500).json({ error: 'Internal Server Error' });

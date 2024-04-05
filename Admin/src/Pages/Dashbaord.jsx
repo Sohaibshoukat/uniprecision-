@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Nav from '../Component/Nav'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import AdminDashboard from './adminDashboard';
@@ -29,15 +29,25 @@ const Dashbaord = () => {
 
 
     const handleLogout = () => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("role");
-            localStorage.removeItem("adminID")
+            sessionStorage.removeItem("token");
+            sessionStorage.removeItem("role");
+            sessionStorage.removeItem("adminID")
             navigate('/login');
     };
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
+
+    
+    useEffect(() => {
+        if (sessionStorage.getItem('token') && sessionStorage.getItem('adminID') && sessionStorage.getItem('role')=='Admin') {
+            navigate('/admin-dashboard')
+        } else {
+            navigate('/login')
+        }
+
+    }, [])
 
     const fetchPrice=()=>{
         fetch('https://backend.uniprecision.com.my/admin/getAllCategories') // Assuming this is the correct endpoint

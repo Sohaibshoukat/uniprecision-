@@ -4,7 +4,10 @@ import { IoIosLogOut } from 'react-icons/io';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AlertContext from '../../Context/Alert/AlertContext';
 import CryptoJS from 'crypto-js';
+import STAMP from "../../assets/stamp.png"
 import { convertDateFormat } from '../DateFunction';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const AllReports = ({ handleLogout, toggleMenu }) => {
     const [SearchKey, setSearchKey] = useState(null);
@@ -15,6 +18,16 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
     const [mobileNumber, setMobileNumber] = useState('');
     const [email, setEmail] = useState('');
     const [Model, setModel] = useState(false)
+    const [Model2, setModel2] = useState(false)
+
+
+    const [DateGenrated, setDateGenrated] = useState(convertDateFormat(new Date))
+    const [OrderId, setOrderId] = useState('')
+    const [RequestType, setRequestType] = useState('')
+    const [TransactionRef, setTransactionRef] = useState('')
+    const [amunt, setamunt] = useState('')
+
+    const [loading, setLoading] = useState(false)
 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
@@ -33,9 +46,15 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
             const secretKey = '41367-365';
             const hashedString = CryptoJS.HmacSHA256(secretKey + statusId + orderId + transactionId + msg, secretKey).toString(CryptoJS.enc.Hex);
 
+            setOrderId(orderId)
+            setRequestType(localStorage.getItem('Request'))
+            setTransactionRef(transactionId)
+            setamunt(localStorage.getItem('amount'))
+            setModel2(true)
             if (hash === hashedString) {
                 if (statusId === '1') {
                     let orderIdArray = orderId.split('_');
+
                     showAlert('Payment was successful with message: ' + msg, 'success');
                     orderIdArray.forEach(item => {
                         fetch(`https://backend.uniprecision.com.my/doctor/payorder/${item}`, {
@@ -67,6 +86,8 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                         body: JSON.stringify({
                             txnref: transactionId,
                             amount: localStorage.getItem('amount'),
+                            orderid: orderId,
+                            requesttype: localStorage.getItem('Request'),
                             date: dategenrate
                         }),
                     }).then(response => {
@@ -79,7 +100,6 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                     }).catch(error => {
                         showAlert(`Error Genrating Transaction Recipt`, 'danger');
                     });
-                    localStorage.removeItem('amount')
 
 
                 } else {
@@ -163,11 +183,23 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
 
         OrderId = OrderId.slice(0, -1);
 
+        let OrderType = ''
+        await Dataset && Dataset.length > 0 && Dataset.map((item, index) => {
+            SelectedItem.map((item2) => {
+                if (item2 == item.order_id) {
+                    OrderType += ` ${item.category_name}`
+                }
+            })
+        })
+
+
+
         const detail = `Ordering for ID: ${OrderId}`;
         const secretKey = '41367-365';
         const amount = SelectedPrice;
-        localStorage.setItem('amount', amount)
         const str = `${secretKey}${detail}${amount}${OrderId}`;
+        localStorage.setItem('Request', OrderType)
+        localStorage.setItem('amount', amount);
 
         const hash = CryptoJS.HmacSHA256(str, secretKey).toString(CryptoJS.enc.Hex);
 
@@ -185,6 +217,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
             { name: 'phone', value: mobileNumber }
         ];
 
+
         await fields.forEach(field => {
             const input = document.createElement('input');
             input.setAttribute('type', 'hidden');
@@ -195,6 +228,19 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
 
         await document.body.appendChild(form);
         form.submit();
+    };
+    const downloadPDF = () => {
+        const capture = document.querySelector('#pdf-content');
+        setLoading(true);
+        html2canvas(capture, { scale: 1 }).then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const width = 210; // A4 width in mm
+            const height = (canvas.height * width) / canvas.width;
+            doc.addImage(imgData, 'PNG', 0, 0, width, height);
+            setLoading(false);
+            doc.save(`UNIPRECISION-${TransactionRef}.pdf`);
+        });
     };
 
     return (
@@ -223,27 +269,27 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                                         <>{
                                             SelectedItem.map((item2) => (
                                                 <>
-                                                {item2==item.order_id&&<tr
-                                                    className='font-Para cursor-pointer'
-                                                    key={index}
-                                                >
-                                                    <td
-                                                        className='text-center w-20'
+                                                    {item2 == item.order_id && <tr
+                                                        className='font-Para cursor-pointer'
+                                                        key={index}
                                                     >
-                                                        {item.status === 'UnPaid' && (
-                                                            <input
-                                                                type='checkbox'
-                                                                checked={SelectedItem.includes(item.order_id)}
-                                                                onChange={(e) => handleCheckboxChange(e, item.order_id, item.price)}
-                                                            />
-                                                        )}
-                                                    </td>
-                                                    <td>{item.order_id}</td>
-                                                    <td>{item.category_name}</td>
-                                                    <td>{convertDateFormat(item.date_generated)}</td>
-                                                    <td>{item.patient_name}</td>
-                                                    <td>{item.price}</td>
-                                                </tr>}
+                                                        <td
+                                                            className='text-center w-20'
+                                                        >
+                                                            {item.status === 'UnPaid' && (
+                                                                <input
+                                                                    type='checkbox'
+                                                                    checked={SelectedItem.includes(item.order_id)}
+                                                                    onChange={(e) => handleCheckboxChange(e, item.order_id, item.price)}
+                                                                />
+                                                            )}
+                                                        </td>
+                                                        <td>{item.order_id}</td>
+                                                        <td>{item.category_name}</td>
+                                                        <td>{convertDateFormat(item.date_generated)}</td>
+                                                        <td>{item.patient_name}</td>
+                                                        <td>{item.price}</td>
+                                                    </tr>}
                                                 </>
                                             ))
                                         }
@@ -261,6 +307,99 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                             onClick={HandlePyaOut}
                         >
                             Pay Know
+                        </button>
+                    </div>
+                </div>
+            }
+
+            {Model2 &&
+                <div className='fixed z-50 w-[100vw] h-[100vh] flex items-center'>
+                    <div className='absolute z-30 bg-black/50 w-[100%] h-[100%]' onClick={() => { setModel2(false) }}>
+                    </div>
+                    <div className='w-fit bg-white relative h-[80vh] z-50 flex flex-col gap-4 rounded-xl lg:w-[70%] py-8 px-8 ml-2 md:ml-8 overflow-y-scroll' >
+                        <div id='pdf-content'>
+                            <div className="flex flex-row justify-start gap-2 py-6">
+                                <div className="basis-[30%] flex justify-center h-auto">
+                                    <img src={'../Logo.png'} alt="" className='w-fit h-[150px]' />
+                                </div>
+                                <div className="basis-[60%]">
+                                    <div className='w-[100%] flex flex-col gap-1 text-left rounded-tl-3xl rounded-bl-3xl text-black font-Para text-base font-light'>
+                                        <h1 className='text-xl font-bold'>UNIPRECISION TELERAD SDN. BHD. (1549296)-V</h1>
+                                        <p>Unisquare Commercial Centre, Sublot 23,</p>
+                                        <p>Kuching-Samarahan Expressway, 94300 kota Samarahan, Sarawak</p>
+                                        <p>admin@uniprecision.com.my</p>
+                                    </div>
+                                    <div className='text-left py-2'>
+                                        <h2 className='text-darkblue font-Para text-base font-bold text-left'>www.uniprecision.com.my</h2>
+                                        <h3 className='text-black font-Para text-base font-bold text-left'>PRIVATE & CONFIDENTIAL</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='flex flex-col gap-4 font-Para w-[60%] m-auto'>
+                                <h2 className='text-4xl font-bold'>Receipt</h2>
+                                <div className="flex gap-4 justify-between">
+                                    <div className='text-xl font-bold flex justify-between basis-[40%]'>
+                                        <h2>TO</h2>
+                                        <span>:</span>
+                                    </div>
+                                    <p className='text-xl'>Senang Pay</p>
+                                </div>
+                                <div className="flex gap-4 justify-between">
+                                    <div className='text-xl font-bold flex justify-between basis-[40%]'>
+                                        <h2>DATE</h2>
+                                        <span>:</span>
+                                    </div>
+                                    <p className='text-xl'>{DateGenrated}</p>
+                                </div>
+                                <div className="flex gap-4 justify-between">
+                                    <div className='text-xl font-bold flex justify-between basis-[40%]'>
+                                        <h2>ORDER ID</h2>
+                                        <span>:</span>
+                                    </div>
+                                    <p className='text-xl'>{OrderId}</p>
+                                </div>
+                                <div className="flex gap-4 justify-between">
+                                    <div className='text-xl font-bold flex justify-between basis-[40%]'>
+                                        <h2>REQUEST TYPE</h2>
+                                        <span>:</span>
+                                    </div>
+                                    <p className='text-xl'>{RequestType}</p>
+                                </div>
+                                <div className="flex gap-4 justify-between">
+                                    <div className='text-xl font-bold flex justify-between mt-10'>
+                                        <h2 className='italic'>Payment made via Senangpay. </h2>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4 justify-between">
+                                    <div className='text-xl font-bold flex justify-between basis-[40%]'>
+                                        <h2>Payment reference</h2>
+                                        <span>:</span>
+                                    </div>
+                                    <p className='text-xl'>{TransactionRef}</p>
+                                </div>
+                                <div className="flex gap-4 justify-between">
+                                    <div className='text-xl font-bold flex justify-between basis-[40%]'>
+                                        <h2>Total Paid</h2>
+                                        <span>:</span>
+                                    </div>
+                                    <p className='text-xl'>{amunt}</p>
+                                </div>
+                                <p className='mt-10 font-Para font-light text-lg'>A copy of the receipt from Senangpay is sent to your email. </p>
+                                <div className="flex justify-between mb-8">
+                                    <div className="flex flex-col justify-between">
+                                        <p className='mt-10 font-Para font-light text-lg'>Thank you for choosing our service.</p>
+                                        <p className='mt-10 font-Para font-light text-sm'>This is a computer-generated document. No signature is required.</p>
+                                    </div>
+                                    <img src={STAMP} alt="" className='w-[150px] h-[150px]' />
+                                </div>
+                            </div>
+                        </div>
+                        <button
+                            className='w-fit self-center bg-darkblue text-center text-white border-2 border-darkblue hover:bg-transparent px-6  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
+                            onClick={downloadPDF}
+                            disabled={loading}
+                        >
+                            {loading ? 'Is Downloading..' : 'Download'}
                         </button>
                     </div>
                 </div>

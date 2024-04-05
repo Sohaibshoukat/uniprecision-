@@ -35,10 +35,11 @@ const Forgetpassword = () => {
   };
 
   return (
+    <>
     <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
       <div className="md:w-1/3 max-w-sm">
         <img
-          src="https://tecdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+          src="./Logo.png"
           alt="Sample image"
         />
       </div>
@@ -79,6 +80,10 @@ const Forgetpassword = () => {
         </div>
       </div>
     </section>
+      <div className="w-[100%] text-center">
+        <h2>© 2024 Uniprecision Telerad Sdn. Bhd. (1549296-V) | <a href="https://uniprecision.com.my/privacy-policy/">Privacy Policy </a> | <a href="https://uniprecision.com.my/terms-and-conditions/"> Terms and Condition </a></h2>
+      </div>
+    </>
   );
 };
 

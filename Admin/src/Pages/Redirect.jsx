@@ -11,7 +11,6 @@ const Redirect = () => {
         } else {
             navigate('/login')
         }
-
     }, [])
 
     return (

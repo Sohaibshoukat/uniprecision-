@@ -26,9 +26,9 @@ const Login = () => {
       const data = await response.json();
       if (response.ok) {
         if (data.role == 'Admin') {
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("role", data.role);
-          localStorage.setItem("adminID", data.userid)
+          sessionStorage.setItem("token", data.token);
+          sessionStorage.setItem("role", data.role);
+          sessionStorage.setItem("adminID", data.userid)
           setEmail('')
           setPassword('')
           showAlert('Login Success', 'success');
@@ -50,7 +50,7 @@ const Login = () => {
       <div className="md:w-1/3 max-w-sm">
         <img
           src="./assets/Logo.png"
-          alt="Sample image"
+          alt="Image Logo"
         />
       </div>
       <div className="md:w-1/3 max-w-sm">

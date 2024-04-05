@@ -24,35 +24,37 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
   const [name, setname] = useState(Data?.patient_name);
   const [Loading, setLoading] = useState(false)
 
-  // const downloadPDF = () => {
-  //   const capture = document.querySelector('#pdf-content');
-  //   setLoading(true);
-  //   html2canvas(capture).then((canvas) => {
-  //     const imgData = canvas.toDataURL('img/png');
-  //     const doc = new jsPDF('p', 'mm', 'a4');
-  //     const componentWidth = doc.internal.pageSize.getWidth();
-  //     const componentHeight = doc.internal.pageSize.getHeight();
-  //     doc.addImage(imgData, 'PNG', 0, 0, componentWidth, componentHeight);
-  //     setLoading(false);
-  //     doc.save(`${Data?.patient_name}.pdf`);
-  //   })
-  // }
+// const downloadPDF = () => {
+//   const capture = document.querySelector('#pdf-content');
+//   setLoading(true);
+//   html2canvas(capture, { scale: 1 }).then((canvas) => {
+//     const imgData = canvas.toDataURL('image/png');
+//     const doc = new jsPDF('p', 'mm', 'a4');
+//     const width = 210; // A4 width in mm
+//     const height = (canvas.height * width) / canvas.width;
+//     doc.addImage(imgData, 'PNG', 0, 0, width, height);
+//     setLoading(false);
+//     doc.save(`UNIPRECISION-${Data?.patient_name}.pdf`);
+//   });
+// };
 
+  
   const downloadPDF = () => {
     const capture = document.querySelector('#pdf-content');
     setLoading(true);
     html2canvas(capture, { scale: 1 }).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       const doc = new jsPDF('p', 'mm', 'a4');
-      const ratio = canvas.width / canvas.height;
       const width = doc.internal.pageSize.getWidth();
-      const height = width / ratio;
-      doc.addImage(imgData, 'PNG', 0, 0, width, height);
+      const height = canvas.height * width / canvas.width;
+      const remainingHeight = doc.internal.pageSize.getHeight() - height;
+      const adjustedHeight = height + remainingHeight;
+      doc.addImage(imgData, 'PNG', 0, 0, width, adjustedHeight);
       setLoading(false);
       doc.save(`UNIPRECISION-${Data?.patient_name}.pdf`);
     });
   };
-  
+    
 
   const getorder = async () => {
     fetch(`https://backend.uniprecision.com.my/doctor/getSingleReprte/${localStorage.getItem('doctorId')}/${itemid}`) // Assuming this is the correct endpoint
@@ -124,7 +126,6 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
                 </div>
               </div>
             </div>
-
 
             <div className='flex flex-col my-10 w-[80%] m-auto'>
               <div className="flex flex-row justify-between gap-[10%] items-center">
@@ -224,7 +225,7 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
                       <p>(USU), FRCR (UK) </p>
                     </div>
                   </div>
-                  <h2>Date<span className='ml-5'>{convertDateFormat(new Date())}</span></h2>
+                  <h2>Date :<span className='ml-5'>{convertDateFormat(new Date())}</span></h2>
                 </div>
                 <div className='w-fit'>
                   <img src={STAMP} alt="" className='w-[200px] h-[200px]' />
