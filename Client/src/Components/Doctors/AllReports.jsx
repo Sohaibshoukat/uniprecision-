@@ -306,7 +306,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                             className='w-fit self-center bg-darkblue text-center text-white border-2 border-darkblue hover:bg-transparent px-6  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
                             onClick={HandlePyaOut}
                         >
-                            Pay Know
+                            Pay Now
                         </button>
                     </div>
                 </div>
@@ -498,7 +498,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
 
                     <button
                         className={`
-                        bg-slate-700 border-2 border-slate-700 text-lg text-white 
+                        bg-slate-700 border-2 border-slate-700 text-lg text-white
                         font-Para py-2 px-4 rounded-lg hover:bg-transparent my-5 float-right
                         hover:text-slate-700 ease-in-out duration-300 ${SelectedItem.length == 0 ? 'opacity-20' : 'opacity-100'}`}
                         disabled={SelectedItem.length == 0}

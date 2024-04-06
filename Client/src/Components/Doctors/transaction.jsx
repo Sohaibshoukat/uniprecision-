@@ -82,7 +82,7 @@ const Transaction = ({ handleLogout, toggleMenu }) => {
                                         <h2>TO</h2>
                                         <span>:</span>
                                     </div>
-                                    <p className='text-xl'>Senang Pay</p>
+                                    <p className='text-xl'>{Select.name}</p>
                                 </div>
                                 <div className="flex gap-4 justify-between">
                                     <div className='text-xl font-bold flex justify-between basis-[40%]'>
@@ -178,7 +178,7 @@ const Transaction = ({ handleLogout, toggleMenu }) => {
                                         <td>{convertDateFormat(item.date_generated)}</td>
                                         <td
                                             className={`
-                                         bg-slate-700 border-2 border-slate-700 text-lg text-white 
+                                         bg-slate-700 border-2 border-slate-700 text-lg text-white
                                          font-Para py-2 px-4 rounded-lg hover:bg-transparent my-5 float-right
                                          hover:text-slate-700 ease-in-out duration-300`}
                                             onClick={() => { setModel(true); setSelect(item) }}
