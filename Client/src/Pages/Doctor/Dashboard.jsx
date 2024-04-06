@@ -55,7 +55,7 @@ function Dashboard() {
             if (response.ok) {
                 const data = await response.json();
                 const { doctorId } = data;
-                localStorage.setItem('doctorId', doctorId); 
+                localStorage.setItem('doctorId', doctorId);
             } else {
                 showAlert('Failed to fetch doctorId','danger');
             }
@@ -127,8 +127,8 @@ function Dashboard() {
                                 <li
                                     key={index}
                                     className={`
-                                        px-4 md:px-6 py-4 cursor-pointer font-medium text-white text-base 
-                                        ${location.pathname === tab.Link && 'bg-black text-white'} 
+                                        px-4 md:px-6 py-4 cursor-pointer font-medium text-white text-base
+                                        ${location.pathname === tab.Link && 'bg-black text-white'}
                                         ${location.pathname === tab.Link ? 'hover:text-white  hover:bg-black' : 'hover:text-white'}
                                         ease-in-out duration-300`
                                     }
@@ -181,9 +181,7 @@ function Dashboard() {
                             element={<ReportDetails toggleMenu={toggleMenu} handleLogout={handleLogout} />}>
                         </Route>
                     </Routes>
-                    <div className="w-[100%] text-center">
-        <h2>© 2024 Uniprecision Telerad Sdn. Bhd. (1549296-V) | <a href="https://uniprecision.com.my/privacy-policy/">Privacy Policy </a> | <a href="https://uniprecision.com.my/terms-and-conditions/"> Terms and Condition </a></h2>
-      </div>
+                    <CFooter/>
                 </div>
             </div>
         </>

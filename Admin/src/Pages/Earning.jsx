@@ -46,7 +46,7 @@ const Earning = ({ toggleMenu, handleLogout }) => {
             </div>
             <div
                 className='
-                    h-[100%] max-h-[100vh] py-10 px-5 
+                    h-[100%] max-h-[100vh] py-10 px-5
                     md:px-10 m-auto overflow-y-scroll
                 '
             >
@@ -60,7 +60,7 @@ const Earning = ({ toggleMenu, handleLogout }) => {
                                 <th>Transaction ID</th>
                                 <th>Doctor</th>
                                 <th>Amount</th>
-                                <th>TillId</th>
+                                <th>Senang Pay Transaction ID</th>
                                 <th>Date</th>
                             </tr>
                         </thead>

@@ -39,7 +39,7 @@ const Dashbaord = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    
+
     useEffect(() => {
         if (sessionStorage.getItem('token') && sessionStorage.getItem('adminID') && sessionStorage.getItem('role')=='Admin') {
             navigate('/admin-dashboard')
@@ -81,11 +81,11 @@ const Dashbaord = () => {
                     },
                     body: JSON.stringify({ price, unit:"RM", category_name })
                 });
-                
+
                 if (!response.ok) {
                     showAlert('Network response was not ok','danger');
                 }
-        
+
                 const data = await response.json();
                 showAlert('Category Added Success','success')
                 setOpenModel(false);
@@ -107,11 +107,11 @@ const Dashbaord = () => {
                     },
                     body: JSON.stringify({ price, unit:"RM", category_name })
                 });
-                
+
                 if (!response.ok) {
                     showAlert('Network response was not ok','danger');
                 }
-        
+
                 const data = await response.json();
                 showAlert('Category Edit Success','success')
                 setOpenModel(false);
@@ -122,7 +122,7 @@ const Dashbaord = () => {
             }
         }
     };
-    
+
 
     return (
         <>
@@ -136,30 +136,30 @@ const Dashbaord = () => {
                         <div className="flex flex-col md:flex-row justify-between gap-6">
                             <div className="flex flex-col gap-4">
                                 <label htmlFor="" className='text-gray-500 text-xl font-normal'>New Service *</label>
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     value={category_name}
                                     onChange={(e)=>{setcategory_name(e.target.value)}}
-                                    placeholder='Enter servie Name' 
-                                    className='w-full text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md border-[1px] border-gray-500' 
+                                    placeholder='Enter service Name'
+                                    className='w-full text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md border-[1px] border-gray-500'
                                 />
                             </div>
                             <div className="flex flex-col gap-4 ">
                                 <label htmlFor="" className=' text-gray-500 text-xl font-normal'>Price *</label>
-                                <input 
-                                    type="number" 
+                                <input
+                                    type="number"
                                     value={price}
                                     onChange={(e)=>{setprice(e.target.value)}}
-                                    placeholder='Enter Service Pricing OTP' 
-                                    className='w-full text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md border-[1px] border-gray-500' 
+                                    placeholder='Enter Service Pricing OTP'
+                                    className='w-full text-black placeholder:text-gray-400 text-lg py-2 px-4 rounded-md border-[1px] border-gray-500'
                                 />
                             </div>
                         </div>
-                            <button 
+                            <button
                                 className='w-fit self-center bg-darkblue text-center text-white border-2 border-darkblue hover:bg-transparent px-6  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
                                 onClick={AddService}
                             >
-                                {type=='Add'? "Add":"Edit"} Servie
+                                {type=='Add'? "Add":"Edit"} Service
                             </button>
                     </div>
                 </div>
