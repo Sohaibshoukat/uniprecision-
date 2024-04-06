@@ -14,7 +14,7 @@ const Earning = ({ toggleMenu, handleLogout }) => {
 
 
     useEffect(() => {
-        fetch(`http://localhost:3000/admin/allTransactions`) // Assuming this is the correct endpoint
+        fetch(`https://backend.uniprecision.com.my/admin/allTransactions`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -46,7 +46,7 @@ const Earning = ({ toggleMenu, handleLogout }) => {
             </div>
             <div
                 className='
-                    h-[100%] max-h-[100vh] py-10 px-5
+                    h-[100%] max-h-[85vh] py-10 px-5
                     md:px-10 m-auto overflow-y-scroll
                 '
             >

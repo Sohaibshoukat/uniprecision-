@@ -57,7 +57,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
 
                     showAlert('Payment was successful with message: ' + msg, 'success');
                     orderIdArray.forEach(item => {
-                        fetch(`http://localhost:3000/doctor/payorder/${item}`, {
+                        fetch(`https://backend.uniprecision.com.my/doctor/payorder/${item}`, {
                             method: 'PUT',
                         })
                             .then(response => {
@@ -78,7 +78,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                     const dategenrate = convertDateFormat(dategen)
 
 
-                    fetch(`http://localhost:3000/doctor/addtransaction/${localStorage.getItem('doctorId')}`, {
+                    fetch(`https://backend.uniprecision.com.my/doctor/addtransaction/${localStorage.getItem('doctorId')}`, {
                         method: 'POST',
                         headers: {
                             "Content-Type": "application/json",
@@ -113,7 +113,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
     }, []);
 
     const getorder = async () => {
-        fetch(`http://localhost:3000/doctor/getAllOrders/${localStorage.getItem('doctorId')}`)
+        fetch(`https://backend.uniprecision.com.my/doctor/getAllOrders/${localStorage.getItem('doctorId')}`)
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -145,7 +145,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
     };
 
     const getuser = async () => {
-        fetch(`http://localhost:3000/guest/getUser/${localStorage.getItem('userid')}`)
+        fetch(`https://backend.uniprecision.com.my/guest/getUser/${localStorage.getItem('userid')}`)
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -300,7 +300,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                         </div>
                         <div className="flex flex-col md:flex-row justify-end gap-4 items-center mx-4">
                             <h2 className='text-2xl font-bold font-Para '>Total :</h2>
-                            <h4 className='text-xl font-Para font-medium'>{SelectedPrice}</h4>
+                            <h4 className='text-xl font-Para font-medium'> MYR {SelectedPrice}</h4>
                         </div>
                         <button
                             className='w-fit self-center bg-darkblue text-center text-white border-2 border-darkblue hover:bg-transparent px-6  py-2  rounded-lg ease-in-out duration-300 hover:text-darkblue text-xl font-medium'
@@ -343,6 +343,13 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                                         <span>:</span>
                                     </div>
                                     <p className='text-xl'>Senang Pay</p>
+                                </div>
+                                <div className="flex gap-4 justify-between">
+                                    <div className='text-xl font-bold flex justify-between basis-[40%]'>
+                                        <h2>PAID BY</h2>
+                                        <span>:</span>
+                                    </div>
+                                    <p className='text-xl'>{name}</p>
                                 </div>
                                 <div className="flex gap-4 justify-between">
                                     <div className='text-xl font-bold flex justify-between basis-[40%]'>
@@ -484,10 +491,10 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                                         </td>
                                         <td>{convertDateFormat(item.date_generated)}</td>
                                         <td>{item.patient_name}</td>
-                                        <td>{item.Examination_Date}</td>
+                                        <td>{convertDateFormat(item.Examination_Date)}</td>
                                         <td
                                             className='text-blue-600 underline cursor-pointer'>
-                                            <a href={item.file_url} download={item.report_id}>{item.file_path}</a>
+                                            <a href={`https://backend.uniprecision.com.my/${item.file_path}`} download={item.report_id}>{item.file_path}</a>
                                         </td>
                                         <td>{item.price}</td>
                                     </tr>

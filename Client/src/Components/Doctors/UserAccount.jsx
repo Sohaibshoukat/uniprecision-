@@ -50,7 +50,7 @@ const UserAccount = ({ handleLogout, toggleMenu }) => {
 
 
   const getuser = async () => {
-    fetch(`http://localhost:3000/guest/getUser/${localStorage.getItem('userid')}`) // Assuming this is the correct endpoint
+    fetch(`https://backend.uniprecision.com.my/guest/getUser/${localStorage.getItem('userid')}`) // Assuming this is the correct endpoint
       .then(response => {
         if (!response.ok) {
           showAlert('Network response was not ok', 'danger');
@@ -91,7 +91,7 @@ const UserAccount = ({ handleLogout, toggleMenu }) => {
     const userId = localStorage.getItem('userid');
 
     try {
-      const response = await fetch(`http://localhost:3000/guest/update/${userId}`, {
+      const response = await fetch(`https://backend.uniprecision.com.my/guest/update/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

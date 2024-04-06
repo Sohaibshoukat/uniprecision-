@@ -18,7 +18,7 @@ const Transaction = ({ handleLogout, toggleMenu }) => {
 
 
     useEffect(() => {
-        fetch(`http://localhost:3000/doctor/doctorTransactions/${localStorage.getItem('doctorId')}}`) // Assuming this is the correct endpoint
+        fetch(`https://backend.uniprecision.com.my/doctor/doctorTransactions/${localStorage.getItem('doctorId')}}`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');

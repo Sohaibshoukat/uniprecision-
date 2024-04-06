@@ -3,6 +3,7 @@ import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoIosLogOut } from 'react-icons/io'
 import { Link, useNavigate } from 'react-router-dom'
 import AlertContext from '../../Context/Alert/AlertContext'
+import { convertDateFormat } from '../DateFunction'
 
 const AllNewFiles = ({ handleLogout, toggleMenu }) => {
     const [Dataset, setDataset] = useState([])
@@ -11,7 +12,7 @@ const AllNewFiles = ({ handleLogout, toggleMenu }) => {
     const { showAlert } = AletContext;
 
     const getorder = async () => {
-        fetch(`http://localhost:3000/radiologist/getAllReports/${localStorage.getItem('RadioId')}`) // Assuming this is the correct endpoint
+        fetch(`https://backend.uniprecision.com.my/radiologist/getAllReports/${localStorage.getItem('RadioId')}`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -53,11 +54,11 @@ const AllNewFiles = ({ handleLogout, toggleMenu }) => {
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>All New Files Request</h2>
                     <div className="flex flex-col gap-4 my-6">
-                        <h2 className='font-Lora italic font-normal text-lg'>Instruction for Radiologist:</h2>
+                        <h2 className='font-Para font-normal text-lg'>Instruction for Radiologist:</h2>
                         <ol className='flex flex-col gap-2 ml-2'>
-                            <li className='text-base font-normal font-Lora '>1. Your assigned request(s) is listed below</li>
-                            <li className='text-base font-normal font-Lora '>2. Download the images for your review (Multiple files are zipped). </li>
-                            <li className='text-base font-normal font-Lora '>3. Click Fill Report to fill in your diagnostic or analysis.</li>
+                            <li className='text-base font-normal font-Para '>1. Your assigned request(s) is listed below</li>
+                            <li className='text-base font-normal font-Para '>2. Download the images for your review (Multiple files are zipped). </li>
+                            <li className='text-base font-normal font-Para '>3. Click Fill Report to fill in your diagnostic or analysis.</li>
                         </ol>
                     </div>
 
@@ -93,9 +94,9 @@ const AllNewFiles = ({ handleLogout, toggleMenu }) => {
                                         <td>{item.report_id}</td>
                                         <td>{item.category_name}</td>
                                         <td>{item.report_status}</td>
-                                        <td>{item.date_generated}</td>
+                                        <td>{convertDateFormat(item.date_generated)}</td>
                                         <td className='text-blue-600 underline cursor-pointer'>
-                                            <a href={item.file_url} download={item.report_id}>
+                                            <a href={`https://backend.uniprecision.com.my/${item.file_path}`} download={item.report_id}>
                                                 {item.file_path}
                                             </a>
                                         </td>

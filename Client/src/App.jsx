@@ -22,9 +22,7 @@ function App() {
             <Route path="/login" element={<LoginPage />}></Route>
             <Route path="/forgetpassword" element={<Forgetpassword />}></Route>
             <Route path="/docDashboard/*" element={<Dashboard />}></Route>
-            {/* <Route path="/docDashboard/ReportDetail" element={<ReportDetails />}></Route> */}
             <Route path="/radioDashboard/*" element={<RadioDashboard />}></Route>
-            {/* <Route path="/radioDashboard/FillForm" element={<FillReport />}></Route> */}
           </Routes>
         </AlertState>
       </BrowserRouter>

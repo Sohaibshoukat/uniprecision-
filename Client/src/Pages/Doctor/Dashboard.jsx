@@ -13,6 +13,7 @@ import UserAccount from '../../Components/Doctors/UserAccount';
 import ReportDetails from '../../Components/Doctors/ReportDetails';
 import AlertContext from '../../Context/Alert/AlertContext';
 import AllPaidReports from '../../Components/Doctors/AllPaidReports';
+import CFooter from '../../Components/CFooter';
 
 
 function Dashboard() {
@@ -51,7 +52,7 @@ function Dashboard() {
     const fetchDoctorId = async () => {
         try {
             const userId = localStorage.getItem('userid'); // Assuming you have stored userId in localStorage
-            const response = await fetch(`http://localhost:3000/doctor/getDoctorId/${userId}`);
+            const response = await fetch(`https://backend.uniprecision.com.my/doctor/getDoctorId/${userId}`);
             if (response.ok) {
                 const data = await response.json();
                 const { doctorId } = data;

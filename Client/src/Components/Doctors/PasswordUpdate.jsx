@@ -16,7 +16,7 @@ const PasswordUpdate = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/guest/update-password/${userId}`, {
+            const response = await fetch(`https://backend.uniprecision.com.my/guest/update-password/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

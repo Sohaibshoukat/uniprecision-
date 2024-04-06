@@ -21,7 +21,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
     const navigate = useNavigate()
 
     const User = () => {
-        fetch(`http://localhost:3000/admin/getuseranalysis`)
+        fetch(`https://backend.uniprecision.com.my/admin/getuseranalysis`)
             .then(response => response.json())
             .then(data => {
                 if (data) {
@@ -33,7 +33,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
     }
 
     const Transation = () => {
-        fetch(`http://localhost:3000/admin/gettransactionrecord`)
+        fetch(`https://backend.uniprecision.com.my/admin/gettransactionrecord`)
             .then(response => response.json())
             .then(data => {
                 if (data) {
@@ -45,7 +45,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
     }
 
     const TransactionReport = () => {
-        fetch(`http://localhost:3000/admin/gettransactionanalysis`)
+        fetch(`https://backend.uniprecision.com.my/admin/gettransactionanalysis`)
             .then(response => response.json())
             .then(data => {
                 if (data) {
@@ -57,7 +57,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
     }
 
     const ReportsData = () => {
-        fetch(`http://localhost:3000/admin/getunassignedreport`)
+        fetch(`https://backend.uniprecision.com.my/admin/getunassignedreport`)
             .then(response => response.json())
             .then(data => {
                 if (data) {
@@ -100,7 +100,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
             </div>
             <div
                 className='
-                    h-[100%] max-h-[100vh] py-10 px-5 
+                    h-[100%] max-h-[85vh] py-10 px-5 
                     md:px-10 m-auto overflow-y-scroll
                 '
             >

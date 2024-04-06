@@ -33,7 +33,7 @@ const AddUser = ({ toggleMenu, handleLogout }) => {
 
         try {
             const apiUrl = userType === 'Doctor' ? '/adddoctor' : '/addradiologist';
-            const response = await fetch(`http://localhost:3000/admin/${apiUrl}`, {
+            const response = await fetch(`https://backend.uniprecision.com.my/admin/${apiUrl}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ const AddUser = ({ toggleMenu, handleLogout }) => {
             </div>
             <div
                 className='
-                    h-[100%] max-h-[100vh] py-10 px-5 
+                    h-[100%] max-h-[85vh] py-10 px-5 
                     md:px-10 m-auto overflow-y-scroll
                 '
             >

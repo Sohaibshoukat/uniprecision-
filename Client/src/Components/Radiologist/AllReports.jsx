@@ -3,6 +3,7 @@ import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoIosLogOut } from 'react-icons/io'
 import { Link, useNavigate } from 'react-router-dom'
 import AlertContext from '../../Context/Alert/AlertContext'
+import { convertDateFormat } from '../DateFunction'
 
 const AllPreviousReport = ({ handleLogout, toggleMenu }) => {
     const [Dataset, setDataset] = useState([])
@@ -11,7 +12,7 @@ const AllPreviousReport = ({ handleLogout, toggleMenu }) => {
     const { showAlert } = AletContext;
 
     const getorder = async () => {
-        fetch(`http://localhost:3000/radiologist/getCompletedReports/${localStorage.getItem('RadioId')}`) // Assuming this is the correct endpoint
+        fetch(`https://backend.uniprecision.com.my/radiologist/getCompletedReports/${localStorage.getItem('RadioId')}`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -75,17 +76,6 @@ const AllPreviousReport = ({ handleLogout, toggleMenu }) => {
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>All Previous Completed Reports</h2>
 
-                    {/* <div className='flex flex-row justify-between'>
-                        <input
-                            type="text"
-                            placeholder='Search'
-                            value={SearchKey}
-                            onChange={(e) => { setSearchKey(e.target.value) }}
-                            className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'
-                        />
-                    </div> */}
-
-
                     <div className='overflow-x-scroll'>
                         <table className='w-[100%] styled-table'>
                             <thead className='font-Para'>
@@ -107,9 +97,9 @@ const AllPreviousReport = ({ handleLogout, toggleMenu }) => {
                                         <td>{item.report_id}</td>
                                         <td>{item.category_name}</td>
                                         <td>{item.report_status}</td>
-                                        <td>{item.date_generated}</td>
+                                        <td>{convertDateFormat(item.date_generated)}</td>
                                         <td className='text-blue-600 underline cursor-pointer'>
-                                            <a href={item.file_url} download={item.patient_name} target='_blank'>{item.file_path}</a>
+                                            <a href={`https://backend.uniprecision.com.my/${item.file_url}`} download={item.patient_name} target='_blank'>{item.file_path}</a>
                                         </td>
                                         <td>
                                             <Link to={'/radioDashboard/ReportDetail'} state={{ id: item.report_id }}>

@@ -27,7 +27,7 @@ const Pricing = ({
 
     const Deletecategory = async (id) => {
         try {
-            const response = await fetch(`http://localhost:3000/admin/deleteCategory/${id}`, {
+            const response = await fetch(`https://backend.uniprecision.com.my/admin/deleteCategory/${id}`, {
                 method: 'DELETE',
             });
 
@@ -59,7 +59,7 @@ const Pricing = ({
             </div>
             <div
                 className='
-                    h-[100%] max-h-[100vh] py-10 px-5 
+                    h-[100%] max-h-[85vh] py-10 px-5 
                     md:px-10 m-auto overflow-y-scroll
                 '
             >

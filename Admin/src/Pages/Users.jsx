@@ -16,7 +16,7 @@ const Users = ({ toggleMenu, handleLogout }) => {
 
 
     const getuser = async () => {
-        fetch(`http://localhost:3000/admin/getAllUsers`) // Assuming this is the correct endpoint
+        fetch(`https://backend.uniprecision.com.my/admin/getAllUsers`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -55,7 +55,7 @@ const Users = ({ toggleMenu, handleLogout }) => {
 
             <div
                 className='
-                    h-[100%] max-h-[100vh] pt-10 pb-20 xl:py-10 px-5 
+                    h-[100%] max-h-[85vh] pt-10 pb-20 xl:py-10 px-5 
                     md:px-10 m-auto overflow-y-scroll
                 '
             >

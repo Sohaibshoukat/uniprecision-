@@ -57,7 +57,7 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
     
 
   const getorder = async () => {
-    fetch(`http://localhost:3000/doctor/getSingleReprte/${localStorage.getItem('doctorId')}/${itemid}`) // Assuming this is the correct endpoint
+    fetch(`https://backend.uniprecision.com.my/doctor/getSingleReprte/${localStorage.getItem('doctorId')}/${itemid}`) // Assuming this is the correct endpoint
       .then(response => {
         if (!response.ok) {
           showAlert('Network response was not ok', 'danger');
@@ -196,7 +196,7 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
 
             <div className='flex w-[80%] flex-col gap-8 m-auto'>
               <h2 className='mb-6'>Clinical Summary</h2>
-              <h2>Examination-Date :<span className='ml-5'>{convertDateFormat(Data?.examination_date)}</span></h2>
+              <h2>Request Type: <span className='ml-5'>{Data?.category_name}</span> <span className='ml-5'>{convertDateFormat(Data?.examination_date)}</span></h2>
 
               <div className='flex flex-col gap-1'>
                 <h1>Prvious study:</h1>

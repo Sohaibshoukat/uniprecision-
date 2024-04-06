@@ -30,13 +30,14 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
   const downloadPDF = () => {
     const capture = document.querySelector('#pdf-content');
     setLoading(true);
-    html2canvas(capture, { scale: 2 }).then((canvas) => {
+    html2canvas(capture, { scale: 1 }).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       const doc = new jsPDF('p', 'mm', 'a4');
-      const ratio = canvas.width / canvas.height;
       const width = doc.internal.pageSize.getWidth();
-      const height = width / ratio;
-      doc.addImage(imgData, 'PNG', 0, 0, width, height);
+      const height = canvas.height * width / canvas.width;
+      const remainingHeight = doc.internal.pageSize.getHeight() - height;
+      const adjustedHeight = height + remainingHeight;
+      doc.addImage(imgData, 'PNG', 0, 0, width, adjustedHeight);
       setLoading(false);
       doc.save(`UNIPRECISION-${Data?.patient_name}.pdf`);
     });
@@ -44,7 +45,7 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
   
 
   const getorder = async () => {
-    fetch(`http://localhost:3000/radiologist/getcompleteSingleReprt/${localStorage.getItem('RadioId')}/${itemid}`) // Assuming this is the correct endpoint
+    fetch(`https://backend.uniprecision.com.my/radiologist/getcompleteSingleReprt/${localStorage.getItem('RadioId')}/${itemid}`) // Assuming this is the correct endpoint
       .then(response => {
         if (!response.ok) {
           showAlert('Network response was not ok', 'danger');
@@ -71,7 +72,7 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
   const fetchDoctorOrganization = async () => {
     try {
       const userId = localStorage.getItem('userid'); // Assuming you have stored userId in localStorage
-      const response = await fetch(`http://localhost:3000/guest/getorganization/${userId}`);
+      const response = await fetch(`https://backend.uniprecision.com.my/guest/getorganization/${userId}`);
       if (response.ok) {
         const data = await response.json();
         console.log(data.organization.organization)

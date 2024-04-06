@@ -24,7 +24,7 @@ const AdminProfile = ({ toggleMenu, handleLogout }) => {
             token: localStorage.getItem('token')
         };
         try {
-            const response = await fetch('http://localhost:3000/admin/ChangePassword', {
+            const response = await fetch('https://backend.uniprecision.com.my/admin/ChangePassword', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -58,7 +58,7 @@ return (
             <h2 className='text-lg md:text-xl font-normal'>Admin Profile</h2>
             <IoIosLogOut className='text-3xl md:text-3xl' onClick={handleLogout} />
         </div>
-        <div className='h-[100%] max-h-[100vh] py-10 px-5 md:px-10 m-auto overflow-y-scroll'>
+        <div className='h-[100%] max-h-[85vh] py-10 px-5 md:px-10 m-auto overflow-y-scroll'>
             <div className=''>
                 <h2 className='font-Para text-2xl font-bold mb-4'>Profile Setting</h2>
                 <div className='my-10 bg-gray-200 rounded-lg py-8 px-5 md:px-10 flex flex-col gap-8'>

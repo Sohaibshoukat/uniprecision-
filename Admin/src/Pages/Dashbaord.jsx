@@ -11,6 +11,7 @@ import ApprovedUser from './ApprovedUser';
 import NewUser from './NewUser';
 import AssignRequest from './AssignRequest';
 import AlertContext from '../Context/Alert/AlertContext';
+import CFooter from '../Component/CFooter';
 
 const Dashbaord = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(true);
@@ -50,7 +51,7 @@ const Dashbaord = () => {
     }, [])
 
     const fetchPrice=()=>{
-        fetch('http://localhost:3000/admin/getAllCategories') // Assuming this is the correct endpoint
+        fetch('https://backend.uniprecision.com.my/admin/getAllCategories') // Assuming this is the correct endpoint
         .then(response => {
             if (!response.ok) {
                 showAlert('Network response was not ok', 'danger');
@@ -74,7 +75,7 @@ const Dashbaord = () => {
                     showAlert('Fill All fields','danger');
                     return;
                 }
-                const response = await fetch('http://localhost:3000/admin/addCateogry', {
+                const response = await fetch('https://backend.uniprecision.com.my/admin/addCateogry', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -100,7 +101,7 @@ const Dashbaord = () => {
                     showAlert('Fill All fields','danger');
                     return;
                 }
-                const response = await fetch(`http://localhost:3000/admin/editCategory/${editid}`, {
+                const response = await fetch(`https://backend.uniprecision.com.my/admin/editCategory/${editid}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -210,6 +211,7 @@ const Dashbaord = () => {
                         </Route>
 
                     </Routes>
+                    <CFooter/>
                 </div>
             </div>
         </>

@@ -3,6 +3,7 @@ import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoIosLogOut } from 'react-icons/io'
 import { Link, useNavigate } from 'react-router-dom'
 import AlertContext from '../../Context/Alert/AlertContext'
+import { convertDateFormat } from '../DateFunction'
 
 const AllPaidReports = ({ handleLogout, toggleMenu }) => {
     const [SearchKey, setSearchKey] = useState(null)
@@ -12,7 +13,7 @@ const AllPaidReports = ({ handleLogout, toggleMenu }) => {
     const { showAlert } = AletContext;
 
     const getorder = async () => {
-        fetch(`http://localhost:3000/doctor/getAllReports/${localStorage.getItem('doctorId')}`) // Assuming this is the correct endpoint
+        fetch(`https://backend.uniprecision.com.my/doctor/getAllReports/${localStorage.getItem('doctorId')}`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -93,9 +94,9 @@ const AllPaidReports = ({ handleLogout, toggleMenu }) => {
                                     >
                                         <td>{item.report_id}</td>
                                         <td>{item.category_name}</td>
-                                        <td>{item.date_generated}</td>
+                                        <td>{convertDateFormat(item.date_generated)}</td>
                                         <td>{item.patient_name}</td>
-                                        <td>{item.Examination_Date}</td>
+                                        <td>{convertDateFormat(item.Examination_Date)}</td>
                                         <td>
                                             <h2 className={`
                                                     ${item.report_status == 'Pending' ? 'bg-red-500' : item.report_status == 'Assigned' ? 'bg-blue-500' : 'bg-green-600'}

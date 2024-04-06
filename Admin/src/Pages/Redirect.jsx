@@ -5,13 +5,13 @@ const Redirect = () => {
 
     const navigate = useNavigate()
 
-    // useEffect(() => {
-    //     if (sessionStorage.getItem('token')) {
-    //             navigate('/admin-dashboard')
-    //     } else {
-    //         navigate('/login')
-    //     }
-    // }, [])
+    useEffect(() => {
+        if (sessionStorage.getItem('token')) {
+                navigate('/admin-dashboard')
+        } else {
+            navigate('/login')
+        }
+    }, [])
 
     return (
         <>

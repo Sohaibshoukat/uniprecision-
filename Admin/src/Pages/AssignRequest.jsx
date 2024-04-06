@@ -20,7 +20,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
     }, []);
 
     const getallRadio = async () => {
-        fetch(`http://localhost:3000/admin/getAllRadiologists`)
+        fetch(`https://backend.uniprecision.com.my/admin/getAllRadiologists`)
             .then(response => response.json())
             .then(data => {
                 if (data.radiologists) {
@@ -31,7 +31,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
     }
 
     const getorder = async () => {
-        fetch(`http://localhost:3000/admin/getPendingReports`)
+        fetch(`https://backend.uniprecision.com.my/admin/getPendingReports`)
             .then(response => response.json())
             .then(data => {
                 if (data.pending_reports) {
@@ -54,7 +54,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
             report_id: reportId
         };
 
-        fetch('http://localhost:3000/admin/assignReport', {
+        fetch('https://backend.uniprecision.com.my/admin/assignReport', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -93,7 +93,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
                 <h2 className='text-lg md:text-xl font-normal'>Assign Request</h2>
                 <IoIosLogOut className='text-3xl md:text-3xl' onClick={handleLogout} />
             </div>
-            <div className='h-[100%] max-h-[100vh] py-10 px-5 md:px-10 m-auto overflow-y-scroll'>
+            <div className='h-[100%] max-h-[85vh] py-10 px-5 md:px-10 m-auto overflow-y-scroll'>
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>Assign Requests to Radiologists</h2>
                     <div className='overflow-x-scroll'>
