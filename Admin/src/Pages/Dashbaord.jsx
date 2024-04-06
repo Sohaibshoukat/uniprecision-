@@ -50,7 +50,7 @@ const Dashbaord = () => {
     }, [])
 
     const fetchPrice=()=>{
-        fetch('https://backend.uniprecision.com.my/admin/getAllCategories') // Assuming this is the correct endpoint
+        fetch('http://localhost:3000/admin/getAllCategories') // Assuming this is the correct endpoint
         .then(response => {
             if (!response.ok) {
                 showAlert('Network response was not ok', 'danger');
@@ -74,7 +74,7 @@ const Dashbaord = () => {
                     showAlert('Fill All fields','danger');
                     return;
                 }
-                const response = await fetch('https://backend.uniprecision.com.my/admin/addCateogry', {
+                const response = await fetch('http://localhost:3000/admin/addCateogry', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -100,7 +100,7 @@ const Dashbaord = () => {
                     showAlert('Fill All fields','danger');
                     return;
                 }
-                const response = await fetch(`https://backend.uniprecision.com.my/admin/editCategory/${editid}`, {
+                const response = await fetch(`http://localhost:3000/admin/editCategory/${editid}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

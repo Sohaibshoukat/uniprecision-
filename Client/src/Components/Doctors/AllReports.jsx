@@ -57,7 +57,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
 
                     showAlert('Payment was successful with message: ' + msg, 'success');
                     orderIdArray.forEach(item => {
-                        fetch(`https://backend.uniprecision.com.my/doctor/payorder/${item}`, {
+                        fetch(`http://localhost:3000/doctor/payorder/${item}`, {
                             method: 'PUT',
                         })
                             .then(response => {
@@ -78,7 +78,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                     const dategenrate = convertDateFormat(dategen)
 
 
-                    fetch(`https://backend.uniprecision.com.my/doctor/addtransaction/${localStorage.getItem('doctorId')}`, {
+                    fetch(`http://localhost:3000/doctor/addtransaction/${localStorage.getItem('doctorId')}`, {
                         method: 'POST',
                         headers: {
                             "Content-Type": "application/json",
@@ -113,7 +113,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
     }, []);
 
     const getorder = async () => {
-        fetch(`https://backend.uniprecision.com.my/doctor/getAllOrders/${localStorage.getItem('doctorId')}`)
+        fetch(`http://localhost:3000/doctor/getAllOrders/${localStorage.getItem('doctorId')}`)
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -145,7 +145,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
     };
 
     const getuser = async () => {
-        fetch(`https://backend.uniprecision.com.my/guest/getUser/${localStorage.getItem('userid')}`)
+        fetch(`http://localhost:3000/guest/getUser/${localStorage.getItem('userid')}`)
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');

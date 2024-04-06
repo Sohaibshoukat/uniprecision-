@@ -51,7 +51,7 @@ function Dashboard() {
     const fetchDoctorId = async () => {
         try {
             const userId = localStorage.getItem('userid'); // Assuming you have stored userId in localStorage
-            const response = await fetch(`https://backend.uniprecision.com.my/doctor/getDoctorId/${userId}`);
+            const response = await fetch(`http://localhost:3000/doctor/getDoctorId/${userId}`);
             if (response.ok) {
                 const data = await response.json();
                 const { doctorId } = data;

@@ -57,7 +57,7 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
     
 
   const getorder = async () => {
-    fetch(`https://backend.uniprecision.com.my/doctor/getSingleReprte/${localStorage.getItem('doctorId')}/${itemid}`) // Assuming this is the correct endpoint
+    fetch(`http://localhost:3000/doctor/getSingleReprte/${localStorage.getItem('doctorId')}/${itemid}`) // Assuming this is the correct endpoint
       .then(response => {
         if (!response.ok) {
           showAlert('Network response was not ok', 'danger');

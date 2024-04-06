@@ -10,7 +10,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
     const [Service, setService] = useState([])
 
     useEffect(() => {
-        fetch('https://backend.uniprecision.com.my/doctor/getAllCategories') // Assuming this is the correct endpoint
+        fetch('http://localhost:3000/doctor/getAllCategories') // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
                     showAlert('Network response was not ok', 'danger');
@@ -70,7 +70,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
         formData2.append('file', formData.file);
 
         try {
-            const response = await fetch('https://backend.uniprecision.com.my/doctor/order', {
+            const response = await fetch('http://localhost:3000/doctor/order', {
                 method: 'POST',
                 body: formData2,
             });
@@ -115,7 +115,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
     const fetchDoctorOrganization = async () => {
         try {
             const userId = localStorage.getItem('userid'); // Assuming you have stored userId in localStorage
-            const response = await fetch(`https://backend.uniprecision.com.my/doctor/getorganization/${userId}`);
+            const response = await fetch(`http://localhost:3000/doctor/getorganization/${userId}`);
             if (response.ok) {
                 const data = await response.json();
                 console.log(data.organization.organization)

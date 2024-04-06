@@ -7,7 +7,7 @@ import { MdOutlineAssignmentLate } from 'react-icons/md'
 import { GrTransaction } from "react-icons/gr";
 import { IoMdPricetags } from 'react-icons/io'
 import { ResponsiveBar } from '@nivo/bar'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const AdminDashboard = ({ toggleMenu, handleLogout }) => {
     const [UserData, setUserData] = useState(null);
@@ -18,10 +18,10 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
 
-    const navigate =useNavigate()
+    const navigate = useNavigate()
 
     const User = () => {
-        fetch(`https://backend.uniprecision.com.my/admin/getuseranalysis`)
+        fetch(`http://localhost:3000/admin/getuseranalysis`)
             .then(response => response.json())
             .then(data => {
                 if (data) {
@@ -33,7 +33,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
     }
 
     const Transation = () => {
-        fetch(`https://backend.uniprecision.com.my/admin/gettransactionrecord`)
+        fetch(`http://localhost:3000/admin/gettransactionrecord`)
             .then(response => response.json())
             .then(data => {
                 if (data) {
@@ -45,7 +45,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
     }
 
     const TransactionReport = () => {
-        fetch(`https://backend.uniprecision.com.my/admin/gettransactionanalysis`)
+        fetch(`http://localhost:3000/admin/gettransactionanalysis`)
             .then(response => response.json())
             .then(data => {
                 if (data) {
@@ -57,7 +57,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
     }
 
     const ReportsData = () => {
-        fetch(`https://backend.uniprecision.com.my/admin/getunassignedreport`)
+        fetch(`http://localhost:3000/admin/getunassignedreport`)
             .then(response => response.json())
             .then(data => {
                 if (data) {
@@ -69,7 +69,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
     }
 
     useEffect(() => {
-        if (sessionStorage.getItem('token') && sessionStorage.getItem('adminID') && sessionStorage.getItem('role')=='Admin') {
+        if (sessionStorage.getItem('token') && sessionStorage.getItem('adminID') && sessionStorage.getItem('role') == 'Admin') {
             navigate('/admin-dashboard')
         } else {
             navigate('/login')
@@ -112,50 +112,60 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                             <div className="bg-[#FFE2E5] rounded-2xl py-6 pl-6 pr-2 flex flex-col gap-5">
-                                <div className='p-3 bg-[#FA5A7D] rounded-full w-fit flex justify-center items-center'>
-                                    <FaUserPlus className='text-white text-2xl' />
+                                <Link to={'/admin-dashboard/approved-user'}>
+                                    <div className='p-3 bg-[#FA5A7D] rounded-full w-fit flex justify-center items-center'>
+                                        <FaUserPlus className='text-white text-2xl' />
 
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <h2 className='font-Para text-2xl font-bold'>{UserData?.totalappdoctors + UserData?.totalappradio}</h2>
-                                    <p className='text-lg font-Para text-gray-500'>Approved Users</p>
-                                </div>
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <h2 className='font-Para text-2xl font-bold'>{UserData?.totalappdoctors + UserData?.totalappradio}</h2>
+                                        <p className='text-lg font-Para text-gray-500'>Approved Users</p>
+                                    </div>
+                                </Link>
                             </div>
                             <div className="bg-[#FFF4DE] rounded-2xl py-6 pl-6 pr-2 flex flex-col gap-5">
-                                <div className='p-3 bg-[#FF947A] rounded-full w-fit flex justify-center items-center'>
-                                    <FaUserMinus className='text-white text-2xl' />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <h2 className='font-Para text-2xl font-bold'>{UserData?.totalunappdoc + UserData?.totalunappradio}</h2>
-                                    <p className='text-lg font-Para text-gray-500'>Un-Approved Users</p>
-                                </div>
+                                <Link to={'/admin-dashboard/user-request'}>
+                                    <div className='p-3 bg-[#FF947A] rounded-full w-fit flex justify-center items-center'>
+                                        <FaUserMinus className='text-white text-2xl' />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <h2 className='font-Para text-2xl font-bold'>{UserData?.totalunappdoc + UserData?.totalunappradio}</h2>
+                                        <p className='text-lg font-Para text-gray-500'>Un-Approved Users</p>
+                                    </div>
+                                </Link>
                             </div>
                             <div className="bg-slate-200 rounded-2xl py-6 pl-6 pr-2 flex flex-col gap-5">
-                                <div className='p-3 bg-gray-500 rounded-full w-fit flex justify-center items-center'>
-                                    <MdOutlineAssignmentLate className='text-white text-2xl' />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <h2 className='font-Para text-2xl font-bold'>{Reports?.UnAssignedReport}</h2>
-                                    <p className='text-lg font-Para text-gray-500'>Un-Assigned Reports</p>
-                                </div>
+                                <Link to={'/admin-dashboard/assign-request'}>
+                                    <div className='p-3 bg-gray-500 rounded-full w-fit flex justify-center items-center'>
+                                        <MdOutlineAssignmentLate className='text-white text-2xl' />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <h2 className='font-Para text-2xl font-bold'>{Reports?.UnAssignedReport}</h2>
+                                        <p className='text-lg font-Para text-gray-500'>Un-Assigned Reports</p>
+                                    </div>
+                                </Link>
                             </div>
                             <div className="bg-[#DCFCE7] rounded-2xl py-6 pl-6 pr-2 flex flex-col gap-5">
-                                <div className='p-3 bg-[#3CD856] rounded-full w-fit flex justify-center items-center'>
-                                    <GrTransaction className='text-white text-2xl' />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <h2 className='font-Para text-2xl font-bold'>{transactiondata?.totaltransaction}</h2>
-                                    <p className='text-lg font-Para text-gray-500'>Number of Transactions</p>
-                                </div>
+                                <Link to={'/admin-dashboard/earning'}>
+                                    <div className='p-3 bg-[#3CD856] rounded-full w-fit flex justify-center items-center'>
+                                        <GrTransaction className='text-white text-2xl' />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <h2 className='font-Para text-2xl font-bold'>{transactiondata?.totaltransaction}</h2>
+                                        <p className='text-lg font-Para text-gray-500'>Number of Transactions</p>
+                                    </div>
+                                </Link>
                             </div>
                             <div className="bg-[#F3E8FF] rounded-2xl py-6 pl-6 pr-2 flex flex-col gap-5">
-                                <div className='p-3 bg-[#BF83FF] rounded-full w-fit flex justify-center items-center'>
-                                    <IoMdPricetags className='text-white text-2xl' />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <h2 className='font-Para text-2xl font-bold'>{transactiondata?.totalEarning}</h2>
-                                    <p className='text-lg font-Para text-gray-500'>Transactions Amount</p>
-                                </div>
+                                <Link to={'/admin-dashboard/earning'}>
+                                    <div className='p-3 bg-[#BF83FF] rounded-full w-fit flex justify-center items-center'>
+                                        <IoMdPricetags className='text-white text-2xl' />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <h2 className='font-Para text-2xl font-bold'>{transactiondata?.totalEarning}</h2>
+                                        <p className='text-lg font-Para text-gray-500'>Transactions Amount</p>
+                                    </div>
+                                </Link>
                             </div>
                         </div>
                     </div>

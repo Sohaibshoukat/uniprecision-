@@ -20,7 +20,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
     }, []);
 
     const getallRadio = async () => {
-        fetch(`https://backend.uniprecision.com.my/admin/getAllRadiologists`)
+        fetch(`http://localhost:3000/admin/getAllRadiologists`)
             .then(response => response.json())
             .then(data => {
                 if (data.radiologists) {
@@ -31,7 +31,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
     }
 
     const getorder = async () => {
-        fetch(`https://backend.uniprecision.com.my/admin/getPendingReports`)
+        fetch(`http://localhost:3000/admin/getPendingReports`)
             .then(response => response.json())
             .then(data => {
                 if (data.pending_reports) {
@@ -54,7 +54,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
             report_id: reportId
         };
 
-        fetch('https://backend.uniprecision.com.my/admin/assignReport', {
+        fetch('http://localhost:3000/admin/assignReport', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

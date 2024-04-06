@@ -17,7 +17,7 @@ const NewUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
 
     const getuser = async () => {
         if (userrole == 'Doctor') {
-            fetch(`https://backend.uniprecision.com.my/admin/getNewDoctors`) // Assuming this is the correct endpoint
+            fetch(`http://localhost:3000/admin/getNewDoctors`) // Assuming this is the correct endpoint
                 .then(response => {
                     if (!response.ok) {
                         showAlert('Network response was not ok', 'danger');
@@ -33,7 +33,7 @@ const NewUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
                     showAlert('Error fetching categories', 'danger');
                 });
         } else if (userrole == 'Radiologist') {
-            fetch(`https://backend.uniprecision.com.my/admin/getnewRadiologist`) // Assuming this is the correct endpoint
+            fetch(`http://localhost:3000/admin/getnewRadiologist`) // Assuming this is the correct endpoint
                 .then(response => {
                     if (!response.ok) {
                         showAlert('Network response was not ok', 'danger');
@@ -56,7 +56,7 @@ const NewUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
     }, [userrole])
 
     const ApproveUser = (user_id) => {
-        const apiUrl = 'https://backend.uniprecision.com.my/admin/updateUserStatus';
+        const apiUrl = 'http://localhost:3000/admin/updateUserStatus';
         const bodyData = {
             user_id: user_id
         };

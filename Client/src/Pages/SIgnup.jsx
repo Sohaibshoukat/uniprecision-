@@ -32,7 +32,7 @@ export default function SignupPage() {
 
         try {
             // Send POST request to signup API endpoint
-            const response = await fetch("https://backend.uniprecision.com.my/guest/signup", {
+            const response = await fetch("http://localhost:3000/guest/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

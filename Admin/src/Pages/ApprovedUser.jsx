@@ -19,7 +19,7 @@ const ApprovedUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => 
 
     const getuser = async () => {
         if (userrole == 'Doctor') {
-            fetch(`https://backend.uniprecision.com.my/admin/getAllApprovedDoctors`) // Assuming this is the correct endpoint
+            fetch(`http://localhost:3000/admin/getAllApprovedDoctors`) // Assuming this is the correct endpoint
                 .then(response => {
                     console.log(response)
                     if (!response.ok) {
@@ -37,7 +37,7 @@ const ApprovedUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => 
                     showAlert('Error fetching categories', 'danger');
                 });
         } else if (userrole == 'Radiologist') {
-            fetch(`https://backend.uniprecision.com.my/admin/getAllApprovedRadiologist`) // Assuming this is the correct endpoint
+            fetch(`http://localhost:3000/admin/getAllApprovedRadiologist`) // Assuming this is the correct endpoint
                 .then(response => {
                     if (!response.ok) {
                         showAlert('Network response was not ok', 'danger');

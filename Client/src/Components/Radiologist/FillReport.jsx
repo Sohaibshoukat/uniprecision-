@@ -24,7 +24,7 @@ const FillReport = ({ handleLogout, toggleMenu }) => {
 
 
   const getorder = async () => {
-    fetch(`https://backend.uniprecision.com.my/radiologist/getSingleReprt/${localStorage.getItem('RadioId')}/${id}`) // Assuming this is the correct endpoint
+    fetch(`http://localhost:3000/radiologist/getSingleReprt/${localStorage.getItem('RadioId')}/${id}`) // Assuming this is the correct endpoint
       .then(response => {
         if (!response.ok) {
           showAlert('Network response was not ok', 'danger');
@@ -49,7 +49,7 @@ const FillReport = ({ handleLogout, toggleMenu }) => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('https://backend.uniprecision.com.my/radiologist/fillReport', {
+      const response = await fetch('http://localhost:3000/radiologist/fillReport', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

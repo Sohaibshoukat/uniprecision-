@@ -24,7 +24,7 @@ const AdminProfile = ({ toggleMenu, handleLogout }) => {
             token: localStorage.getItem('token')
         };
         try {
-            const response = await fetch('https://backend.uniprecision.com.my/admin/ChangePassword', {
+            const response = await fetch('http://localhost:3000/admin/ChangePassword', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'

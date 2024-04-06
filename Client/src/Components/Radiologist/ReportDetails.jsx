@@ -44,7 +44,7 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
   
 
   const getorder = async () => {
-    fetch(`https://backend.uniprecision.com.my/radiologist/getcompleteSingleReprt/${localStorage.getItem('RadioId')}/${itemid}`) // Assuming this is the correct endpoint
+    fetch(`http://localhost:3000/radiologist/getcompleteSingleReprt/${localStorage.getItem('RadioId')}/${itemid}`) // Assuming this is the correct endpoint
       .then(response => {
         if (!response.ok) {
           showAlert('Network response was not ok', 'danger');
@@ -71,7 +71,7 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
   const fetchDoctorOrganization = async () => {
     try {
       const userId = localStorage.getItem('userid'); // Assuming you have stored userId in localStorage
-      const response = await fetch(`https://backend.uniprecision.com.my/guest/getorganization/${userId}`);
+      const response = await fetch(`http://localhost:3000/guest/getorganization/${userId}`);
       if (response.ok) {
         const data = await response.json();
         console.log(data.organization.organization)
