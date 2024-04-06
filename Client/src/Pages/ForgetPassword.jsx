@@ -25,7 +25,7 @@ const Forgetpassword = () => {
       if (response.ok) {
         setEmail('')
         showAlert(data.message, 'success');
-          navigate("/login"); 
+          navigate("/login");
       } else {
         showAlert(data.error, 'danger')
       }
