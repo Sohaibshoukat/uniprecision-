@@ -100,7 +100,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
             </div>
             <div
                 className='
-                    h-[100%] max-h-[85vh] py-10 px-5 
+                    h-[100%] max-h-[85vh] py-10 px-5
                     md:px-10 m-auto overflow-y-scroll
                 '
             >
@@ -130,7 +130,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <h2 className='font-Para text-2xl font-bold'>{UserData?.totalunappdoc + UserData?.totalunappradio}</h2>
-                                        <p className='text-lg font-Para text-gray-500'>Un-Approved Users</p>
+                                        <p className='text-lg font-Para text-gray-500'>UnApproved Users</p>
                                     </div>
                                 </Link>
                             </div>
@@ -141,7 +141,7 @@ const AdminDashboard = ({ toggleMenu, handleLogout }) => {
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <h2 className='font-Para text-2xl font-bold'>{Reports?.UnAssignedReport}</h2>
-                                        <p className='text-lg font-Para text-gray-500'>Un-Assigned Reports</p>
+                                        <p className='text-lg font-Para text-gray-500'>UnAssigned Reports</p>
                                     </div>
                                 </Link>
                             </div>

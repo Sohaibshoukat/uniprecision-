@@ -1,6 +1,7 @@
-import React, { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AlertContext from "../Context/Alert/AlertContext";
+import CFooter from "../../../Client/src/Components/CFooter";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -46,6 +47,7 @@ const Login = () => {
   };
 
   return (
+    <div style={{ overflow: 'visible !important' }}>
     <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
       <div className="md:w-1/3 max-w-sm">
         <img
@@ -76,15 +78,6 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
             />
-            {/* Forgot password link */}
-            {/* <div className="mt-4 flex justify-between font-semibold text-sm">
-              <Link
-                className="text-blue-600 hover:text-blue-700 text-xl font-Para hover:underline hover:underline-offset-4"
-                to={'/forgetpassword'}
-              >
-                Forgot Password?
-              </Link>
-            </div> */}
             {/* Login button */}
             <div className="text-center md:text-left">
               <button
@@ -95,10 +88,12 @@ const Login = () => {
               </button>
             </div>
           </form>
-
         </div>
       </div>
     </section>
+
+    <CFooter/>
+  </div>
   );
 };
 
