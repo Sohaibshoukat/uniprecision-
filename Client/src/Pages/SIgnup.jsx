@@ -83,7 +83,7 @@ export default function SignupPage() {
 
     return (
         <div className="overflow-x-hidden">
-            <section className="h-screen w-[80%] flex flex-col lg:flex-row justify-between space-y-10 md:space-y-0 md:space-x-16 md:items-center my-2 md:my-0  m-auto">
+            <section className="h-[100%] min-h-screen w-[80%] flex flex-col lg:flex-row justify-between space-y-10 md:space-y-0 md:space-x-16 md:items-center my-2 md:my-0  m-auto">
                 <div className="hidden md:block basis-[40%]">
                     <img
                         src="./Logo.png"
