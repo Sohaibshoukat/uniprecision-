@@ -11,7 +11,6 @@ const generateToken = () => {
     return crypto.randomBytes(20).toString('hex');
 };
 
-// Send reset password email
 router.post('/forgot-password', (req, res) => {
     const { email } = req.body;
 
@@ -24,7 +23,7 @@ router.post('/forgot-password', (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: 'user not found' });
+            return res.status(404).json({ error: 'User not found' });
         }
 
         // Generate a unique token
@@ -37,42 +36,100 @@ router.post('/forgot-password', (req, res) => {
             }
             // Store the token in the database
             const insertTokenQuery = 'UPDATE user SET password = ? WHERE email = ?';
-            db.query(insertTokenQuery, [hashedPassword, email], (err) => {
+            db.query(insertTokenQuery, [hashedPassword, email], async (err) => {
                 if (err) {
                     console.error('Error inserting token:', err);
                     return res.status(500).json({ error: 'Internal Server Error' });
                 }
 
-                // Send reset password email
-                const transporter = nodemailer.createTransport({
-                    host: 'smtp.gmail.com',
-                    port: 465,
-                    secure: true,
-                    auth: {
-                        user: 'inzamamyousaf11111@gmail.com',
-                        pass: 'jmon otld jzhx xohs'
+                try {
+                    const sendMailResponse = await fetch('https://backenduniprec.vercel.app/sendMail', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ Email: email, token: token }),
+                    });
+
+                    const responseData = await sendMailResponse.json();
+
+                    if (sendMailResponse.ok) {
+                        res.json({ success: true, response: responseData });
+                    } else {
+                        res.status(500).json({ success: false, error: 'Failed to send email' });
                     }
-                });
-
-                const mailOptions = {
-                    from: 'inzamamyousaf11111@gmail.com',
-                    to: email,
-                    subject: 'Your temporary Password',
-                    text: `This is your temporary password login with it. Then You can reset your password from account setting ${token}`
-                };
-
-                transporter.sendMail(mailOptions, (error) => {
-                    if (error) {
-                        console.error('Error sending email:', error);
-                        return res.status(500).json({ error: 'Internal Server Error' });
-                    }
-
-                    return res.status(200).json({ message: 'Reset password email sent successfully' });
-                });
+                } catch (error) {
+                    console.error('Error sending mail:', error);
+                    return res.status(500).json({ error: 'Internal Server Error' });
+                }
             });
-        })
+        });
     });
 });
+
+
+// Send reset password email
+// router.post('/forgot-password', (req, res) => {
+//     const { email } = req.body;
+
+//     // Check if the user exists in the database
+//     const userQuery = 'SELECT * FROM user WHERE email = ?';
+//     db.query(userQuery, [email], (err, results) => {
+//         if (err) {
+//             console.error('Error retrieving user:', err);
+//             return res.status(500).json({ error: 'Internal Server Error' });
+//         }
+
+//         if (results.length === 0) {
+//             return res.status(404).json({ error: 'user not found' });
+//         }
+
+//         // Generate a unique token
+//         const token = generateToken();
+
+//         bcrypt.hash(token, 10, (err, hashedPassword) => {
+//             if (err) {
+//                 console.error('Error hashing password:', err);
+//                 return res.status(500).json({ error: 'Internal Server Error' });
+//             }
+//             // Store the token in the database
+//             const insertTokenQuery = 'UPDATE user SET password = ? WHERE email = ?';
+//             db.query(insertTokenQuery, [hashedPassword, email], (err) => {
+//                 if (err) {
+//                     console.error('Error inserting token:', err);
+//                     return res.status(500).json({ error: 'Internal Server Error' });
+//                 }
+
+//                 // Send reset password email
+//                 const transporter = nodemailer.createTransport({
+//                     host: 'smtp.gmail.com',
+//                     port: 465,
+//                     secure: true,
+//                     auth: {
+//                         user: 'inzamamyousaf11111@gmail.com',
+//                         pass: 'jmon otld jzhx xohs'
+//                     }
+//                 });
+
+//                 const mailOptions = {
+//                     from: 'inzamamyousaf11111@gmail.com',
+//                     to: email,
+//                     subject: 'Your temporary Password',
+//                     text: `This is your temporary password login with it. Then You can reset your password from account setting ${token}`
+//                 };
+
+//                 transporter.sendMail(mailOptions, (error) => {
+//                     if (error) {
+//                         console.error('Error sending email:', error);
+//                         return res.status(500).json({ error: 'Internal Server Error' });
+//                     }
+
+//                     return res.status(200).json({ message: 'Reset password email sent successfully' });
+//                 });
+//             });
+//         })
+//     });
+// });
 
 router.post('/signup', (req, res) => {
     const { name, organization, guest_type, mobile_number, email, password, address_line1, address_line2, postcode, city, state, country, role } = req.body;

@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { StateData } from "../Constants/StateData";
 import AlertContext from "../Context/Alert/AlertContext";
-
+import CFooter from "../Components/CFooter";
 
 export default function SignupPage() {
 

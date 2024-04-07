@@ -24,7 +24,7 @@ const Forgetpassword = () => {
       const data = await response.json();
       if (response.ok) {
         setEmail('')
-        showAlert(data.message, 'success');
+        showAlert('We have update your password with temp password check your email and login with it', 'success');
           navigate("/login");
       } else {
         showAlert(data.error, 'danger')
