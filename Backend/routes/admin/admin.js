@@ -172,7 +172,7 @@ router.post('/updateUserStatus', (req, res) => {
     const { user_id } = req.body;
 
     // Query to get the role of the user
-    const roleQuery = 'SELECT role FROM user WHERE user_id = ?';
+    const roleQuery = 'SELECT * FROM user WHERE user_id = ?';
     db.query(roleQuery, [user_id], (err, results) => {
         if (err) {
             console.error('Error retrieving user role:', err);
@@ -184,6 +184,8 @@ router.post('/updateUserStatus', (req, res) => {
         }
 
         const role = results[0].role.toLowerCase();
+        const email = results[0].email
+        const name = results[0].name
 
         // Update status based on the role
         let updateQuery = '';
@@ -201,7 +203,7 @@ router.post('/updateUserStatus', (req, res) => {
         }
 
         // Execute the update query
-        db.query(updateQuery, [user_id], (err, result) => {
+        db.query(updateQuery, [user_id], async (err, result) => {
             if (err) {
                 console.error('Error updating user status:', err);
                 return res.status(500).json({ error: 'Internal Server Error' });
@@ -211,7 +213,26 @@ router.post('/updateUserStatus', (req, res) => {
                 return res.status(404).json({ error: 'user not found in respective table' });
             }
 
-            return res.status(200).json({ message: 'user status updated successfully' });
+            try {
+                const sendMailResponse = await fetch('https://backenduniprec.vercel.app/sendMailapprove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ Email: email, name: name })
+                });
+
+                const responseData = await sendMailResponse.json();
+
+                if (sendMailResponse.ok) {
+                    return res.status(200).json({ success: true, message: 'user status updated successfully' });
+                } else {
+                    res.status(500).json({ success: false, error: 'Failed to send email' });
+                }
+            } catch (error) {
+                console.error('Error sending mail:', error);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
         });
     });
 });
@@ -633,7 +654,7 @@ router.get('/gettransactionanalysis', async (req, res) => {
         const totalEarning = results[0].totalEarning;
         const totaltransaction = results[0].totaltransaction
 
-        return res.status(200).json({ totalEarning,totaltransaction });
+        return res.status(200).json({ totalEarning, totaltransaction });
     });
 });
 
@@ -654,14 +675,14 @@ router.get('/gettransactionrecord', async (req, res) => {
         ORDER BY 
             month;
     `;
-    
+
     // Execute the SQL query
     db.query(transactionQuery, (err, results) => {
         if (err) {
             console.error('Error retrieving transaction analysis data:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
-        
+
         // Create an array of all months in the last six months
         const lastSixMonths = [];
         const currentDate = new Date();
@@ -670,7 +691,7 @@ router.get('/gettransactionrecord', async (req, res) => {
             const year = currentDate.getFullYear();
             lastSixMonths.push(`${year}-${String(month).padStart(2, '0')}`);
         }
-        
+
         // Merge query results with the list of all months
         const mergedResults = lastSixMonths.map(month => {
             const foundResult = results.find(result => result.month === month);
@@ -680,7 +701,7 @@ router.get('/gettransactionrecord', async (req, res) => {
                 return { month, Amount: 0, Transactions: 0 };
             }
         });
-        
+
         return res.status(200).json({ transactionAnalysis: mergedResults });
     });
 });

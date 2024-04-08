@@ -38,7 +38,39 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
 //   });
 // };
 
+  // const downloadPDF = () => {
+  //   const capture = document.querySelector('#pdf-content');
+  //   setLoading(true);
+  //   html2canvas(capture, { scale: 1 }).then((canvas) => {
+  //     const imgData = canvas.toDataURL('image/png');
+  //     const doc = new jsPDF('p', 'mm', 'a4');
+  //     const width = doc.internal.pageSize.getWidth();
+  //     const height = canvas.height * width / canvas.width;
+  //     const remainingHeight = doc.internal.pageSize.getHeight() - height;
+  //     const adjustedHeight = height + remainingHeight;
+  //     doc.addImage(imgData, 'PNG', 0, 0, width, adjustedHeight);
+  //     setLoading(false);
+  //     doc.save(`UNIPRECISION-${Data?.patient_name}.pdf`);
+  //   });
+  // };
+
   
+  // const downloadPDF = () => {
+  //   const capture = document.querySelector('#pdf-content');
+  //   setLoading(true);
+  //   html2canvas(capture, { scale: 1 }).then((canvas) => {
+  //     const imgData = canvas.toDataURL('image/png');
+  //     const doc = new jsPDF('p', 'mm', 'a4');
+  //     const width = doc.internal.pageSize.getWidth();
+  //     const height = canvas.height * width / canvas.width;
+  //     const remainingHeight = doc.internal.pageSize.getHeight() - height;
+  //     const adjustedHeight = height + remainingHeight;
+  //     doc.addImage(imgData, 'PNG', 0, 0, width, adjustedHeight);
+  //     setLoading(false);
+  //     doc.save(`UNIPRECISION-${Data?.patient_name}.pdf`);
+  //   });
+  // };
+
   const downloadPDF = () => {
     const capture = document.querySelector('#pdf-content');
     setLoading(true);
@@ -196,7 +228,7 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
 
             <div className='flex w-[80%] flex-col gap-8 m-auto'>
               <h2 className='mb-6'>Clinical Summary</h2>
-              <h2>Request Type: <span className='ml-5'>{Data?.category_name}</span> <span className='ml-5'>{convertDateFormat(Data?.examination_date)}</span></h2>
+              <h2><span>{Data?.category_name}</span> - <span>{convertDateFormat(Data?.examination_date)}</span></h2>
 
               <div className='flex flex-col gap-1'>
                 <h1>Prvious study:</h1>

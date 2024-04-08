@@ -339,13 +339,6 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                                 <h2 className='text-4xl font-bold'>Receipt</h2>
                                 <div className="flex gap-4 justify-between">
                                     <div className='text-xl font-bold flex justify-between basis-[40%]'>
-                                        <h2>TO</h2>
-                                        <span>:</span>
-                                    </div>
-                                    <p className='text-xl'>Senang Pay</p>
-                                </div>
-                                <div className="flex gap-4 justify-between">
-                                    <div className='text-xl font-bold flex justify-between basis-[40%]'>
                                         <h2>PAID BY</h2>
                                         <span>:</span>
                                     </div>

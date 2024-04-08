@@ -15,6 +15,7 @@ const Transaction = ({ handleLogout, toggleMenu }) => {
     const [Select, setSelect] = useState(null)
     const [Model, setModel] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [Name, setName] = useState(null)
 
 
     useEffect(() => {
@@ -49,6 +50,35 @@ const Transaction = ({ handleLogout, toggleMenu }) => {
         });
     };
 
+    const getuser = async () => {
+        fetch(`https://backend.uniprecision.com.my/guest/getUser/${localStorage.getItem('userid')}`)
+            .then(response => {
+                if (!response.ok) {
+                    showAlert('Network response was not ok', 'danger');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.user) {
+                    const user = data?.user;
+                    setName(user.name);
+                }
+            })
+            .catch(error => {
+                showAlert('Error fetching your Data', 'danger');
+                localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                localStorage.removeItem('doctorId');
+                localStorage.removeItem('userid');
+                localStorage.removeItem('RadioId');
+                navigate('/login');
+            });
+    };
+
+    useEffect(() => {
+        getuser();
+    }, []);
+
     return (
         <>
 
@@ -79,10 +109,10 @@ const Transaction = ({ handleLogout, toggleMenu }) => {
                                 <h2 className='text-4xl font-bold'>Receipt</h2>
                                 <div className="flex gap-4 justify-between">
                                     <div className='text-xl font-bold flex justify-between basis-[40%]'>
-                                        <h2>TO</h2>
+                                        <h2>PAID BY</h2>
                                         <span>:</span>
                                     </div>
-                                    <p className='text-xl'>{Select.name}</p>
+                                    <p className='text-xl'>{Name}</p>
                                 </div>
                                 <div className="flex gap-4 justify-between">
                                     <div className='text-xl font-bold flex justify-between basis-[40%]'>

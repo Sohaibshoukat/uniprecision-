@@ -1,0 +1,1 @@
+export const BaseURL='https://backend.uniprecision.com.my'

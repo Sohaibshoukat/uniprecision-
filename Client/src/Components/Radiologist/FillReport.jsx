@@ -7,8 +7,10 @@ import { convertDateFormat } from '../DateFunction'
 
 const FillReport = ({ handleLogout, toggleMenu }) => {
 
-  const [findings, setFindings] = useState('');
-  const [summary, setSummary] = useState('');
+  const [findings, setFindings] = useState(`No consolidation. No pleural effusion. 
+The mediastinum is not widened. 
+No cardiomegaly. Bones are unremarkable. `);
+  const [summary, setSummary] = useState('Normal chest radiograph.');
 
   const [Data, setData] = useState([])
   const [doctor, setdoctor] = useState()
@@ -147,9 +149,7 @@ const FillReport = ({ handleLogout, toggleMenu }) => {
                     id=''
                     cols='30'
                     rows='4'
-                    placeholder='No consolidation. No pleural effusion. 
-The mediastinum is not widened. 
-No cardiomegaly. Bones are unremarkable. '
+                    placeholder=''
                     className='border-gray-400 border-2 py-2 px-4 rounded-lg'
                     value={findings}
                     onChange={(e) => setFindings(e.target.value)}
@@ -165,7 +165,7 @@ No cardiomegaly. Bones are unremarkable. '
                     id=''
                     cols='30'
                     rows='4'
-                    placeholder='Normal chest radiograph.'
+                    placeholder=''
                     className='border-gray-400 border-2 py-2 px-4 rounded-lg'
                     value={summary}
                     onChange={(e) => setSummary(e.target.value)}

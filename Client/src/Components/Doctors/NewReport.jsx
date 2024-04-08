@@ -256,7 +256,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                         <div className='mt-5'>
                             <p className='text-base text-gray-500 my-2'>
                                 Upload Study Image File (file type DICOM or DICOM files in ZIP, RAR)
-                                <span className='text-red-600 font-bold'>Please upload DICOM (.dem) files only.</span>
+                                <span className='text-red-600 font-bold'>Please upload DICOM (.dcom) files only.</span>
                             </p>
                             <div className='w-[100%] flex flex-col'>
                                 <label htmlFor="file" className='font-Para text-base'>Add Image</label>

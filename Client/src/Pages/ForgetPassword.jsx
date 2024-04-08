@@ -62,7 +62,7 @@ const Forgetpassword = () => {
                 className="mt-4 bg-blue-600 text-xl font-Para hover:bg-blue-700 px-4 py-2 text-white uppercase rounded tracking-wider"
                 type="submit"
               >
-                Send Reuqest
+                Send Request
               </button>
             </div>
           </form>

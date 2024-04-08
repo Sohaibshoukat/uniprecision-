@@ -73,7 +73,7 @@ const PasswordUpdate = () => {
                             updatePassword()
                         }}
                     >
-                        Chnage Password
+                        Change Password
                     </button>
                 </div>
             </div>
