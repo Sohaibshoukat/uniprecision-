@@ -8,8 +8,40 @@ const bcrypt = require('bcryptjs');
 
 // Generate a random token
 const generateToken = () => {
-    return crypto.randomBytes(20).toString('hex');
+    return crypto.randomBytes(4).toString('hex');
 };
+
+const transporter = nodemailer.createTransport({
+    host: "mail.uniprecision.com.my",
+    port: 465,
+    secure: true,
+    auth: {
+      user: "uniprecisionsupport@uniprecision.com.my",
+      pass: "uniprecision1234",
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+const sendEmail = async (email, token) => {
+    try {
+        const mailOptions = {
+            from: "uniprecisionsupport@uniprecision.com.my",
+            to: email,
+            subject: "Temporary Password for Uniprecision Telerad",
+            text: `Please login using this password and change it to your preferred password in the User Account page. ${token}.
+        
+        
+  This is an automated email. Do not reply to this email.`,
+        };
+        await transporter.sendMail(mailOptions);
+        return { status: true };
+    } catch (error) {
+        return { status: "Failed", message: error.message };
+    }
+};
+
 
 router.post('/forgot-password', (req, res) => {
     const { email } = req.body;
@@ -42,25 +74,12 @@ router.post('/forgot-password', (req, res) => {
                     return res.status(500).json({ error: 'Internal Server Error' });
                 }
 
-                try {
-                    const sendMailResponse = await fetch('https://backenduniprec.vercel.app/sendMail', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ Email: email, token: token }),
-                    });
-
-                    const responseData = await sendMailResponse.json();
-
-                    if (sendMailResponse.ok) {
-                        res.json({ success: true, response: responseData });
-                    } else {
-                        res.status(500).json({ success: false, error: 'Failed to send email' });
-                    }
-                } catch (error) {
-                    console.error('Error sending mail:', error);
-                    return res.status(500).json({ error: 'Internal Server Error' });
+                const response = await sendEmail(email, token);
+                if (response.status) {
+                    console.log(response)
+                    res.json({ success: true });
+                } else {
+                    res.json({ success: false });
                 }
             });
         });

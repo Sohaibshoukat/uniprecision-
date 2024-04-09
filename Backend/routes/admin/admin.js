@@ -1,9 +1,46 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../config/db');
+const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+
+const transporter = nodemailer.createTransport({
+    host: "mail.uniprecision.com.my",
+    port: 465,
+    secure: true,
+    auth: {
+        user: "uniprecisionsupport@uniprecision.com.my",
+        pass: "uniprecision1234",
+    },
+    tls: {
+        rejectUnauthorized: false,
+    },
+});
+
+const sendEmailApprove = async (email, name) => {
+    try {
+        const mailOptions = {
+            from: "uniprecisionsupport@uniprecision.com.my",
+            to: email,
+            subject: "Congratulation! Your Account has been Approved",
+            text: `Hi ${name},
+  Your new account request has been approved.
+  Please login via https://telerad.uniprecision.com.my/login 
+  Thank you!
+  If you have any urgent enquiry, please do not hesitate to contact our team directly at admin@uniprecision.com.my or +6010-3837828.
+  
+  
+  This is an automated email. Do not reply to this email.`,
+        };
+        await transporter.sendMail(mailOptions);
+        return { status: true };
+    } catch (error) {
+        return { status: "Failed", message: error.message };
+    }
+};
+
 
 
 router.get('/allTransactions', (req, res) => {
@@ -103,27 +140,33 @@ router.post('/adddoctor', (req, res) => {
         if (emailCount > 0) {
             return res.status(400).json({ error: 'Email already exists' });
         }
-        // Insert data into user table
-        const userInsertQuery = 'INSERT INTO user (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        db.query(userInsertQuery, [name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country], (err, result) => {
+        bcrypt.hash(password, 10, (err, hashedPassword) => {
             if (err) {
-                console.error('Error signing up doctor:', err);
+                console.error('Error hashing password:', err);
                 return res.status(500).json({ error: 'Internal Server Error' });
             }
-
-            const userId = result.insertId;
-
-            // Insert data into doctor table
-            const doctorInsertQuery = 'INSERT INTO doctor (user_id, status) VALUES (?, ?)';
-            db.query(doctorInsertQuery, [userId, status], (err, result) => {
+            // Insert data into user table
+            const userInsertQuery = 'INSERT INTO user (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            db.query(userInsertQuery, [name, organization, mobile_number, email, hashedPassword, role, address_line_1, address_line_2, postcode, city, state, country], (err, result) => {
                 if (err) {
                     console.error('Error signing up doctor:', err);
                     return res.status(500).json({ error: 'Internal Server Error' });
                 }
 
-                return res.status(200).json({ message: 'doctor signed up successfully' });
+                const userId = result.insertId;
+
+                // Insert data into doctor table
+                const doctorInsertQuery = 'INSERT INTO doctor (user_id, status) VALUES (?, ?)';
+                db.query(doctorInsertQuery, [userId, status], (err, result) => {
+                    if (err) {
+                        console.error('Error signing up doctor:', err);
+                        return res.status(500).json({ error: 'Internal Server Error' });
+                    }
+
+                    return res.status(200).json({ message: 'doctor signed up successfully' });
+                });
             });
-        });
+        })
     })
 });
 
@@ -144,27 +187,33 @@ router.post('/addradiologist', (req, res) => {
         if (emailCount > 0) {
             return res.status(400).json({ error: 'Email already exists' });
         }
-        // Insert data into user table
-        const userInsertQuery = 'INSERT INTO user (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        db.query(userInsertQuery, [name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country], (err, result) => {
+        bcrypt.hash(password, 10, (err, hashedPassword) => {
             if (err) {
-                console.error('Error signing up radiologist:', err);
+                console.error('Error hashing password:', err);
                 return res.status(500).json({ error: 'Internal Server Error' });
             }
-
-            const userId = result.insertId;
-
-            // Insert data into radiologist table
-            const radiologistInsertQuery = 'INSERT INTO radiologist (user_id, status) VALUES (?, ?)';
-            db.query(radiologistInsertQuery, [userId, status], (err, result) => {
+            // Insert data into user table
+            const userInsertQuery = 'INSERT INTO user (name, organization, mobile_number, email, password, role, address_line_1, address_line_2, postcode, city, state, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            db.query(userInsertQuery, [name, organization, mobile_number, email, hashedPassword, role, address_line_1, address_line_2, postcode, city, state, country], (err, result) => {
                 if (err) {
                     console.error('Error signing up radiologist:', err);
                     return res.status(500).json({ error: 'Internal Server Error' });
                 }
 
-                return res.status(200).json({ message: 'radiologist signed up successfully' });
+                const userId = result.insertId;
+
+                // Insert data into radiologist table
+                const radiologistInsertQuery = 'INSERT INTO radiologist (user_id, status) VALUES (?, ?)';
+                db.query(radiologistInsertQuery, [userId, status], (err, result) => {
+                    if (err) {
+                        console.error('Error signing up radiologist:', err);
+                        return res.status(500).json({ error: 'Internal Server Error' });
+                    }
+
+                    return res.status(200).json({ message: 'radiologist signed up successfully' });
+                });
             });
-        });
+        })
     })
 });
 
@@ -213,25 +262,11 @@ router.post('/updateUserStatus', (req, res) => {
                 return res.status(404).json({ error: 'user not found in respective table' });
             }
 
-            try {
-                const sendMailResponse = await fetch('https://backenduniprec.vercel.app/sendMailapprove', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ Email: email, name: name })
-                });
-
-                const responseData = await sendMailResponse.json();
-
-                if (sendMailResponse.ok) {
-                    return res.status(200).json({ success: true, message: 'user status updated successfully' });
-                } else {
-                    res.status(500).json({ success: false, error: 'Failed to send email' });
-                }
-            } catch (error) {
-                console.error('Error sending mail:', error);
-                return res.status(500).json({ error: 'Internal Server Error' });
+            const response = await sendEmailApprove(email, name);
+            if (response.status) {
+                res.json({ success: true });
+            } else {
+                res.json({ success: false });
             }
         });
     });

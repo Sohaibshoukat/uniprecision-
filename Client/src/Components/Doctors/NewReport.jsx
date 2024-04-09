@@ -63,7 +63,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
         formData2.append('dob', formData.dob);
         formData2.append('price', Price);
         formData2.append('nric_passport_no', formData.nric_passport_no);
-        formData2.append('clinical_summary_title', formData.clinical_summary_title);
+        formData2.append('clinical_summary_title', Organization);
         formData2.append('age', formData.age);
         formData2.append('gender', formData.gender);
         formData2.append('previous_study', formData.previous_study);
@@ -266,7 +266,7 @@ const NewReport = ({ handleLogout, toggleMenu }) => {
                                     className='border-gray-400 border-2 py-2 px-4 rounded-lg '
                                     type='file'
                                     onChange={handleFileChange}
-                                    accept='.dcm'
+                                    accept='.dcm, .zip'
                                 />
                             </div>
                             <p className='text-red-600 text-base font-bold'>Examination / Study Image file is mandatory for the reading specialist to report</p>

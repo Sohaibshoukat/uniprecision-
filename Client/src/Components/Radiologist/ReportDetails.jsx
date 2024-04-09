@@ -214,12 +214,12 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
                 <p className='ml-4 text-lg'>{Data?.previous_study}</p>
               </div>
 
-              <div className='flex flex-col gap-1'>
+              <div className='flex flex-col gap-1 min-h-[250px]'>
                 <h1>Findings:</h1>
                 <p>{Data?.findings}</p>
               </div>
 
-              <div className='flex flex-col gap-1'>
+              <div className='flex flex-col gap-1 min-h-[250px]'>
                 <h1>Summary:</h1>
                 <p>{Data?.summary}</p>
               </div>

@@ -12,6 +12,7 @@ import jsPDF from 'jspdf';
 const AllReports = ({ handleLogout, toggleMenu }) => {
     const [SearchKey, setSearchKey] = useState(null);
     const [Dataset, setDataset] = useState([]);
+    const [Datasetfilter, setDatasetfilter] = useState([]);
     const [SelectedItem, setSelectedItem] = useState([]);
     const [SelectedPrice, setSelectedPrice] = useState(0);
     const [name, setName] = useState('');
@@ -123,6 +124,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
             .then(data => {
                 if (data.orders) {
                     setDataset(data.orders);
+                    setDatasetfilter(data.orders)
                 }
             })
             .catch(error => {
@@ -242,6 +244,26 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
             doc.save(`UNIPRECISION-${TransactionRef}.pdf`);
         });
     };
+
+    useEffect(() => {
+        if (SearchKey !== null) {
+            const filteredData = Dataset.filter(item => {
+                {console.log(item)}
+                return (
+                    item?.patient_name?.toLowerCase().includes(SearchKey.toLowerCase()) ||
+                    item?.category_name && item.category_name.toLowerCase().includes(SearchKey?.toLowerCase())
+                    // item.Status.toLowerCase().includes(SearchKey.toLowerCase()) ||
+                    // item.Date.toLowerCase().includes(SearchKey.toLowerCase()) ||
+                    // item.StudyDate.toLowerCase().includes(SearchKey.toLowerCase()) ||
+                    // item.UploadedFile.toLowerCase().includes(SearchKey.toLowerCase()) ||
+                    // item.Price.toString().toLowerCase().includes(SearchKey.toLowerCase())
+                );
+            });
+            setDatasetfilter(filteredData);
+        } else {
+            setDatasetfilter(Dataset);
+        }
+    }, [SearchKey]);
 
     return (
         <>
@@ -455,7 +477,7 @@ const AllReports = ({ handleLogout, toggleMenu }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {Dataset && Dataset.length > 0 && Dataset.map((item, index) => (
+                                {Datasetfilter && Datasetfilter?.length > 0 && Datasetfilter?.map((item, index) => (
                                     <tr
                                         className='font-Para cursor-pointer'
                                         key={index}
