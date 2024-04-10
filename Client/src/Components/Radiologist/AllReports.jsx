@@ -99,7 +99,7 @@ const AllPreviousReport = ({ handleLogout, toggleMenu }) => {
                                         <td>{item.report_status}</td>
                                         <td>{convertDateFormat(item.date_generated)}</td>
                                         <td className='text-blue-600 underline cursor-pointer'>
-                                            <a href={`https://backend.uniprecision.com.my/${item.file_url}`} download={item.patient_name} target='_blank'>{item.file_path}</a>
+                                            <a href={`https://backend.uniprecision.com.my/${item.file_path}`} download={item.patient_name} target='_blank'>{item.file_path}</a>
                                         </td>
                                         <td>
                                             <Link to={'/radioDashboard/ReportDetail'} state={{ id: item.report_id }}>
