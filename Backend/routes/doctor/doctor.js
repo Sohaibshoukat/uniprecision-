@@ -81,6 +81,7 @@ router.get('/getAllOrders/:doctorId', (req, res) => {
         FROM orders o
         INNER JOIN category c ON o.category_id = c.category_id
         WHERE o.doctor_id = ?
+        ORDER BY o.order_id DESC
     `;
 
     db.query(ordersQuery, [doctorId], (err, results) => {
@@ -99,6 +100,7 @@ router.get('/getAllOrders/:doctorId', (req, res) => {
     });
 });
 
+
 router.get('/getAllReports/:doctorId', (req, res) => {
     const doctorId = req.params.doctorId;
 
@@ -108,7 +110,7 @@ router.get('/getAllReports/:doctorId', (req, res) => {
     INNER JOIN orders o ON r.order_id = o.order_id
     INNER JOIN category c ON o.category_id = c.category_id
     WHERE r.doctor_id = ? AND r.report_status != 'UnPaid'
-    
+    ORDER BY r.report_id DESC
     `;
 
     db.query(ordersQuery, [doctorId], (err, results) => {

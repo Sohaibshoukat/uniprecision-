@@ -7,9 +7,7 @@ import { convertDateFormat } from '../DateFunction'
 
 const FillReport = ({ handleLogout, toggleMenu }) => {
 
-  const [findings, setFindings] = useState(`No consolidation. No pleural effusion. 
-The mediastinum is not widened. 
-No cardiomegaly. Bones are unremarkable. `);
+  const [findings, setFindings] = useState(`No consolidation. No pleural effusion.\nThe mediastinum is not widened.\nNo cardiomegaly. Bones are unremarkable.`);
   const [summary, setSummary] = useState('Normal chest radiograph.');
 
   const [Data, setData] = useState([])
@@ -49,8 +47,38 @@ No cardiomegaly. Bones are unremarkable. `);
   }, []);
 
 
+  // const handleSubmit = async () => {
+  //   try {
+  //     const response = await fetch('https://backend.uniprecision.com.my/radiologist/fillReport', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         report_id: id,
+  //         findings: findings,
+  //         summary: summary,
+  //       }),
+  //     });
+  //     const responseData = await response.json();
+  //     if (!response.ok) {
+  //       showAlert(responseData.error, 'danger');
+  //     }
+  //     showAlert('Report Submitted', 'success');
+  //     navigate('/radioDashboard/')
+  //   } catch (error) {
+  //     showAlert(error.message, 'danger');
+  //     // Handle error
+  //   }
+  // };
+
+
   const handleSubmit = async () => {
     try {
+      // Replace newline characters with HTML line breaks for proper display
+      const formattedFindings = findings.replace(/\n/g, "<br/>");
+      const formattedSummary = summary.replace(/\n/g, "<br/>");
+  
       const response = await fetch('https://backend.uniprecision.com.my/radiologist/fillReport', {
         method: 'POST',
         headers: {
@@ -58,8 +86,8 @@ No cardiomegaly. Bones are unremarkable. `);
         },
         body: JSON.stringify({
           report_id: id,
-          findings: findings,
-          summary: summary,
+          findings: formattedFindings, // Send formatted findings with HTML line breaks
+          summary: formattedSummary, // Send formatted summary with HTML line breaks
         }),
       });
       const responseData = await response.json();
@@ -73,6 +101,19 @@ No cardiomegaly. Bones are unremarkable. `);
       // Handle error
     }
   };
+  
+
+  const handleKeyPress = (event) => {
+    // Check if Enter key is pressed (key code 13)
+    if (event.keyCode === 13) {
+      // Prevent default behavior (preventing the Enter key from creating a new line)
+      event.preventDefault();
+
+      // Add a line break to the textarea value
+      var textarea = event.target;
+      textarea.value += '\n';
+    }
+  }
 
   return (
     <>
@@ -152,7 +193,10 @@ No cardiomegaly. Bones are unremarkable. `);
                     placeholder=''
                     className='border-gray-400 border-2 py-2 px-4 rounded-lg'
                     value={findings}
-                    onChange={(e) => setFindings(e.target.value)}
+                    onKeyPress={(event) => { handleKeyPress(event) }}
+                    onChange={(e) => {
+                      setFindings(e.target.value)
+                    }}
                   />
                 </div>
 
@@ -168,6 +212,7 @@ No cardiomegaly. Bones are unremarkable. `);
                     placeholder=''
                     className='border-gray-400 border-2 py-2 px-4 rounded-lg'
                     value={summary}
+                    onKeyPress={(event) => { handleKeyPress(event) }}
                     onChange={(e) => setSummary(e.target.value)}
                   />
                 </div>

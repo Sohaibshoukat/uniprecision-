@@ -5,6 +5,7 @@ import AlertContext from '../../Context/Alert/AlertContext'
 import { convertDateFormat } from '../DateFunction'
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import Pagination from '@mui/material/Pagination';
 import STAMP from "../../assets/stamp.png"
 
 
@@ -17,8 +18,18 @@ const Transaction = ({ handleLogout, toggleMenu }) => {
     const [loading, setLoading] = useState(false)
     const [Name, setName] = useState(null)
 
+    const [TotalPages, setTotalPages] = useState(0)
+    const [TotalOrder, setTotalOrder] = useState(0)
+    const [page, setPage] = useState(1);
+    const ordersPerPage = 2;
+    
+    const handleChange = (event, value) => {
+        setPage(value);
+      };
 
     useEffect(() => {
+        const startIndex = (page - 1) * ordersPerPage;
+        const endIndex = startIndex + ordersPerPage;
         fetch(`https://backend.uniprecision.com.my/doctor/doctorTransactions/${localStorage.getItem('doctorId')}}`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
@@ -28,7 +39,13 @@ const Transaction = ({ handleLogout, toggleMenu }) => {
             })
             .then(data => {
                 if (data.transactions) {
-                    setData(data.transactions);
+                    // setData(data.transactions);
+                    setTotalOrder(data.transactions.length);
+                    setTotalPages(Math.ceil(data.transactions.length / ordersPerPage));
+
+                    // Slice the orders array based on pagination
+                    setData(data.transactions.slice(startIndex, endIndex));
+
                 }
             })
             .catch(error => {
@@ -188,6 +205,9 @@ const Transaction = ({ handleLogout, toggleMenu }) => {
             <div className='min-h-[100vh] py-10 px-5 md:px-10 m-auto'>
                 <div className=''>
                     <h2 className='font-Para text-3xl font-bold mb-4'>All Transaction History</h2>
+                    <div className='my-4'>
+                    <Pagination count={TotalPages} page={page} onChange={handleChange} variant="outlined" shape="rounded" />
+                    </div>
                     <div className='overflow-x-scroll w-[100%]'>
                         <table className='styled-table w-[100%]'>
                             <thead className='font-Lora'>

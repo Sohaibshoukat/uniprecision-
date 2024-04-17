@@ -3,6 +3,7 @@ import { IoIosLogOut } from 'react-icons/io'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import AlertContext from '../Context/Alert/AlertContext'
 import { convertDateFormat } from '../Component/DateFunction'
+import Pagination from '@mui/material/Pagination';
 
 const AssignRequest = ({ toggleMenu, handleLogout }) => {
 
@@ -14,10 +15,19 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
     const alertContext = useContext(AlertContext);
     const { showAlert } = alertContext;
 
+    const [TotalPages, setTotalPages] = useState(0)
+    const [TotalOrder, setTotalOrder] = useState(0)
+    const [page, setPage] = useState(1);
+    const ordersPerPage = 20;
+
+    const handleChange = (event, value) => {
+        setPage(value);
+    };
+
     useEffect(() => {
         getorder();
         getallRadio();
-    }, []);
+    }, [page]);
 
     const getallRadio = async () => {
         fetch(`https://backend.uniprecision.com.my/admin/getAllRadiologists`)
@@ -31,17 +41,22 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
     }
 
     const getorder = async () => {
+        const startIndex = (page - 1) * ordersPerPage;
+        const endIndex = startIndex + ordersPerPage;
         fetch(`https://backend.uniprecision.com.my/admin/getPendingReports`)
             .then(response => response.json())
             .then(data => {
                 if (data.pending_reports) {
-                    setData(data.pending_reports);
+                    setTotalOrder(data.pending_reports.length);
+                    setTotalPages(Math.ceil(data.pending_reports.length / ordersPerPage));
+                    // setData(data.pending_reports);
+                    setData(data.pending_reports.slice(startIndex, endIndex));
                 }
             })
             .catch(error => showAlert('Error fetching pending reports', 'danger'));
     }
 
-    const assignReport = async (index,reportid) => {
+    const assignReport = async (index, reportid) => {
         const radiologistId = radiologistIds[index];
         const reportId = reportid;
         if (!radiologistId) {
@@ -76,8 +91,8 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
             });
     };
 
-    const handleAssign = (index,reportid) => {
-        assignReport(index,reportid);
+    const handleAssign = (index, reportid) => {
+        assignReport(index, reportid);
     };
 
     return (
@@ -96,6 +111,9 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
             <div className='h-[100%] max-h-[85vh] py-10 px-5 md:px-10 m-auto overflow-y-scroll'>
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>Assign Requests to Radiologists</h2>
+                    <div className="my-4">
+                        <Pagination count={TotalPages} page={page} onChange={handleChange} variant="outlined" shape="rounded" />
+                    </div>
                     <div className='overflow-x-scroll'>
                         <table className='w-[100%] styled-table'>
                             <thead className='font-Para'>
@@ -139,7 +157,7 @@ const AssignRequest = ({ toggleMenu, handleLogout }) => {
                                         <td>
                                             <button
                                                 className='border-slate-700 border-2 bg-transparent hover:bg-slate-700 text-slate-700 hover:text-white py-2 px-4 m-1 rounded-lg ease-in-out duration-300'
-                                                onClick={() => { handleAssign(index,item.report_id) }}
+                                                onClick={() => { handleAssign(index, item.report_id) }}
                                             >
                                                 Assign
                                             </button>

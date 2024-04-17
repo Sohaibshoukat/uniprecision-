@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useContext } from 'react';
 import AlertContext from '../Context/Alert/AlertContext';
+import Pagination from '@mui/material/Pagination';
 
 const Users = ({ toggleMenu, handleLogout }) => {
     // const [searchQuery, setSearchQuery] = useState('');
@@ -14,8 +15,20 @@ const Users = ({ toggleMenu, handleLogout }) => {
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
 
+    const [TotalPages, setTotalPages] = useState(0)
+    const [TotalOrder, setTotalOrder] = useState(0)
+    const [page, setPage] = useState(1);
+    const ordersPerPage = 20;
+
+    const handleChange = (event, value) => {
+        setPage(value);
+    };
+
 
     const getuser = async () => {
+        const startIndex = (page - 1) * ordersPerPage;
+        const endIndex = startIndex + ordersPerPage;
+
         fetch(`https://backend.uniprecision.com.my/admin/getAllUsers`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
@@ -25,7 +38,11 @@ const Users = ({ toggleMenu, handleLogout }) => {
             })
             .then(data => {
                 if (data.users) {
-                    setUsers(data.users);
+                    setTotalOrder(data.users.length);
+                    setTotalPages(Math.ceil(data.users.length / ordersPerPage));
+                    // setData(data.pending_reports);
+                    setUsers(data.users.slice(startIndex, endIndex));
+                    // setUsers(data.users);
                 }
             })
             .catch(error => {
@@ -35,7 +52,7 @@ const Users = ({ toggleMenu, handleLogout }) => {
 
     useEffect(() => {
         getuser()
-    }, [])
+    }, [page])
     
 
     return (
@@ -61,7 +78,9 @@ const Users = ({ toggleMenu, handleLogout }) => {
             >
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>All Users</h2>
-
+                    <div className="my-4">
+                        <Pagination count={TotalPages} page={page} onChange={handleChange} variant="outlined" shape="rounded" />
+                    </div>
                     <div className='overflow-x-scroll w-[100%]'>
                         <table className='styled-table w-[100%]'>
                             <thead className='font-Para'>

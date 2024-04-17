@@ -12,6 +12,7 @@ router.get('/getAllReports/:radioid', (req, res) => {
     INNER JOIN orders o ON r.order_id = o.order_id
     INNER JOIN category c ON o.category_id = c.category_id
     WHERE r.radiologist_id = ? AND report_status = 'Assigned'
+    ORDER BY r.report_id DESC
     `;
 
     db.query(ordersQuery, [radioid], (err, results) => {
@@ -164,6 +165,7 @@ router.get('/getCompletedReports/:radioid', (req, res) => {
     INNER JOIN orders o ON r.order_id = o.order_id
     INNER JOIN category c ON o.category_id = c.category_id
     WHERE r.radiologist_id = ? AND report_status = 'Complete'
+    ORDER BY r.report_id DESC
     `;
 
     db.query(ordersQuery, [radioid], (err, results) => {

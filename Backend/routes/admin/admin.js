@@ -51,6 +51,7 @@ router.get('/allTransactions', (req, res) => {
     FROM transactions t
     INNER JOIN doctor d ON t.doctor_id = d.doctor_id
     INNER JOIN user u ON d.user_id = u.user_id
+    ORDER BY t.transaction_id DESC
     `;
     db.query(transactionsQuery, (err, results) => {
         if (err) {
@@ -70,7 +71,7 @@ router.get('/allTransactions', (req, res) => {
 
 router.get('/getAllRadiologists', (req, res) => {
     // Query to fetch all radiologists with their names
-    const radiologistsQuery = 'SELECT r.*, u.name AS radiologist_name FROM radiologist r INNER JOIN user u ON r.user_id = u.user_id Where status= "Approved"';
+    const radiologistsQuery = 'SELECT r.*, u.name AS radiologist_name FROM radiologist r INNER JOIN user u ON r.user_id = u.user_id Where status= "Approved" ORDER BY r.radiologist_id DESC';
 
     db.query(radiologistsQuery, (err, results) => {
         if (err) {
@@ -90,7 +91,9 @@ router.get('/getPendingReports', (req, res) => {
     FROM report r
     INNER JOIN orders o ON r.order_id = o.order_id
     INNER JOIN category c ON o.category_id = c.category_id
-    WHERE report_status = 'Pending'`;
+    WHERE report_status = 'Pending'
+    ORDER BY r.report_id DESC
+    `;
 
 
     db.query(pendingReportsQuery, (err, results) => {
@@ -287,7 +290,7 @@ This is an automated email. Do not reply to this email.`,
 
 router.get('/getAllUsers', (req, res) => {
     // Query to retrieve all users
-    const getUsersQuery = 'SELECT * FROM user';
+    const getUsersQuery = 'SELECT * FROM user ORDER BY user_id DESC';
 
     // Execute the query
     db.query(getUsersQuery, (err, results) => {
@@ -313,6 +316,7 @@ router.get('/getAllApprovedDoctors', (req, res) => {
         FROM user u
         INNER JOIN doctor d ON u.user_id = d.user_id
         WHERE u.role = 'Doctor' AND d.status = 'Approved'
+        ORDER BY u.user_id DESC
     `;
 
     // Execute the query
@@ -334,6 +338,7 @@ router.get('/getAllApprovedRadiologist', (req, res) => {
         FROM user u
         INNER JOIN radiologist r ON u.user_id = r.user_id
         WHERE u.role = 'Radiologist' AND r.status = 'Approved'
+        ORDER BY u.user_id DESC
     `;
 
     // Execute the query
@@ -357,6 +362,7 @@ router.get('/getNewDoctors', (req, res) => {
         FROM user u
         INNER JOIN doctor d ON u.user_id = d.user_id
         WHERE u.role = 'Doctor' AND d.status = 'Not Approved'
+        ORDER BY u.user_id DESC
     `;
 
     // Execute the query
@@ -378,6 +384,7 @@ router.get('/getnewRadiologist', (req, res) => {
         FROM user u
         INNER JOIN radiologist r ON u.user_id = r.user_id
         WHERE u.role = 'Radiologist' AND r.status = 'Not Approved'
+        ORDER BY u.user_id DESC
     `;
 
     // Execute the query

@@ -4,14 +4,26 @@ import { IoIosLogOut } from 'react-icons/io'
 import { Link, useNavigate } from 'react-router-dom'
 import AlertContext from '../../Context/Alert/AlertContext'
 import { convertDateFormat } from '../DateFunction'
+import Pagination from '@mui/material/Pagination';
 
 const AllPreviousReport = ({ handleLogout, toggleMenu }) => {
     const [Dataset, setDataset] = useState([])
+
+    const [TotalPages, setTotalPages] = useState(0)
+    const [TotalOrder, setTotalOrder] = useState(0)
+    const [page, setPage] = useState(1);
+    const ordersPerPage = 2;
+    
+    const handleChange = (event, value) => {
+        setPage(value);
+      };
 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
 
     const getorder = async () => {
+        const startIndex = (page - 1) * ordersPerPage;
+        const endIndex = startIndex + ordersPerPage;
         fetch(`https://backend.uniprecision.com.my/radiologist/getCompletedReports/${localStorage.getItem('RadioId')}`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
@@ -21,7 +33,10 @@ const AllPreviousReport = ({ handleLogout, toggleMenu }) => {
             })
             .then(data => {
                 if (data.orders) {
-                    setDataset(data.orders);
+
+                    setTotalOrder(data.orders.length);
+                    setTotalPages(Math.ceil(data.orders.length / ordersPerPage));
+                    setDataset(data.orders.slice(startIndex, endIndex));
                 }
             })
             .catch(error => {
@@ -31,31 +46,9 @@ const AllPreviousReport = ({ handleLogout, toggleMenu }) => {
 
     useEffect(() => {
         getorder()
-    }, []);
+    }, [page]);
 
     // const [SearchKey, setSearchKey] = useState(null)
-
-
-    // useEffect(() => {
-    //     if (SearchKey !== null) {
-    //         const filteredData = Data.filter(item => {
-    //             // Customize the conditions based on your search requirements
-    //             return (
-    //                 item.ID.toLowerCase().includes(SearchKey.toLowerCase()) ||
-    //                 item.Type.toLowerCase().includes(SearchKey.toLowerCase()) ||
-    //                 item.Status.toLowerCase().includes(SearchKey.toLowerCase()) ||
-    //                 item.Date.toLowerCase().includes(SearchKey.toLowerCase()) ||
-    //                 item.Patient.toLowerCase().includes(SearchKey.toLowerCase()) ||
-    //                 item.StudyDate.toLowerCase().includes(SearchKey.toLowerCase()) ||
-    //                 item.UploadedFile.toLowerCase().includes(SearchKey.toLowerCase()) ||
-    //                 item.Price.toString().toLowerCase().includes(SearchKey.toLowerCase())
-    //             );
-    //         });
-    //         setDataset(filteredData);
-    //     } else {
-    //         setDataset(Data);
-    //     }
-    // }, [SearchKey]);
 
     const navigate = useNavigate()
 
@@ -75,7 +68,9 @@ const AllPreviousReport = ({ handleLogout, toggleMenu }) => {
             <div className='min-h-[100vh] py-10 px-5 md:px-10 m-auto'>
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>All Previous Completed Reports</h2>
-
+                    <div className="my-4">
+                    <Pagination count={TotalPages} page={page} onChange={handleChange} variant="outlined" shape="rounded" />
+                    </div>
                     <div className='overflow-x-scroll'>
                         <table className='w-[100%] styled-table'>
                             <thead className='font-Para'>

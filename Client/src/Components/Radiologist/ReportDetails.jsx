@@ -42,10 +42,11 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
       doc.save(`UNIPRECISION-${Data?.patient_name}.pdf`);
     });
   };
+
   
 
   const getorder = async () => {
-    fetch(`https://backend.uniprecision.com.my/radiologist/getcompleteSingleReprt/${localStorage.getItem('RadioId')}/${itemid}`) // Assuming this is the correct endpoint
+    fetch(`http://localhost:3000/radiologist/getcompleteSingleReprt/${localStorage.getItem('RadioId')}/${itemid}`) // Assuming this is the correct endpoint
       .then(response => {
         if (!response.ok) {
           showAlert('Network response was not ok', 'danger');
@@ -72,7 +73,7 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
   const fetchDoctorOrganization = async () => {
     try {
       const userId = localStorage.getItem('userid'); // Assuming you have stored userId in localStorage
-      const response = await fetch(`https://backend.uniprecision.com.my/guest/getorganization/${userId}`);
+      const response = await fetch(`http://localhost:3000/guest/getorganization/${userId}`);
       if (response.ok) {
         const data = await response.json();
         console.log(data.organization.organization)
@@ -216,12 +217,13 @@ const ReportDetails = ({ handleLogout, toggleMenu }) => {
 
               <div className='flex flex-col gap-1 min-h-[250px]'>
                 <h1>Findings:</h1>
-                <p>{Data?.findings}</p>
+                <p dangerouslySetInnerHTML={{ __html: Data?.findings }}></p>
+                {/* <p>{Data?.findings}</p> */}
               </div>
 
               <div className='flex flex-col gap-1 min-h-[250px]'>
                 <h1>Summary:</h1>
-                <p>{Data?.summary}</p>
+                <p dangerouslySetInnerHTML={{ __html: Data?.summary }}></p>
               </div>
 
 

@@ -3,6 +3,7 @@ import { IoIosLogOut } from 'react-icons/io'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { useEffect } from 'react'
 import { useContext } from 'react'
+import Pagination from '@mui/material/Pagination';
 import AlertContext from '../Context/Alert/AlertContext'
 
 const ApprovedUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => {
@@ -14,10 +15,21 @@ const ApprovedUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
 
+    const [TotalPages, setTotalPages] = useState(0)
+    const [TotalOrder, setTotalOrder] = useState(0)
+    const [page, setPage] = useState(1);
+    const ordersPerPage = 20;
+
+    const handleChange = (event, value) => {
+        setPage(value);
+    };
+
     const [userrole, setuserrole] = useState('Doctor')
 
 
     const getuser = async () => {
+        const startIndex = (page - 1) * ordersPerPage;
+        const endIndex = startIndex + ordersPerPage;
         if (userrole == 'Doctor') {
             fetch(`https://backend.uniprecision.com.my/admin/getAllApprovedDoctors`) // Assuming this is the correct endpoint
                 .then(response => {
@@ -29,7 +41,12 @@ const ApprovedUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => 
                 })
                 .then(data => {
                     if (data.approvedDoctors) {
-                        setUsers(data.approvedDoctors);
+                        // setUsers(data.approvedDoctors);
+
+                        setTotalOrder(data.approvedDoctors.length);
+                        setTotalPages(Math.ceil(data.approvedDoctors.length / ordersPerPage));
+                        // setData(data.pending_reports);
+                        setUsers(data.approvedDoctors.slice(startIndex, endIndex));
                     }
                 })
                 .catch(error => {
@@ -46,7 +63,11 @@ const ApprovedUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => 
                 })
                 .then(data => {
                     if (data.approvedRadio) {
-                        setUsers(data.approvedRadio);
+                        // setUsers(data.approvedRadio);
+                        setTotalOrder(data.approvedRadio.length);
+                        setTotalPages(Math.ceil(data.approvedRadio.length / ordersPerPage));
+                        // setData(data.pending_reports);
+                        setUsers(data.approvedRadio.slice(startIndex, endIndex));
                     }
                 })
                 .catch(error => {
@@ -57,7 +78,7 @@ const ApprovedUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => 
 
     useEffect(() => {
         getuser()
-    }, [userrole])
+    }, [userrole,page])
 
 
     return (
@@ -83,11 +104,14 @@ const ApprovedUser = ({ toggleMenu, handleLogout, OpenModel, setOpenModel }) => 
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>All Approved Users</h2>
 
-                    <div className='flex flex-row justify-between'>
+                    <div className='flex flex-row justify-between items-center'>
                         <select name="" id="" value={userrole} onChange={(e)=>{setuserrole(e.target.value)}} className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'>
                             <option value="Doctor">Doctor</option>
                             <option value="Radiologist">Radiologist</option>
                         </select>
+                        {/* <div className="my-4"> */}
+                        <Pagination count={TotalPages} page={page} onChange={handleChange} variant="outlined" shape="rounded" />
+                    {/* </div> */}
                     </div>
 
                     <div className='overflow-x-scroll'>

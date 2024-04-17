@@ -4,11 +4,21 @@ import { IoIosLogOut } from 'react-icons/io'
 import { Link, useNavigate } from 'react-router-dom'
 import AlertContext from '../../Context/Alert/AlertContext'
 import { convertDateFormat } from '../DateFunction'
+import Pagination from '@mui/material/Pagination';
 
 const AllPaidReports = ({ handleLogout, toggleMenu }) => {
     const [SearchKey, setSearchKey] = useState(null)
     const [Dataset, setDataset] = useState([])
     const [Datasetfilter, setDatasetfilter] = useState([]);
+
+    const [TotalPages, setTotalPages] = useState(0)
+    const [TotalOrder, setTotalOrder] = useState(0)
+    const [page, setPage] = useState(1);
+    const ordersPerPage = 20;
+    
+    const handleChange = (event, value) => {
+        setPage(value);
+      };
 
     useEffect(() => {
         if (SearchKey !== null) {
@@ -35,6 +45,9 @@ const AllPaidReports = ({ handleLogout, toggleMenu }) => {
     const { showAlert } = AletContext;
 
     const getorder = async () => {
+        const startIndex = (page - 1) * ordersPerPage;
+        const endIndex = startIndex + ordersPerPage;
+
         fetch(`https://backend.uniprecision.com.my/doctor/getAllReports/${localStorage.getItem('doctorId')}`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
@@ -45,7 +58,11 @@ const AllPaidReports = ({ handleLogout, toggleMenu }) => {
             .then(data => {
                 if (data.orders) {
                     setDataset(data.orders);
-                    setDatasetfilter(data.orders)
+                    setTotalOrder(data.orders.length);
+                    setTotalPages(Math.ceil(data.orders.length / ordersPerPage));
+
+                    // Slice the orders array based on pagination
+                    setDatasetfilter(data.orders.slice(startIndex, endIndex));
                 }
             })
             .catch(error => {
@@ -55,7 +72,7 @@ const AllPaidReports = ({ handleLogout, toggleMenu }) => {
 
     useEffect(() => {
         getorder()
-    }, []);
+    }, [page]);
 
 
     const navigate = useNavigate()
@@ -85,7 +102,7 @@ const AllPaidReports = ({ handleLogout, toggleMenu }) => {
                         </ol>
                     </div>
 
-                    <div className='flex flex-row justify-between'>
+                    <div className='flex flex-row items-center justify-between'>
                         <input
                             type="text"
                             placeholder='Search'
@@ -93,6 +110,7 @@ const AllPaidReports = ({ handleLogout, toggleMenu }) => {
                             onChange={(e) => { setSearchKey(e.target.value) }}
                             className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'
                         />
+                        <Pagination count={TotalPages} page={page} onChange={handleChange} variant="outlined" shape="rounded" />
                     </div>
 
 
@@ -100,7 +118,7 @@ const AllPaidReports = ({ handleLogout, toggleMenu }) => {
                         <table className=' w-[100%] styled-table'>
                             <thead className='font-Para'>
                                 <tr>
-                                    <th>Report ID</th>
+                                    <th>Order ID</th>
                                     <th>Type</th>
                                     <th>Genrated Date</th>
                                     <th>Patient name</th>
@@ -115,7 +133,7 @@ const AllPaidReports = ({ handleLogout, toggleMenu }) => {
                                         className='font-Para'
                                         key={index}
                                     >
-                                        <td>{item.report_id}</td>
+                                        <td>{item.order_id}</td>
                                         <td>{item.category_name}</td>
                                         <td>{convertDateFormat(item.date_generated)}</td>
                                         <td>{item.patient_name}</td>

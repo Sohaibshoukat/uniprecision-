@@ -4,6 +4,7 @@ import { IoIosLogOut } from 'react-icons/io'
 import { Link, useNavigate } from 'react-router-dom'
 import AlertContext from '../../Context/Alert/AlertContext'
 import { convertDateFormat } from '../DateFunction'
+import Pagination from '@mui/material/Pagination';
 
 const AllNewFiles = ({ handleLogout, toggleMenu }) => {
     const [Dataset, setDataset] = useState([])
@@ -11,7 +12,18 @@ const AllNewFiles = ({ handleLogout, toggleMenu }) => {
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
 
+    const [TotalPages, setTotalPages] = useState(0)
+    const [TotalOrder, setTotalOrder] = useState(0)
+    const [page, setPage] = useState(1);
+    const ordersPerPage = 20;
+
+    const handleChange = (event, value) => {
+        setPage(value);
+    };
+
     const getorder = async () => {
+        const startIndex = (page - 1) * ordersPerPage;
+        const endIndex = startIndex + ordersPerPage;
         fetch(`https://backend.uniprecision.com.my/radiologist/getAllReports/${localStorage.getItem('RadioId')}`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
@@ -21,7 +33,10 @@ const AllNewFiles = ({ handleLogout, toggleMenu }) => {
             })
             .then(data => {
                 if (data.orders) {
-                    setDataset(data.orders);
+                    setTotalOrder(data.orders.length);
+                    setTotalPages(Math.ceil(data.orders.length / ordersPerPage));
+                    setDataset(data.orders.slice(startIndex, endIndex));
+                    // setDataset(data.orders);
                 }
             })
             .catch(error => {
@@ -31,7 +46,7 @@ const AllNewFiles = ({ handleLogout, toggleMenu }) => {
 
     useEffect(() => {
         getorder()
-    }, []);
+    }, [page]);
 
     const navigate = useNavigate()
 
@@ -62,16 +77,9 @@ const AllNewFiles = ({ handleLogout, toggleMenu }) => {
                         </ol>
                     </div>
 
-                    {/* <div className='flex flex-row justify-between'>
-                        <input
-                            type="text"
-                            placeholder='Search'
-                            value={SearchKey}
-                            onChange={(e) => { setSearchKey(e.target.value) }}
-                            className='py-2 px-4 border-2 border-gray-500 placeholder:text-gray-500 text-black rounded-lg font-Para'
-                        />
-                    </div> */}
-
+                    <div className="my-4">
+                        <Pagination count={TotalPages} page={page} onChange={handleChange} variant="outlined" shape="rounded" />
+                    </div>
 
                     <div className='overflow-x-scroll'>
                         <table className='w-[100%] styled-table'>

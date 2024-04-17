@@ -6,14 +6,27 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import AlertContext from '../Context/Alert/AlertContext'
 import { convertDateFormat } from '../Component/DateFunction'
+import Pagination from '@mui/material/Pagination';
+
 
 const Earning = ({ toggleMenu, handleLogout }) => {
     const [Data, setData] = useState([])
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
 
+    const [TotalPages, setTotalPages] = useState(0)
+    const [TotalOrder, setTotalOrder] = useState(0)
+    const [page, setPage] = useState(1);
+    const ordersPerPage = 20;
+
+    const handleChange = (event, value) => {
+        setPage(value);
+    };
+
 
     useEffect(() => {
+        const startIndex = (page - 1) * ordersPerPage;
+        const endIndex = startIndex + ordersPerPage;
         fetch(`https://backend.uniprecision.com.my/admin/allTransactions`) // Assuming this is the correct endpoint
             .then(response => {
                 if (!response.ok) {
@@ -23,13 +36,17 @@ const Earning = ({ toggleMenu, handleLogout }) => {
             })
             .then(data => {
                 if (data.transactions) {
-                    setData(data.transactions);
+                    // setData(data.transactions);
+                    setTotalOrder(data.transactions.length);
+                    setTotalPages(Math.ceil(data.transactions.length / ordersPerPage));
+                    // setData(data.pending_reports);
+                    setData(data.transactions.slice(startIndex, endIndex));
                 }
             })
             .catch(error => {
                 showAlert('Error fetching categories', 'danger');
             });
-    }, []);
+    }, [page]);
 
     return (
         <>
@@ -52,34 +69,36 @@ const Earning = ({ toggleMenu, handleLogout }) => {
             >
                 <div className=''>
                     <h2 className='font-Para text-2xl font-bold mb-4'>All Earning</h2>
-
-<div className='overflow-x-scroll'>
-                    <table className='styled-table w-[100%]'>
-                        <thead className='font-Para'>
-                            <tr>
-                                <th>Transaction ID</th>
-                                <th>Doctor</th>
-                                <th>Amount</th>
-                                <th>Senang Pay Transaction ID</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {Data &&Data?.length>0 && Data?.map((item, index) => (
-                                <tr
-                                    className='font-Para cursor-pointer'
-                                    key={index}
-                                >
-                                    <td>{item.transaction_id}</td>
-                                    <td>{item.name}</td>
-                                    <td>RM {item.amount}</td>
-                                    <td>{item.transaction_ref}</td>
-                                    <td>{convertDateFormat(item.date_generated)}</td>
+                    <div className="my-4">
+                        <Pagination count={TotalPages} page={page} onChange={handleChange} variant="outlined" shape="rounded" />
+                    </div>
+                    <div className='overflow-x-scroll'>
+                        <table className='styled-table w-[100%]'>
+                            <thead className='font-Para'>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Doctor</th>
+                                    <th>Amount</th>
+                                    <th>Senang Pay Transaction ID</th>
+                                    <th>Date</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-</div>
+                            </thead>
+                            <tbody>
+                                {Data && Data?.length > 0 && Data?.map((item, index) => (
+                                    <tr
+                                        className='font-Para cursor-pointer'
+                                        key={index}
+                                    >
+                                        <td>{item.transaction_id}</td>
+                                        <td>{item.name}</td>
+                                        <td>RM {item.amount}</td>
+                                        <td>{item.transaction_ref}</td>
+                                        <td>{convertDateFormat(item.date_generated)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </>
