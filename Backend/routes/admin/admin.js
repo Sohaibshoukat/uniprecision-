@@ -262,11 +262,24 @@ router.post('/updateUserStatus', (req, res) => {
                 return res.status(404).json({ error: 'user not found in respective table' });
             }
 
-            const response = await sendEmailApprove(email, name);
-            if (response.status) {
-                res.json({ success: true });
-            } else {
-                res.json({ success: false });
+            try {
+                const mailOptions = {
+                    from: "uniprecisionsupport@uniprecision.com.my",
+                    to: email,
+                    subject: "Congratulation! Your Account has been Approved",
+                    text: `Hi ${name},
+Your new account request has been approved.
+Please login via https://telerad.uniprecision.com.my/login 
+Thank you!
+If you have any urgent enquiry, please do not hesitate to contact our team directly at admin@uniprecision.com.my or +6010-3837828.
+          
+          
+This is an automated email. Do not reply to this email.`,
+                };
+                await transporter.sendMail(mailOptions);
+                return res.json({ success: true });
+            } catch (error) {
+                return res.json({ success: false,message:error.message });
             }
         });
     });

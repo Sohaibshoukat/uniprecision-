@@ -16,13 +16,13 @@ const transporter = nodemailer.createTransport({
     port: 465,
     secure: true,
     auth: {
-      user: "uniprecisionsupport@uniprecision.com.my",
-      pass: "uniprecision1234",
+        user: "uniprecisionsupport@uniprecision.com.my",
+        pass: "uniprecision1234",
     },
     tls: {
-      rejectUnauthorized: false,
+        rejectUnauthorized: false,
     },
-  });
+});
 
 const sendEmail = async (email, token) => {
     try {
@@ -73,13 +73,20 @@ router.post('/forgot-password', (req, res) => {
                     console.error('Error inserting token:', err);
                     return res.status(500).json({ error: 'Internal Server Error' });
                 }
-
-                const response = await sendEmail(email, token);
-                if (response.status) {
-                    console.log(response)
-                    res.json({ success: true });
-                } else {
-                    res.json({ success: false });
+                try {
+                    const mailOptions = {
+                        from: "uniprecisionsupport@uniprecision.com.my",
+                        to: email,
+                        subject: "Temporary Password for Uniprecision Telerad",
+                        text: `Please login using this password and change it to your preferred password in the User Account page. ${token}.
+                    
+                    
+This is an automated email. Do not reply to this email.`,
+                    };
+                    await transporter.sendMail(mailOptions);
+                    return res.json({ success: true });
+                } catch (error) {
+                    return res.json({ success: false, message: error.message });
                 }
             });
         });
